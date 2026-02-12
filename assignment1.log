@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.16)  12 FEB 2026 10:55
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.16)  12 FEB 2026 11:44
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -57,6 +57,41 @@ Package: times 2020/03/25 PSNFSS-v9.3 (SPQR)
 Package: helvet 2020/03/25 PSNFSS-v9.3 (WaS) 
 ) (C:\Users\bharg\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\courier.sty
 Package: courier 2020/03/25 PSNFSS-v9.3 (WaS) 
+) (C:\Users\bharg\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\mathptmx.sty
+Package: mathptmx 2020/03/25 PSNFSS-v9.3 Times w/ Math, improved (SPQR, WaS) 
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 28.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  OT1/cmr/m/n --> OT1/ztmcm/m/n on input line 28.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/ztmcm/m/n on input line 28.
+LaTeX Font Info:    Redeclaring symbol font `letters' on input line 29.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `normal'
+(Font)                  OML/cmm/m/it --> OML/ztmcm/m/it on input line 29.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `bold'
+(Font)                  OML/cmm/b/it --> OML/ztmcm/m/it on input line 29.
+LaTeX Font Info:    Redeclaring symbol font `symbols' on input line 30.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `normal'
+(Font)                  OMS/cmsy/m/n --> OMS/ztmcm/m/n on input line 30.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
+(Font)                  OMS/cmsy/b/n --> OMS/ztmcm/m/n on input line 30.
+LaTeX Font Info:    Redeclaring symbol font `largesymbols' on input line 31.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
+(Font)                  OMX/cmex/m/n --> OMX/ztmcm/m/n on input line 31.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
+(Font)                  OMX/cmex/m/n --> OMX/ztmcm/m/n on input line 31.
+\symbold=\mathgroup4
+\symitalic=\mathgroup5
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 34.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
+(Font)                  OT1/cmr/bx/n --> OT1/ptm/bx/n on input line 34.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/ptm/bx/n on input line 34.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 35.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
+(Font)                  OT1/cmr/m/it --> OT1/ptm/m/it on input line 35.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
+(Font)                  OT1/cmr/bx/it --> OT1/ptm/m/it on input line 35.
+LaTeX Info: Redefining \hbar on input line 50.
 ) (C:\Users\bharg\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
 Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
  (C:\Users\bharg\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
@@ -315,7 +350,7 @@ Package: titlesec 2025/01/04 v2.17 Sectioning titles
 \titlewidthlast=\dimen196
 \titlewidthfirst=\dimen197
 )
-LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 45.
+LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 46.
  (C:\Users\bharg\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 ) (C:\Users\bharg\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdftex.def
@@ -324,24 +359,24 @@ File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 ) (assignment1.aux)
 \openout1 = `assignment1.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 45.
-LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -399,14 +434,37 @@ File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: hyperref package is loaded.
 Package caption Info: End \AtBeginDocument code.
-Package hyperref Info: Link coloring OFF on input line 45.
+Package hyperref Info: Link coloring OFF on input line 46.
  (assignment1.out) (assignment1.out)
 \@outlinefile=\write3
 \openout3 = `assignment1.out'.
 
  [1
 
-{C:/Users/bharg/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}] (assignment1.toc)
+{C:/Users/bharg/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}] (assignment1.toc
+LaTeX Font Info:    Trying to load font information for OT1+ztmcm on input line 2.
+ (C:\Users\bharg\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1ztmcm.fd
+File: ot1ztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OT1/ztmcm.
+)
+LaTeX Font Info:    Trying to load font information for OML+ztmcm on input line 2.
+ (C:\Users\bharg\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\omlztmcm.fd
+File: omlztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OML/ztmcm.
+)
+LaTeX Font Info:    Trying to load font information for OMS+ztmcm on input line 2.
+ (C:\Users\bharg\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\omsztmcm.fd
+File: omsztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMS/ztmcm.
+)
+LaTeX Font Info:    Trying to load font information for OMX+ztmcm on input line 2.
+ (C:\Users\bharg\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\omxztmcm.fd
+File: omxztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMX/ztmcm.
+)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10.95> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 2.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 2.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 2.
+)
 \tf@toc=\write4
 \openout4 = `assignment1.toc'.
 
@@ -422,17 +480,21 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.68 \newpage
+l.69 \newpage
               [1]
-<Image_B_Original.png, id=78, 370.0224pt x 370.0224pt>
+<Image_B_Original.png, id=98, 370.0224pt x 370.0224pt>
 File: Image_B_Original.png Graphic file (type png)
 <use Image_B_Original.png>
-Package pdftex.def Info: Image_B_Original.png  used on input line 83.
+Package pdftex.def Info: Image_B_Original.png  used on input line 84.
 (pdftex.def)             Requested size: 211.38832pt x 211.38922pt.
-<Image_BT_Binary.png, id=80, 370.0224pt x 370.0224pt>
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 85.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 85.
+<Image_BT_Binary.png, id=100, 370.0224pt x 370.0224pt>
 File: Image_BT_Binary.png Graphic file (type png)
 <use Image_BT_Binary.png>
-Package pdftex.def Info: Image_BT_Binary.png  used on input line 89.
+Package pdftex.def Info: Image_BT_Binary.png  used on input line 90.
 (pdftex.def)             Requested size: 211.38832pt x 211.38922pt.
 
 
@@ -443,16 +505,6 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [2 <./Image_B_Original.png> <./Image_BT_Binary.png>]
-LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 110.
- (C:\Users\bharg\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
-File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
-)
-<Image_C_Size_100.png, id=93, 715.11165pt x 402.5439pt>
-File: Image_C_Size_100.png Graphic file (type png)
-<use Image_C_Size_100.png>
-Package pdftex.def Info: Image_C_Size_100.png  used on input line 128.
-(pdftex.def)             Requested size: 399.29463pt x 224.77196pt.
-
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 13.59999pt, for example:
@@ -461,16 +513,39 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [3]
-<Histograms_Size_100.png, id=101, 868.4445pt x 296.18655pt>
+<Image_C_Size_100.png, id=128, 705.71655pt x 721.9773pt>
+File: Image_C_Size_100.png Graphic file (type png)
+<use Image_C_Size_100.png>
+Package pdftex.def Info: Image_C_Size_100.png  used on input line 158.
+(pdftex.def)             Requested size: 399.29463pt x 408.5018pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.59999pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.59999pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
+
+[4]
+<Histograms_Size_100.png, id=135, 868.4445pt x 296.18655pt>
 File: Histograms_Size_100.png Graphic file (type png)
 <use Histograms_Size_100.png>
-Package pdftex.def Info: Histograms_Size_100.png  used on input line 134.
+Package pdftex.def Info: Histograms_Size_100.png  used on input line 164.
 (pdftex.def)             Requested size: 469.75502pt x 160.20952pt.
-<Component_Description_Table_Size_100.pdf, id=102, 574.54652pt x 233.98315pt>
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.59999pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.59999pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
+
+[5 <./Image_C_Size_100.png>]
+<Component_Description_Table_Size_100.pdf, id=142, 742.57423pt x 233.98315pt>
 File: Component_Description_Table_Size_100.pdf Graphic file (type pdf)
 <use Component_Description_Table_Size_100.pdf>
-Package pdftex.def Info: Component_Description_Table_Size_100.pdf  used on input line 140.
-(pdftex.def)             Requested size: 422.77664pt x 172.17726pt.
+Package pdftex.def Info: Component_Description_Table_Size_100.pdf  used on input line 170.
+(pdftex.def)             Requested size: 422.77664pt x 133.21468pt.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -479,30 +554,31 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[4 <./Image_C_Size_100.png> <./Histograms_Size_100.png>]
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 13.59999pt, for example:
-(fancyhdr)                \setlength{\headheight}{13.59999pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
-
-[5 <./Component_Description_Table_Size_100.pdf>]
-<Image_C_Size_500.png, id=177, 715.11165pt x 402.5439pt>
+[6 <./Histograms_Size_100.png> <./Component_Description_Table_Size_100.pdf>]
+<Image_C_Size_500.png, id=213, 697.04414pt x 719.44785pt>
 File: Image_C_Size_500.png Graphic file (type png)
 <use Image_C_Size_500.png>
-Package pdftex.def Info: Image_C_Size_500.png  used on input line 151.
-(pdftex.def)             Requested size: 399.29463pt x 224.77196pt.
-<Histograms_Size_500.png, id=178, 870.01035pt x 296.18655pt>
+Package pdftex.def Info: Image_C_Size_500.png  used on input line 181.
+(pdftex.def)             Requested size: 399.29463pt x 412.13142pt.
+<Histograms_Size_500.png, id=214, 870.01035pt x 296.18655pt>
 File: Histograms_Size_500.png Graphic file (type png)
 <use Histograms_Size_500.png>
-Package pdftex.def Info: Histograms_Size_500.png  used on input line 157.
+Package pdftex.def Info: Histograms_Size_500.png  used on input line 187.
 (pdftex.def)             Requested size: 469.75502pt x 159.92479pt.
-<Component_Description_Table_Size_500.pdf, id=179, 574.54652pt x 208.9416pt>
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.59999pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.59999pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
+
+[7 <./Image_C_Size_500.png>]
+<Component_Description_Table_Size_500.pdf, id=221, 742.57423pt x 208.9416pt>
 File: Component_Description_Table_Size_500.pdf Graphic file (type pdf)
 <use Component_Description_Table_Size_500.pdf>
-Package pdftex.def Info: Component_Description_Table_Size_500.pdf  used on input line 163.
-(pdftex.def)             Requested size: 422.77664pt x 153.75035pt.
+Package pdftex.def Info: Component_Description_Table_Size_500.pdf  used on input line 193.
+(pdftex.def)             Requested size: 422.77664pt x 118.95766pt.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -511,39 +587,35 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[6 <./Image_C_Size_500.png> <./Histograms_Size_500.png>]
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 13.59999pt, for example:
-(fancyhdr)                \setlength{\headheight}{13.59999pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
-
-[7 <./Component_Description_Table_Size_500.pdf>]
-<Image_C_Size_1000.png, id=255, 715.11165pt x 402.5439pt>
+[8 <./Histograms_Size_500.png> <./Component_Description_Table_Size_500.pdf>]
+<Image_C_Size_1000.png, id=291, 677.53125pt x 715.11165pt>
 File: Image_C_Size_1000.png Graphic file (type png)
 <use Image_C_Size_1000.png>
-Package pdftex.def Info: Image_C_Size_1000.png  used on input line 174.
-(pdftex.def)             Requested size: 399.29463pt x 224.77196pt.
-<Histograms_Size_1000.png, id=256, 870.01035pt x 296.18655pt>
+Package pdftex.def Info: Image_C_Size_1000.png  used on input line 204.
+(pdftex.def)             Requested size: 399.29463pt x 421.45392pt.
+<Histograms_Size_1000.png, id=292, 870.01035pt x 296.18655pt>
 File: Histograms_Size_1000.png Graphic file (type png)
 <use Histograms_Size_1000.png>
-Package pdftex.def Info: Histograms_Size_1000.png  used on input line 180.
+Package pdftex.def Info: Histograms_Size_1000.png  used on input line 210.
 (pdftex.def)             Requested size: 469.75502pt x 159.92479pt.
-<Component_Description_Table_Size_1000.pdf, id=257, 574.54652pt x 183.90004pt>
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.59999pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.59999pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
+
+[9 <./Image_C_Size_1000.png>]
+<Component_Description_Table_Size_1000.pdf, id=299, 742.57423pt x 183.90004pt>
 File: Component_Description_Table_Size_1000.pdf Graphic file (type pdf)
 <use Component_Description_Table_Size_1000.pdf>
-Package pdftex.def Info: Component_Description_Table_Size_1000.pdf  used on input line 186.
-(pdftex.def)             Requested size: 422.77664pt x 135.32344pt.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 13.59999pt, for example:
-(fancyhdr)                \setlength{\headheight}{13.59999pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
-
-[8 <./Image_C_Size_1000.png> <./Histograms_Size_1000.png>]
+Package pdftex.def Info: Component_Description_Table_Size_1000.pdf  used on input line 216.
+(pdftex.def)             Requested size: 422.77664pt x 104.70064pt.
+LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 228.
+ (C:\Users\bharg\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
+File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
+)
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 13.59999pt, for example:
@@ -551,7 +623,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[9 <./Component_Description_Table_Size_1000.pdf>]
+[10 <./Histograms_Size_1000.png> <./Component_Description_Table_Size_1000.pdf>]
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 13.59999pt, for example:
@@ -559,26 +631,34 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[10] (assignment1.aux)
+[11]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.59999pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.59999pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
+
+[12] (assignment1.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-10-24>
  ***********
 Package rerunfilecheck Info: File `assignment1.out' has not changed.
-(rerunfilecheck)             Checksum: 0D368FE1BEE52CFD45B623F240148844;2562.
+(rerunfilecheck)             Checksum: 08F1003105A08BD5A3F9C03E3851822E;3439.
  ) 
 Here is how much of TeX's memory you used:
- 12136 strings out of 467871
- 196869 string characters out of 5418375
- 610245 words of memory out of 5000000
- 40832 multiletter control sequences out of 15000+600000
- 643178 words of font info for 69 fonts, out of 8000000 for 9000
+ 12293 strings out of 467871
+ 199729 string characters out of 5418375
+ 614277 words of memory out of 5000000
+ 40941 multiletter control sequences out of 15000+600000
+ 664358 words of font info for 109 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,11n,79p,413b,588s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on assignment1.pdf (11 pages, 1509424 bytes).
+ 75i,12n,79p,413b,606s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/urw/symbol/usyr.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/urw/symbol/usyr.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
+Output written on assignment1.pdf (13 pages, 1557757 bytes).
 PDF statistics:
- 395 PDF objects out of 1000 (max. 8388607)
- 36 named destinations out of 1000 (max. 500000)
- 160 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 435 PDF objects out of 1000 (max. 8388607)
+ 50 named destinations out of 1000 (max. 500000)
+ 192 words of extra memory for PDF output out of 10000 (max. 10000000)
 

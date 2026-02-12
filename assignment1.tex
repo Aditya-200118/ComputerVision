@@ -13,6 +13,7 @@
 \usepackage{times}          % Times New Roman-ish
 \usepackage[scaled]{helvet} % Helvetica-ish
 \usepackage{courier}        % Courier
+\usepackage{mathptmx}       % Math font matching Times
 
 % Figures & graphics
 \usepackage{graphicx}
@@ -95,7 +96,7 @@ The input image ($B$) was converted to a binary image ($B_T$) using a threshold 
 % ============================================================
 % 2. METHODOLOGY
 % ============================================================
-\section{Methodology}
+\section{Methodology and Mathematical Formulation}
 
 \subsection{Connected Component Labeling (CCL)}
 An iterative 4-connected CCL algorithm was implemented. The process involved two passes:
@@ -104,14 +105,43 @@ An iterative 4-connected CCL algorithm was implemented. The process involved two
     \item \textbf{Second Pass:} Equivalences were resolved to merge connected components, and a final re-labeling step normalized the IDs to sequential integers (1, 2, 3...) for clarity.
 \end{enumerate}
 
-\subsection{Feature Extraction}
-For each component, geometric moments were calculated to derive:
-\begin{itemize}
-    \item \textbf{Centroid $(x_c, y_c)$:} The center of mass (Smith, 2018).
-    \item \textbf{Orientation ($\theta$):} Calculated using central moments to minimize the second moment of inertia (Johnson, 2018).
-    \item \textbf{Principal Axes:} The major and minor axes were derived from the eigenvalues of the covariance matrix ($I_{max}, I_{min}$) (Lee \& Kim, 2019).
-    \item \textbf{Eccentricity:} Defined as $\sqrt{1 - (I_{min}/I_{max})}$, used to classify shapes as Compact, Oval, or Elongated (Garcia, 2020).
-\end{itemize}
+\subsection{Feature Extraction Formulation}
+For each labeled component, geometric properties were derived using zeroth, first, and second-order moments.
+
+\subsubsection{Area and Centroid}
+The area $A$ is defined as the total number of pixels in the component. The centroid $(x_c, y_c)$ is calculated as:
+\begin{equation}
+    x_c = \frac{1}{A} \sum_{i,j \in R} j, \quad y_c = \frac{1}{A} \sum_{i,j \in R} i
+\end{equation}
+where $j$ corresponds to the column index (x-coordinate) and $i$ corresponds to the row index (y-coordinate).
+
+\subsubsection{Central Moments}
+To determine orientation, coordinates were normalized relative to the centroid:
+\begin{equation}
+    x' = j - x_c, \quad y' = i - y_c
+\end{equation}
+The second-order central moments $a$, $b$, and $c$ were computed as:
+\begin{align}
+    a &= \sum (x')^2 \\
+    b &= 2 \sum (x' y') \\
+    c &= \sum (y')^2
+\end{align}
+
+\subsubsection{Orientation and Principal Axes}
+The orientation $\theta$ of the axis of elongation (the axis of least inertia) is given by:
+\begin{equation}
+    \theta = \frac{1}{2} \arctan \left( \frac{b}{a - c} \right)
+\end{equation}
+The principal moments of inertia, $I_{max}$ and $I_{min}$, representing the major and minor axes variances, are:
+\begin{equation}
+    I_{max}, I_{min} = \frac{(a + c) \pm \sqrt{(a - c)^2 + b^2}}{2}
+\end{equation}
+
+\subsubsection{Eccentricity}
+Eccentricity was calculated to classify the shapes (Compact vs. Elongated):
+\begin{equation}
+    \text{Eccentricity} = \sqrt{1 - \frac{I_{min}}{I_{max}}}
+\end{equation}
 
 % ============================================================
 % 3. RESULTS
@@ -193,7 +223,7 @@ At the highest threshold, only the largest primary objects remain.
 \section{Discussion and Analysis}
 
 \subsection{Noise Analysis and Size Filter Trade-off}
-As the minimum size specification increases, smaller components are progressively suppressed[cite: 7]. 
+As the minimum size specification increases, smaller components are progressively suppressed. 
 \begin{itemize}
     \item At \textbf{T=100}, the system detects fine details but includes granular noise (likely artifacts from thresholding).
     \item At \textbf{T=1000}, the system acts as a high-pass spatial filter, retaining only the dominant structures. 
