@@ -273,11 +273,11 @@ def save_component_description_table(props, size_thresh):
         "ID",
         "Area",
         "Centroid",
-        "BBox",
-        "Orient(deg)",
-        "Eccen.",
-        "Perim.",
-        "Compact.",
+        "Bounding Box",
+        "Orientation(deg)",
+        "Eccentricity",
+        "Perimeter",
+        "Compactness",
     ]
     table_data = []
 
@@ -311,7 +311,7 @@ def save_component_description_table(props, size_thresh):
         colLabels=column_labels,
         loc="center",
         cellLoc="center",
-        colWidths=[0.05, 0.1, 0.15, 0.2, 0.12, 0.1, 0.1, 0.1],
+        colWidths=[0.05, 0.1, 0.15, 0.2, 0.2, 0.2, 0.2, 0.2],
     )
 
     table.auto_set_font_size(False)
@@ -321,6 +321,7 @@ def save_component_description_table(props, size_thresh):
     for (row, col), cell in table.get_celld().items():
         cell.set_edgecolor("black")
         cell.set_linewidth(0.5)
+        cell.get_text().set_wrap(True)
         if row == 0:
             cell.set_text_props(weight="bold")
             cell.set_facecolor("#eaeaea")
@@ -386,7 +387,7 @@ def visualize_results(original, labels, props, size_thresh):
             edgecolor="white",
             facecolor="none",
             linestyle=":",
-            alpha=0.7,
+            alpha=0.9,
         )
         ax.add_patch(rect)
 
