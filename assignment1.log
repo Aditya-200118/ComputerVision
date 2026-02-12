@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.16)  11 FEB 2026 23:33
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.16)  12 FEB 2026 09:14
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -461,12 +461,21 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [3]
-<Histograms_Size_100.png, id=101, 884.3439pt x 296.18655pt>
+<Histograms_Size_100.png, id=101, 868.4445pt x 296.18655pt>
 File: Histograms_Size_100.png Graphic file (type png)
 <use Histograms_Size_100.png>
 Package pdftex.def Info: Histograms_Size_100.png  used on input line 134.
-(pdftex.def)             Requested size: 469.75502pt x 157.33516pt.
-<Component_Description_Table_Size_100.pdf, id=102, 574.54652pt x 233.98315pt>
+(pdftex.def)             Requested size: 469.75502pt x 160.20952pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.59999pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.59999pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
+
+[4 <./Image_C_Size_100.png>]
+<Component_Description_Table_Size_100.pdf, id=108, 574.54652pt x 233.98315pt>
 File: Component_Description_Table_Size_100.pdf Graphic file (type pdf)
 <use Component_Description_Table_Size_100.pdf>
 Package pdftex.def Info: Component_Description_Table_Size_100.pdf  used on input line 140.
@@ -479,25 +488,17 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[4 <./Image_C_Size_100.png> <./Histograms_Size_100.png>]
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 13.59999pt, for example:
-(fancyhdr)                \setlength{\headheight}{13.59999pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
-
-[5 <./Component_Description_Table_Size_100.pdf>]
+[5 <./Histograms_Size_100.png> <./Component_Description_Table_Size_100.pdf>]
 <Image_C_Size_500.png, id=177, 697.04414pt x 719.44785pt>
 File: Image_C_Size_500.png Graphic file (type png)
 <use Image_C_Size_500.png>
 Package pdftex.def Info: Image_C_Size_500.png  used on input line 151.
 (pdftex.def)             Requested size: 399.29463pt x 412.13142pt.
-<Histograms_Size_500.png, id=178, 885.90974pt x 296.18655pt>
+<Histograms_Size_500.png, id=178, 870.01035pt x 296.18655pt>
 File: Histograms_Size_500.png Graphic file (type png)
 <use Histograms_Size_500.png>
 Package pdftex.def Info: Histograms_Size_500.png  used on input line 157.
-(pdftex.def)             Requested size: 469.75502pt x 157.05043pt.
+(pdftex.def)             Requested size: 469.75502pt x 159.92479pt.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -526,11 +527,11 @@ File: Image_C_Size_1000.png Graphic file (type png)
 <use Image_C_Size_1000.png>
 Package pdftex.def Info: Image_C_Size_1000.png  used on input line 174.
 (pdftex.def)             Requested size: 399.29463pt x 421.45392pt.
-<Histograms_Size_1000.png, id=256, 879.5259pt x 296.18655pt>
+<Histograms_Size_1000.png, id=256, 870.01035pt x 296.18655pt>
 File: Histograms_Size_1000.png Graphic file (type png)
 <use Histograms_Size_1000.png>
 Package pdftex.def Info: Histograms_Size_1000.png  used on input line 180.
-(pdftex.def)             Requested size: 469.75502pt x 158.19385pt.
+(pdftex.def)             Requested size: 469.75502pt x 159.92479pt.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -586,7 +587,7 @@ Here is how much of TeX's memory you used:
  1141 hyphenation exceptions out of 8191
  75i,11n,79p,413b,588s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/bharg/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on assignment1.pdf (12 pages, 1710017 bytes).
+Output written on assignment1.pdf (12 pages, 1571731 bytes).
 PDF statistics:
  402 PDF objects out of 1000 (max. 8388607)
  37 named destinations out of 1000 (max. 500000)

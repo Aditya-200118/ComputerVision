@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from collections import defaultdict
 import math
-
+from matplotlib.ticker import MaxNLocator
 # ============================================================
 # CONFIGURATION & STYLE (ACADEMIC)
 # ============================================================
@@ -438,15 +438,15 @@ def visualize_results(original, labels, props, size_thresh):
         axes[0].hist(areas, bins=10, color="skyblue", edgecolor="black")
         axes[0].set_title("Area Distribution")
         axes[0].set_xlabel("Pixels")
-
+        axes[0].yaxis.set_major_locator(MaxNLocator(integer=True))
         axes[1].hist(eccs, bins=10, range=(0, 1), color="salmon", edgecolor="black")
         axes[1].set_title("Eccentricity Distribution")
         axes[1].set_xlabel("0 (Circle) -> 1 (Line)")
-
+        axes[1].yaxis.set_major_locator(MaxNLocator(integer=True))
         axes[2].hist(comps, bins=10, color="lightgreen", edgecolor="black")
         axes[2].set_title("Compactness Distribution")
         axes[2].set_xlabel("P^2 / Area")
-
+        axes[2].yaxis.set_major_locator(MaxNLocator(integer=True))
         fig_hist.suptitle(f"Feature Statistics (Size ≥ {size_thresh})", fontsize=14)
         hist_file = f"Histograms_Size_{size_thresh}.png"
         plt.savefig(hist_file, bbox_inches="tight")
