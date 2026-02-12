@@ -31,8 +31,8 @@ def load_and_preprocess(path):
         original = img.reshape((512, 512))
         binary = (original > 128).astype(np.uint8)
 
-        if np.sum(binary) > (binary.size // 2):
-            binary = 1 - binary
+        #inverting the image
+        binary = 1 - binary
 
         return original, binary
     except FileNotFoundError:
@@ -503,7 +503,7 @@ if __name__ == "__main__":
     # 1. Preprocess
     original_img, binary_mask = load_and_preprocess("comb.img")
     plt.imsave("Image_B_Original.png", original_img, cmap="gray")
-    plt.imsave("Image_BT_Binary.png", binary_mask, cmap="gray")
+    plt.imsave("Image_BT_Binary.png", binary_mask, cmap="gray", vmin=0, vmax = 1)
 
     # 2. Segment
     raw_labels = label_components(binary_mask)
