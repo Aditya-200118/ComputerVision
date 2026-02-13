@@ -355,7 +355,7 @@ def visualize_results(labels, props, size_thresh, global_colors, mapping):
 
     outfile = f"Image_C_Size_{size_thresh}.png"
     plt.tight_layout()
-    plt.savefig(outfile, bbox_inches="tight", dpi=600)
+    plt.savefig(outfile, bbox_inches="tight", dpi=600, facecolor="#fdf6e3")
     plt.close()
     print(f"[Saved] {outfile}")
 
