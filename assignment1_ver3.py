@@ -15,7 +15,6 @@ plt.rcParams.update(
 
 
 def load_and_preprocess(path):
-    """Loads raw image, strips header, returns original and binary."""
     try:
         with open(path, "rb") as f:
             _ = f.read(512)
@@ -24,8 +23,7 @@ def load_and_preprocess(path):
         original = img.reshape((512, 512))
         binary = (original > 128).astype(np.uint8)
 
-        if np.sum(binary) > (binary.size // 2):
-            binary = 1 - binary
+        binary = 1 - binary
 
         return original, binary
     except FileNotFoundError:
@@ -280,10 +278,10 @@ def visualize_results(labels, props, size_thresh):
             max_x - min_x,
             max_y - min_y,
             linewidth=0.8,
-            edgecolor="white",
+            edgecolor="#FF6B35",
             facecolor="none",
-            linestyle=":",
-            alpha=0.7,
+            linestyle="--",
+            alpha=1.0,
         )
         ax.add_patch(rect)
 
@@ -328,15 +326,12 @@ def visualize_results(labels, props, size_thresh):
 if __name__ == "__main__":
     print("Starting\n")
 
-    # 1. Loading and Preprocess
     original_img, binary_mask = load_and_preprocess("comb.img")
     plt.imsave("Image_B_Original.png", original_img, cmap="gray")
     plt.imsave("Image_BT_Binary.png", binary_mask, cmap="gray")
 
-    # Segment/Label
     raw_labels = label_components(binary_mask)
 
-    # 3. Analyze
     size_filters = [100, 500, 1000]
 
     for size in size_filters:
