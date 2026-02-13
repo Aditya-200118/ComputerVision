@@ -184,52 +184,65 @@ where $P$ is the perimeter and $A$ is the area.
 
 \section{Experimental Results}
 The algorithm was evaluated across three minimum size thresholds: 100, 500, and 1000 pixels.\\
-\textbf{\textit{Note:}} Kindly correlate the Labeled Components in Figure 2, Figure 4 and Figure 6 with Component Description Table Figure 3, Figure 5 and Figure 7 respectively.
+\textbf{\textit{Note:}} Kindly correlate the Labeled Components with their respective Feature Tables: For Case 1 refer to Figure 2, and for Case 2 (Figure 3) and Case 3 (Figure 5) refer to Figure 4 and Figure 6 respectively.
 
 \subsection{Case 1: Minimum Size Threshold = 100}
-At $T_{size}=100$, the algorithm labels artifacts/noise in the image as components along with primary objects of interest as shown in $Figure \ 2$.
+At $T_{size}=100$, the algorithm labels artifacts/noise in the image as components along with primary objects of interest as shown in Figure 2. 
 
 \begin{figure}[H]
     \centering
-    % Labeled Components Image
-    \includegraphics[width=0.7\textwidth]{Image_C_Size_100.png}
-    \vspace{0.3cm} % small gap
-    % Table
-    \includegraphics[width=0.9\textwidth]{Component_Description_Table_Size_100.pdf}
+    % Reduced width slightly to prevent page overflow
+    \includegraphics[width=0.62\textwidth]{Image_C_Size_100.png}
+    \vspace{0.1cm} 
+    \includegraphics[width=0.85\textwidth]{Component_Description_Table_Size_100.pdf}
     \caption{Labeled Components and Corresponding Feature Table for Case 1}
 \end{figure}
-
+\newpage
 \subsection{Case 2: Minimum Size Threshold = 500}
 Increasing the threshold effectively filters out noise while correctly labelling the primary objects.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{Image_C_Size_500.png}
+    \includegraphics[width=0.7\textwidth]{Image_C_Size_500.png}
     \caption{Labeled Components ($Size \ge 500$).}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Component_Description_Table_Size_500.pdf}
-    \caption{Extracted Features for Case 2 .}
+    \includegraphics[width=0.85\textwidth]{Component_Description_Table_Size_500.pdf}
+    \caption{Extracted Features for Case 2.}
 \end{figure}
-
+\newpage
 \subsection{Case 3: Minimum Size Threshold = 1000}
-At $T_{size}=1000$, leaves only the most significant geometric structures.
+At $T_{size}=1000$, only the most significant geometric structures remain.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{Image_C_Size_1000.png}
+    \includegraphics[width=0.7\textwidth]{Image_C_Size_1000.png}
     \caption{Labeled Components ($Size \ge 1000$).}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Component_Description_Table_Size_1000.pdf}
-    \caption{Extracted Features for Case 3 .}
+    \includegraphics[width=0.85\textwidth]{Component_Description_Table_Size_1000.pdf}
+    \caption{Extracted Features for Case 3.}
 \end{figure}
 
-\section{Discussion and Analysis}
+\newpage
+\section{Analysis}
+\subsection{Component Descriptions}
+The following components were identified and analyzed based on their geometric properties and attributes:
+
+\begin{description}
+    \item[Hammer:] The largest component in the scene with an area of 19,762 pixels. It exhibits an elongation of 5.54 and a distinct orientation of approximately -19.6$^\circ$.
+    \item[Wrench:] A highly elongated tool-shaped object with an area of 15,327 pixels and a near-vertical orientation of 79.0$^\circ$.
+    \item[Hexagon:] A compact geometric shape with the lowest eccentricity (0.388) among the primary objects, indicating a more equilateral structure.
+    \item[Triangle:] A mid-sized geometric component with an area of 8,913 pixels and a relatively low elongation of 1.49.
+    \item[Cyan Base:] A wide, horizontal structure spanning the bottom of the frame. It has the highest perimeter (1,200 pixels) and a very high elongation of 158.65 due to its thin, wide aspect ratio.
+    \item[Orange Sliver (Noise):] A thin vertical artifact located at the top-right edge with an area of 620 pixels. It is removed when the size threshold is increased to 1000.
+    \item[Small Fragment (Noise):] A tiny vertical sliver with an area of only 119 pixels, which is immediately filtered out at any threshold above 100.
+\end{description}
+
 \subsection{Noise Analysis and Size Filter Trade-off}
 The experimental results highlight a fundamental trade-off:
 \begin{itemize}
@@ -241,7 +254,7 @@ The experimental results highlight a fundamental trade-off:
 To ensure the accuracy of the moment-based orientation, the invariant property $I_{max} + I_{min} = a + c$ was calculated. The error was consistently negligible ($6.0\times10^{-8}$), validating the orientation calculation and axis visualization.
 
 \section{Conclusion}
-The iterative CCL algorithm effectively labelled the components in the test image.
+The iterative CCL algorithm effectively labelled the components in the test image. The 1000-pixel threshold successfully isolates the Wrench, Hammer, Hexagon, Triangle, and Base as the primary structural components
 
 \begin{shaded}
 \textbf{\textit{Note:}} For source code kindly refer to appendix at the end.
