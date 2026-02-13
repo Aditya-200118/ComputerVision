@@ -231,6 +231,18 @@ To compute the second-order moments \( a \), \( b \), and \( c \), we start with
 \tan(2\theta) = \frac{b}{a-c}
 \]
 \newpage
+
+\begin{shaded}
+    \begin{equation}
+        a = \sum_{i=1}^{n}\sum_{j=1}^{m}[X^\prime(i,j)]^2 \cdot B(i,j)
+    \end{equation}
+    \begin{equation}
+        b = 2\sum_{i=1}^{n}\sum_{j=1}^{m}[X^\prime(i,j)]^2[Y^\prime(i,j)]^2 \cdot B(i,j)
+    \end{equation}
+    \begin{equation}
+        c = \sum_{i=1}^{n}\sum_{j=1}^{m}[Y^\prime(i,j)]^2 \cdot B(i,j)
+    \end{equation}
+\end{shaded}
 Consider the following expression for \( X^2 \):
 
 \begin{equation}X^2 = \frac{1}{2}(a+c) + \frac{1}{2}(a-c) \cos(2\theta) + \frac{1\cdot b}{2} \sin(2\theta)\end{equation}
@@ -849,7 +861,85 @@ Each node has 4 children or no children (leafnode)
 
 Roof node represents the entire image\\
 A leaf node in the quad tree represents homogenous region otherwise the node is split into 4 child nodes
-\section{OctTree}
+\section*{OctTree}
 3-Dimensional representations
+
+\section{Picture tree}
+\begin{itemize}
+    \item leaf node represent a homogenous region
+    \item a non leaf node is split into child nodes based on containment
+    \item not a regular structure unlike quad and oct tree
+\end{itemize}
+
+\section{Region Adjacency Graph (RAG)}
+Scene Graph (RAG is more specialized variant)
+
+\begin{itemize}
+    \item Nodes: Represent Regions
+    \item Arcs: Represent Common Boundary between two regions
+\end{itemize}
+
+\begin{unnote}
+    Nodes and Arc possess attribtues
+\end{unnote} 
+Node Attributes: Region Attributes
+\begin{itemize}
+    \item Geometric Attributes/Features
+    \item Spectral Attributes (avg gray level, texture, color etc \ldots)
+\end{itemize}
+
+ARC Attributes: Contour Attributes
+\begin{itemize}
+    \item 
+    \item 
+\end{itemize}
+
+\newpage
+\section*{RAG Generation}
+Given a label array $L(i,j)$ one can generate an RAG
+\begin{enumerate}
+    \item Raster Scan the L(i,j)
+    \item Consider pixel (i,j)
+    \begin{itemize}
+        \item If node with label L(i,j) exists then update the node in the RAG to include pixel(i, j)
+        \item else create a new node with label L(i, j) cosnsiting of pixel (i, j)
+    \end{itemize}
+    \item Examine the neighbour pixel (i,j)
+    \begin{itemize}
+        \item if an arc exists between (i, j) and its neighbours region then update it
+        \item else create a new arc
+    \end{itemize}
+    \item Continue with raster scan until all pixels are exhausted
+\end{enumerate}
+
+
+Given the bitmaps $B^\alpha$ (i, j)
+\begin{enumerate}
+    \item Determine the connected components of $B^\alpha(i,j)$ for each $\alpha$
+    \item Create a node for each connected component for all $\alpha$
+    \item Trace the boundary of each cc to generate the arcs between the nodes
+\end{enumerate}
+
+\section{Over Segmentated Image}
+
+\ldots
+
+\section{Merge based segementation}
+
+Over segement the image\\
+Create initial RAG for the over segemented image\\
+visit each node in the RAG\\
+a. conside the adjacent nodes\\
+b. if the current node and its adjacent node satisfies the merge criteria then merge the nodes and update RAG\\
+4. Repeat Step 4 unitl no more merges are possible
+
+\section{Node Selection}
+- Random selection of the node\\
+- Order the nodes based on same criterion and select the best node
+"best" node - longest region (smallest region) \\ 
+- list of all pairs of adjacent nodes and select the best pair for merging
+
+\section{Mean Based}
+$\vert \mu_i - \mu_j \vert$
 \end{document}
 
