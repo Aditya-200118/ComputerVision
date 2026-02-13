@@ -53,8 +53,8 @@
     \vspace*{2in}
     {\bfseries\Large Assignment 1: Connected Component Labeling and Analysis \par}
     \vspace{0.5in}
-    {\Large Your Name \par}
-    {\large UGA ID: 81XXXXXXX \par}
+    {\Large Aditya Bhargava \par}
+    {\large UGA ID: 811235738 \par}
     \vspace{0.5in}
     {\large CSCI 8820: Computer Vision and Pattern Recognition \par}
     {\large Department of Computer Science, University of Georgia \par}
@@ -156,7 +156,7 @@ At this low threshold, the algorithm captures nearly all potential objects but a
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{Image_C_Size_100.png}
-    \caption{Labeled Components ($Size \ge 100$). Overlays show Centroids, Bounding Boxes, and Principal Axes.}
+    \caption{Labeled Components ($Size \ge 100$). \\ Visualization includes Centroids, Bounding Boxes, and Principal Axes}
 \end{figure}
 
 \begin{figure}[H]
@@ -179,7 +179,7 @@ Increasing the threshold eliminates small artifacts, leaving distinct, meaningfu
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{Image_C_Size_500.png}
-    \caption{Labeled Components ($Size \ge 500$). The principal axes (Yellow=Major, Red=Minor) confirm the orientation calculations.}
+    \caption{Labeled Components ($Size \ge 500$). Visualization includes Centroids, Bounding Boxes, and Principal Axes}
 \end{figure}
 
 \begin{figure}[H]
@@ -214,7 +214,7 @@ At the highest threshold, only the largest primary objects remain.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{Component_Description_Table_Size_1000.pdf}
-    \caption{Extracted Features for Size $\ge$ 1000.}
+    \caption{Extracted Features for Size $\ge$ 1000. \\Visualization includes Centroids, Bounding Boxes, and Principal Axes}
 \end{figure}
 
 % ============================================================
@@ -231,7 +231,7 @@ As the minimum size specification increases, smaller components are progressivel
 This demonstrates a clear trade-off: lower thresholds provide high recall of potential features but low precision due to noise, whereas higher thresholds ensure high precision for large objects at the cost of missing finer details.
 
 \subsection{Geometric Validation}
-To verify the correctness of the moment calculations, the property $I_{max} + I_{min} = a + c$ was checked for every component. The error was consistently near machine epsilon ($< 10^{-14}$), confirming that the principal axes visualization (Yellow/Red lines) correctly represents the true mass distribution of the components.
+To verify the correctness of the moment calculations, the property $I_{max} + I_{min} = a + c$ was checked for every component. The error was consistently near 0 ($ 6.0e-{08}$), confirming that the principal axes visualization (Yellow/Red lines) correctly represents the true mass distribution of the components.
 
 \section{Conclusion}
 The iterative CCL algorithm successfully segmented the input image. The feature extraction pipeline provided robust geometric descriptors, and the visual overlay of principal axes confirmed the accuracy of the moment-based orientation calculations.

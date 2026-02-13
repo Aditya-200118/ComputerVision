@@ -2,8 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from collections import defaultdict
-import math
 from matplotlib.ticker import MaxNLocator
+import math
+
 # ============================================================
 # CONFIGURATION & STYLE (ACADEMIC)
 # ============================================================
@@ -31,8 +32,8 @@ def load_and_preprocess(path):
         original = img.reshape((512, 512))
         binary = (original > 128).astype(np.uint8)
 
-        #inverting the image
-        binary = 1 - binary
+        if np.sum(binary) > (binary.size // 2):
+            binary = 1 - binary
 
         return original, binary
     except FileNotFoundError:
@@ -148,6 +149,9 @@ def extract_features(labels):
         Imax = (a + c + term) / 2
         Imin = (a + c - term) / 2
 
+        # Added Elongation Ratio
+        elongation = (Imax / Imin) if Imin > 0 else 0
+
         moment_error = abs((a + c) - (Imax + Imin))
         eccentricity = np.sqrt(1 - (Imin / Imax)) if Imax > 0 else 0
 
@@ -181,6 +185,7 @@ def extract_features(labels):
             "bbox": (min_x, min_y, max_x, max_y),
             "orientation": theta,
             "orientation_deg": theta_deg,
+            "elongation": elongation,  # Added Elongation
             "eccentricity": eccentricity,
             "perimeter": perimeter,  # Added for the new table requirement
             "compactness": compactness,
@@ -203,7 +208,8 @@ def save_analysis_table(props, size_thresh):
     if not props:
         return
 
-    column_labels = ["ID", "Area", "Centroid", "Eccentricity", "Class", "Moment Check"]
+    # Added Elongation column
+    column_labels = ["ID", "Area", "Centroid", "Eccentricity", "Elongation", "Class", "Moment Check"]
     table_data = []
 
     for lab in sorted(props.keys()):
@@ -217,6 +223,7 @@ def save_analysis_table(props, size_thresh):
                 p["area"],
                 f"({xc:.1f}, {yc:.1f})",
                 f"{p['eccentricity']:.4f}",
+                f"{p['elongation']:.2f}",  # Added value
                 p["shape_class"],
                 err_flag,
             ]
@@ -225,7 +232,7 @@ def save_analysis_table(props, size_thresh):
     n_rows = len(table_data) + 1
     fig_height = max(2, n_rows * 0.4)
 
-    fig, ax = plt.subplots(figsize=(8.5, fig_height))
+    fig, ax = plt.subplots(figsize=(10, fig_height)) # Slightly wider for new col
     ax.axis("off")
 
     table = ax.table(
@@ -233,7 +240,8 @@ def save_analysis_table(props, size_thresh):
         colLabels=column_labels,
         loc="center",
         cellLoc="center",
-        colWidths=[0.08, 0.15, 0.25, 0.15, 0.15, 0.20],
+        # Adjusted widths to fit new column
+        colWidths=[0.08, 0.12, 0.22, 0.12, 0.20, 0.20, 0.20], 
     )
 
     table.auto_set_font_size(False)
@@ -269,12 +277,14 @@ def save_component_description_table(props, size_thresh):
         return
 
     # Note: 'ID' is usually needed to identify rows, I will include it as the first column
+    # Added Elong. column
     column_labels = [
         "ID",
         "Area",
         "Centroid",
         "Bounding Box",
-        "Orientation(deg)",
+        "Orient(deg)",
+        "Elongation", # Added
         "Eccentricity",
         "Perimeter",
         "Compactness",
@@ -293,6 +303,7 @@ def save_component_description_table(props, size_thresh):
                 f"({xc:.1f}, {yc:.1f})",
                 f"[{min_x},{min_y},{max_x},{max_y}]",
                 f"{p['orientation_deg']:.1f}",
+                f"{p['elongation']:.2f}", # Added value
                 f"{p['eccentricity']:.3f}",
                 f"{p['perimeter']}",
                 f"{p['compactness']:.2f}",
@@ -303,7 +314,7 @@ def save_component_description_table(props, size_thresh):
     fig_height = max(2, n_rows * 0.45)  # Slightly taller for density
 
     # Wider figure to accommodate BBox and extra columns
-    fig, ax = plt.subplots(figsize=(10, fig_height))
+    fig, ax = plt.subplots(figsize=(11, fig_height)) # Slightly wider
     ax.axis("off")
 
     table = ax.table(
@@ -311,7 +322,8 @@ def save_component_description_table(props, size_thresh):
         colLabels=column_labels,
         loc="center",
         cellLoc="center",
-        colWidths=[0.05, 0.1, 0.15, 0.2, 0.2, 0.2, 0.2, 0.2],
+        # Adjusted widths for 9 columns
+        colWidths=[0.05, 0.08, 0.15, 0.18, 0.12, 0.10, 0.15, 0.15, 0.15],
     )
 
     table.auto_set_font_size(False)
@@ -321,7 +333,6 @@ def save_component_description_table(props, size_thresh):
     for (row, col), cell in table.get_celld().items():
         cell.set_edgecolor("black")
         cell.set_linewidth(0.5)
-        cell.get_text().set_wrap(True)
         if row == 0:
             cell.set_text_props(weight="bold")
             cell.set_facecolor("#eaeaea")
@@ -368,11 +379,18 @@ def visualize_results(original, labels, props, size_thresh):
 
     ax.imshow(colored)
     ax.set_title(
-        f"Image C: Filtered Components (Size ≥ {size_thresh})\n"
-        f"Visualization includes Centroids, Bounding Boxes, and Principal Axes",
+        f"Image C: Filtered Components (Size ≥ {size_thresh})\n",
         pad=15,
     )
     ax.axis("off")
+    # fig.subplots_adjust(bottom=0.12)
+    # fig.text(
+    #     0.5, 0.02,
+    #     "Visualization includes Centroids, Bounding Boxes, and Principal Axes",
+    #     ha="center",
+    #     fontsize=11,
+    #     color="dimgray"
+    # )
 
     for lab, p in props.items():
         xc, yc = p["centroid"]
@@ -387,7 +405,7 @@ def visualize_results(original, labels, props, size_thresh):
             edgecolor="white",
             facecolor="none",
             linestyle=":",
-            alpha=0.9,
+            alpha=0.7,
         )
         ax.add_patch(rect)
 
@@ -476,7 +494,7 @@ def print_statistical_report(props, size_thresh):
     print(f"Moment Val. Err:  {max_moment_error:.1e} (Should be near 0)")
 
     print(
-        f"\n{'ID':<4} {'Area':<8} {'Centroid':<18} {'Eccentricity':<14} {'Class':<10} {'Moment Check'}"
+        f"\n{'ID':<4} {'Area':<8} {'Centroid':<18} {'Eccentricity':<14} {'Elongation':<12} {'Class':<10} {'Moment Check'}"
     )
     print("-" * 80)
 
@@ -489,6 +507,7 @@ def print_statistical_report(props, size_thresh):
             f"{lab:<4} {p['area']:<8} "
             f"({xc:>6.1f}, {yc:>6.1f})    "
             f"{p['eccentricity']:<14.4f} "
+            f"{p['elongation']:<12.2f} "
             f"{p['shape_class']:<10} "
             f"{err_flag}"
         )
@@ -504,7 +523,7 @@ if __name__ == "__main__":
     # 1. Preprocess
     original_img, binary_mask = load_and_preprocess("comb.img")
     plt.imsave("Image_B_Original.png", original_img, cmap="gray")
-    plt.imsave("Image_BT_Binary.png", binary_mask, cmap="gray", vmin=0, vmax = 1)
+    plt.imsave("Image_BT_Binary.png", binary_mask, cmap="gray")
 
     # 2. Segment
     raw_labels = label_components(binary_mask)
