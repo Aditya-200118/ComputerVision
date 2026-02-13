@@ -90,7 +90,7 @@ def label_components(binary_img):
 def generate_color_map(labels):
     unique_labels = np.unique(labels)
     unique_labels = unique_labels[unique_labels != 0]
-    
+
     np.random.seed(29)
     color_map = {}
     for lab in unique_labels:
@@ -146,7 +146,7 @@ def extract_features(labels):
 
         # Elongation Ratio
         elongation = (Imax / Imin) if Imin > 0 else 0
-        
+
         # Moment Error Check
         moment_error = abs((a + c) - (Imax + Imin))
         eccentricity = np.sqrt(1 - (Imin / Imax)) if Imax > 0 else 0
@@ -194,7 +194,7 @@ def save_component_description_table(props, size_thresh):
         "Centroid",
         "Bounding Box",
         "Orient(deg)",
-        "Elongation", 
+        "Elongation",
         "Eccentricity",
         "Perimeter",
         "Compactness",
@@ -220,24 +220,18 @@ def save_component_description_table(props, size_thresh):
             ]
         )
 
-    # Prepare main table and summary data
     total_count = len(props)
     n_rows = len(table_data) + 1
-    
-    # Calculate figure height to accommodate both tables
-    fig_height = max(2.5, (n_rows + 1) * 0.5)  
 
-    # Create two subplots: top for main table, bottom for summary
+    fig_height = max(2.5, (n_rows + 1) * 0.5)
+
     fig, (ax_main, ax_sum) = plt.subplots(
-        2, 1, 
-        figsize=(11, fig_height), 
-        gridspec_kw={'height_ratios': [n_rows, 1]}
+        2, 1, figsize=(11, fig_height), gridspec_kw={"height_ratios": [n_rows, 1]}
     )
-    
+
     ax_main.axis("off")
     ax_sum.axis("off")
 
-    # --- Main Data Table ---
     main_table = ax_main.table(
         cellText=table_data,
         colLabels=column_labels,
@@ -247,7 +241,7 @@ def save_component_description_table(props, size_thresh):
     )
 
     main_table.auto_set_font_size(False)
-    main_table.set_fontsize(9)  
+    main_table.set_fontsize(9)
     main_table.scale(1, 1.5)
 
     for (row, col), cell in main_table.get_celld().items():
@@ -260,37 +254,32 @@ def save_component_description_table(props, size_thresh):
         else:
             cell.set_facecolor("white")
 
-    # --- Summary Table (Single Row) ---
     summary_data = [["Total Components Labelled:", total_count]]
-    
-    # Widths should sum to the same total as the main table (1.13)
+
     sum_table = ax_sum.table(
-        cellText=summary_data,
-        loc="top",
-        cellLoc="center",
-        colWidths=[0.98, 0.15] 
+        cellText=summary_data, loc="top", cellLoc="center", colWidths=[0.98, 0.15]
     )
-    
+
     sum_table.auto_set_font_size(False)
     sum_table.set_fontsize(10)
     sum_table.scale(1, 1.5)
-    
+
     for (row, col), cell in sum_table.get_celld().items():
         cell.set_edgecolor("black")
         cell.set_linewidth(1.0)
         cell.set_text_props(weight="bold")
         if col == 0:
-            cell.set_text_props(ha='center') # Label aligned right
+            cell.set_text_props(ha="center")
             cell.set_facecolor("#f9f9f9")
         else:
-            cell.set_text_props(ha='center')
-            cell.set_facecolor("white") # Value background
+            cell.set_text_props(ha="center")
+            cell.set_facecolor("white")
 
     plt.suptitle(
         f"Component Description Table (Size ≥ {size_thresh})",
         fontsize=12,
         fontweight="bold",
-        y=0.95
+        y=0.95,
     )
 
     outfile = f"Component_Description_Table_Size_{size_thresh}.pdf"
