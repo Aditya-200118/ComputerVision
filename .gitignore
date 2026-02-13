@@ -22,7 +22,8 @@ rpn.py
 *.vrb
 *.log
 *.xdv
-
+*.fls
+*.fdb_latexmk
 # Other editor or OS files
 *~
 *.swp
