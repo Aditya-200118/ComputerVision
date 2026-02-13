@@ -1,2 +1,30 @@
 a.py
 rpn.py
+# LaTeX intermediate/auxiliary files
+*.aux
+*.lof
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+*.blg
+*.bbl
+*.bcf
+*.run.xml
+*.fdb_latexmk
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+*.log
+*.xdv
+*.fls
+*.fdb_latexmk
+# Other editor or OS files
+*~
+*.swp
+.DS_Store
