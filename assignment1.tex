@@ -184,52 +184,52 @@ where $P$ is the perimeter and $A$ is the area.
 
 \section{Experimental Results}
 The algorithm was evaluated across three minimum size thresholds: 100, 500, and 1000 pixels.\\
-\textbf{\textit{Note:}} Kindly correlate the Labeled Components in Figure 2, Figure 4 and Figure 6 with Component Description Table Figure 3, Figure 5 and Figure 7 respectively.
+\textbf{\textit{Note:}} Kindly correlate the Labeled Components with their respective Feature Tables: for Case 1 refer to Figure 2, and for Cases 2 and 3 refer to Figure 4 and Figure 6 respectively.
 
 \subsection{Case 1: Minimum Size Threshold = 100}
-At $T_{size}=100$, the algorithm labels artifacts/noise in the image as components along with primary objects of interest as shown in $Figure \ 2$.
+At $T_{size}=100$, the algorithm labels artifacts/noise in the image as components along with primary objects of interest as shown in Figure 2. 
 
 \begin{figure}[H]
     \centering
-    % Labeled Components Image
-    \includegraphics[width=0.7\textwidth]{Image_C_Size_100.png}
-    \vspace{0.3cm} % small gap
-    % Table
-    \includegraphics[width=0.9\textwidth]{Component_Description_Table_Size_100.pdf}
+    % Reduced width slightly to prevent page overflow
+    \includegraphics[width=0.62\textwidth]{Image_C_Size_100.png}
+    \vspace{0.1cm} 
+    \includegraphics[width=0.85\textwidth]{Component_Description_Table_Size_100.pdf}
     \caption{Labeled Components and Corresponding Feature Table for Case 1}
 \end{figure}
-
+\newpage
 \subsection{Case 2: Minimum Size Threshold = 500}
 Increasing the threshold effectively filters out noise while correctly labelling the primary objects.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{Image_C_Size_500.png}
+    \includegraphics[width=0.7\textwidth]{Image_C_Size_500.png}
     \caption{Labeled Components ($Size \ge 500$).}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Component_Description_Table_Size_500.pdf}
-    \caption{Extracted Features for Case 2 .}
+    \includegraphics[width=0.85\textwidth]{Component_Description_Table_Size_500.pdf}
+    \caption{Extracted Features for Case 2.}
 \end{figure}
-
+\newpage
 \subsection{Case 3: Minimum Size Threshold = 1000}
-At $T_{size}=1000$, leaves only the most significant geometric structures.
+At $T_{size}=1000$, only the most significant geometric structures remain.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{Image_C_Size_1000.png}
+    \includegraphics[width=0.7\textwidth]{Image_C_Size_1000.png}
     \caption{Labeled Components ($Size \ge 1000$).}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{Component_Description_Table_Size_1000.pdf}
-    \caption{Extracted Features for Case 3 .}
+    \includegraphics[width=0.85\textwidth]{Component_Description_Table_Size_1000.pdf}
+    \caption{Extracted Features for Case 3.}
 \end{figure}
 
-\section{Discussion and Analysis}
+\newpage
+\section{Analysis}
 \subsection{Noise Analysis and Size Filter Trade-off}
 The experimental results highlight a fundamental trade-off:
 \begin{itemize}

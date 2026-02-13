@@ -87,6 +87,20 @@ def label_components(binary_img):
     return labels
 
 
+def generate_color_map(labels):
+    unique_labels = np.unique(labels)
+    unique_labels = unique_labels[unique_labels != 0]
+    
+    np.random.seed(29)
+    color_map = {}
+    for lab in unique_labels:
+        color = np.random.rand(3)
+        while np.mean(color) < 0.4:
+            color = np.random.rand(3)
+        color_map[lab] = color
+    return color_map
+
+
 def filter_and_relabel(labels, min_size):
     unique_labels, counts = np.unique(labels, return_counts=True)
     valid_mask = (unique_labels != 0) & (counts >= min_size)
@@ -180,7 +194,7 @@ def save_component_description_table(props, size_thresh):
         "Centroid",
         "Bounding Box",
         "Orient(deg)",
-        "Elongation", # Added
+        "Elongation", 
         "Eccentricity",
         "Perimeter",
         "Compactness",
@@ -199,20 +213,32 @@ def save_component_description_table(props, size_thresh):
                 f"({xc:.1f}, {yc:.1f})",
                 f"[{min_x},{min_y},{max_x},{max_y}]",
                 f"{p['orientation_deg']:.1f}",
-                f"{p['elongation']:.2f}", # Added value
+                f"{p['elongation']:.2f}",
                 f"{p['eccentricity']:.3f}",
                 f"{p['perimeter']}",
                 f"{p['compactness']:.2f}",
             ]
         )
 
+    # Prepare main table and summary data
+    total_count = len(props)
     n_rows = len(table_data) + 1
-    fig_height = max(2, n_rows * 0.45)  
+    
+    # Calculate figure height to accommodate both tables
+    fig_height = max(2.5, (n_rows + 1) * 0.5)  
 
-    fig, ax = plt.subplots(figsize=(11, fig_height)) 
-    ax.axis("off")
+    # Create two subplots: top for main table, bottom for summary
+    fig, (ax_main, ax_sum) = plt.subplots(
+        2, 1, 
+        figsize=(11, fig_height), 
+        gridspec_kw={'height_ratios': [n_rows, 1]}
+    )
+    
+    ax_main.axis("off")
+    ax_sum.axis("off")
 
-    table = ax.table(
+    # --- Main Data Table ---
+    main_table = ax_main.table(
         cellText=table_data,
         colLabels=column_labels,
         loc="center",
@@ -220,11 +246,11 @@ def save_component_description_table(props, size_thresh):
         colWidths=[0.05, 0.08, 0.15, 0.18, 0.12, 0.10, 0.15, 0.15, 0.15],
     )
 
-    table.auto_set_font_size(False)
-    table.set_fontsize(9)  
-    table.scale(1, 1.5)
+    main_table.auto_set_font_size(False)
+    main_table.set_fontsize(9)  
+    main_table.scale(1, 1.5)
 
-    for (row, col), cell in table.get_celld().items():
+    for (row, col), cell in main_table.get_celld().items():
         cell.set_edgecolor("black")
         cell.set_linewidth(0.5)
         if row == 0:
@@ -234,11 +260,37 @@ def save_component_description_table(props, size_thresh):
         else:
             cell.set_facecolor("white")
 
-    plt.title(
+    # --- Summary Table (Single Row) ---
+    summary_data = [["Total Components Labelled:", total_count]]
+    
+    # Widths should sum to the same total as the main table (1.13)
+    sum_table = ax_sum.table(
+        cellText=summary_data,
+        loc="top",
+        cellLoc="center",
+        colWidths=[0.98, 0.15] 
+    )
+    
+    sum_table.auto_set_font_size(False)
+    sum_table.set_fontsize(10)
+    sum_table.scale(1, 1.5)
+    
+    for (row, col), cell in sum_table.get_celld().items():
+        cell.set_edgecolor("black")
+        cell.set_linewidth(1.0)
+        cell.set_text_props(weight="bold")
+        if col == 0:
+            cell.set_text_props(ha='center') # Label aligned right
+            cell.set_facecolor("#f9f9f9")
+        else:
+            cell.set_text_props(ha='center')
+            cell.set_facecolor("white") # Value background
+
+    plt.suptitle(
         f"Component Description Table (Size ≥ {size_thresh})",
-        pad=10,
         fontsize=12,
         fontweight="bold",
+        y=0.95
     )
 
     outfile = f"Component_Description_Table_Size_{size_thresh}.pdf"
@@ -247,19 +299,15 @@ def save_component_description_table(props, size_thresh):
     print(f"[Saved PDF] {outfile}")
 
 
-def visualize_results(labels, props, size_thresh):
+def visualize_results(labels, props, size_thresh, global_colors, mapping):
     fig, ax = plt.subplots(figsize=(10, 10))
 
     colored = np.zeros((*labels.shape, 3))
-    np.random.seed(42)
     colored[:] = [0, 0, 0]
 
-    unique_labs = list(props.keys())
-    for lab in unique_labs:
-        color = np.random.rand(3)
-        while np.mean(color) < 0.4:
-            color = np.random.rand(3)
-        colored[labels == lab] = color
+    for lab in props.keys():
+        original_id = mapping[lab]
+        colored[labels == lab] = global_colors[original_id]
 
     ax.imshow(colored)
     ax.set_title(
@@ -277,11 +325,11 @@ def visualize_results(labels, props, size_thresh):
             (min_x, min_y),
             max_x - min_x,
             max_y - min_y,
-            linewidth=0.8,
-            edgecolor="#FF6B35",
+            linewidth=1.2,
+            edgecolor="cyan",
             facecolor="none",
             linestyle="--",
-            alpha=1.0,
+            alpha=0.9,
         )
         ax.add_patch(rect)
 
@@ -302,23 +350,23 @@ def visualize_results(labels, props, size_thresh):
             xc,
             yc,
             str(lab),
-            color="cyan",
+            color="white",
             fontsize=8,
             fontweight="bold",
             ha="center",
             va="center",
-            bbox=dict(facecolor="black", alpha=0.5, pad=0),
+            bbox=dict(facecolor="black", alpha=0.6, pad=1),
         )
 
     legend_elements = [
         plt.Line2D([0], [0], color="yellow", lw=2, label="Major Axis"),
         plt.Line2D([0], [0], color="red", lw=2, label="Minor Axis"),
     ]
-    ax.legend(handles=legend_elements, loc="upper right", fontsize=8)
+    ax.legend(handles=legend_elements, loc="upper right", fontsize=8, framealpha=0.8)
 
     outfile = f"Image_C_Size_{size_thresh}.png"
     plt.tight_layout()
-    plt.savefig(outfile, bbox_inches="tight", dpi=200)
+    plt.savefig(outfile, bbox_inches="tight", dpi=600)
     plt.close()
     print(f"[Saved] {outfile}")
 
@@ -331,15 +379,16 @@ if __name__ == "__main__":
     plt.imsave("Image_BT_Binary.png", binary_mask, cmap="gray")
 
     raw_labels = label_components(binary_mask)
+    global_colors = generate_color_map(raw_labels)
 
     size_filters = [100, 500, 1000]
 
     for size in size_filters:
-        clean_labels, _ = filter_and_relabel(raw_labels, size)
+        clean_labels, mapping = filter_and_relabel(raw_labels, size)
         features = extract_features(clean_labels)
 
         save_component_description_table(features, size)
 
-        visualize_results(clean_labels, features, size)
+        visualize_results(clean_labels, features, size, global_colors, mapping)
 
     print("Ended")
