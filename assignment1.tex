@@ -1,216 +1,259 @@
 \documentclass[11pt, letterpaper]{article}
 
-% Encoding & margins
+% --- Encoding & Margins ---
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{geometry}
+\usepackage{framed}
+
 \geometry{margin=1in}
 
-% Line spacing
-\usepackage{setspace}
-\doublespacing % APA requirement
+% --- Fonts ---
+\usepackage{mathptmx} % Times New Roman
+\usepackage[scaled]{helvet} 
+\usepackage{courier}
 
-% Fonts (pdflatex-compatible)
-\usepackage{times}          % Times New Roman-ish
-\usepackage[scaled]{helvet} % Helvetica-ish
-\usepackage{courier}        % Courier
-
-% Figures & graphics
+% --- Graphics & Tables ---
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{caption}
 \usepackage{subcaption}
-
-% Math & tables
-\usepackage{amsmath}
 \usepackage{booktabs}
+\usepackage{array}
 
-% Links & headers
+% --- Math ---
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+% --- Code Highlighting ---
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\colorlet{shadecolor}{orange!15}
+\lstset{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=Python
+}
+
+% --- Links & Headers ---
 \usepackage{hyperref}
 \usepackage{fancyhdr}
 
-% APA 7 Headings
-\usepackage{titlesec}
-\titleformat{\section}{\bfseries\centering}{}{0em}{}
-\titleformat{\subsection}{\bfseries}{}{0em}{}
-\titleformat{\subsubsection}{\bfseries\itshape}{}{0em}{}
-
-% Header setup
 \pagestyle{fancy}
 \fancyhf{}
 \rhead{\thepage}
 \lhead{CSCI 8820: Assignment 1}
-\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\headrulewidth}{0.5pt}
 
-
+% ============================================================
+% DOCUMENT START
+% ============================================================
 \begin{document}
 
-% ============================================================
-% TITLE PAGE (APA 7 Student Paper)
-% ============================================================
 \begin{titlepage}
     \centering
     \vspace*{2in}
-    {\bfseries\Large Assignment 1: Connected Component Labeling and Analysis \par}
-    \vspace{0.5in}
-    {\Large Aditya Bhargava \par}
-    {\large UGA ID: 811235738 \par}
-    \vspace{0.5in}
+    {\huge \bfseries Assignment 1: Connected Component Labeling and Analysis \par}
+    \vspace{0.6in}
+    {\Large name \par}
+    {\large UGA ID: 811xxxx \par}
+    \vspace{0.6in}
     {\large CSCI 8820: Computer Vision and Pattern Recognition \par}
     {\large Department of Computer Science, University of Georgia \par}
     {\large February 12, 2026 \par}
 \end{titlepage}
 
-% ============================================================
-% TABLE OF CONTENTS
-% ============================================================
 \newpage
 \tableofcontents
 \newpage
 
-% ============================================================
-% 1. INTRODUCTION & PREPROCESSING
-% ============================================================
 \section{Introduction and Preprocessing}
-This report presents the implementation of an iterative Connected Component Labeling (CCL) algorithm to analyze a grayscale image. The objective is to segment objects from the background, extract geometric features, and analyze the impact of size filtering on object detection.
+This report implements an iterative Connected Component Labeling (CCL) algorithm to segment and analyze objects in a grayscale image. The pipeline involves binary thresholding, labeling, and geometric feature extraction.
 
 \subsection{Thresholding and Binary Mask Generation}
-The input image ($B$) was converted to a binary image ($B_T$) using a threshold value of $T=128$. To ensure the objects of interest were labeled as foreground (1), the algorithm automatically checked the pixel distribution; if the foreground pixels exceeded 50\% of the image area, the binary mask was inverted.
+The input image $B$ was converted to a binary image $B_T$ using a fixed threshold $T=128$. To ensure consistency, the mask was automatically inverted by $B_{T} = 1-B_{T}$.
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{0.45\textwidth}
+    \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=\linewidth]{Image_B_Original.png}
         \caption{Original Grayscale Image ($B$)}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.45\textwidth}
+    \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=\linewidth]{Image_BT_Binary.png}
-        \caption{Thresholded Binary Image ($B_T$)}
+        \caption{Thresholded Binary Image (with inversion) ($B_T$)}
     \end{subfigure}
-    \caption{Preprocessing results showing the conversion from grayscale to binary mask.}
+    \caption{Preprocessing: Conversion from 8-bit grayscale to binary mask.}
 \end{figure}
 
-% ============================================================
-% 2. METHODOLOGY
-% ============================================================
 \section{Methodology}
-
 \subsection{Connected Component Labeling (CCL)}
-An iterative 4-connected CCL algorithm was implemented. The process involved two passes:
+An iterative 4-connected CCL algorithm was implemented using a two-pass approach:
 \begin{enumerate}
-    \item \textbf{First Pass:} The image was raster-scanned. Temporary labels were assigned to foreground pixels based on their top and left neighbors. Label equivalences (collisions) were recorded in a union-find structure.
-    \item \textbf{Second Pass:} Equivalences were resolved to merge connected components, and a final re-labeling step normalized the IDs to sequential integers (1, 2, 3...) for clarity.
+    \item \textbf{First Pass:} Raster-scanning the image and assigning temporary labels based on the 4 connectivity of the top and left neighbors. Collisions were managed via a union-find data structure.
+    \item \textbf{Second Pass:} Resolution of equivalences to merge components and sequential re-labeling of the final IDs.
 \end{enumerate}
+% \newpage
+\subsection{Feature Extraction and Mathematical Models}
 
-\subsection{Feature Extraction}
-For each component, geometric moments were calculated to derive:
+Geometric properties were derived from the zeroth-, first-, and second-order central moments.
+
 \begin{itemize}
-    \item \textbf{Centroid $(x_c, y_c)$:} The center of mass (Smith, 2018).
-    \item \textbf{Orientation ($\theta$):} Calculated using central moments to minimize the second moment of inertia (Johnson, 2018).
-    \item \textbf{Principal Axes:} The major and minor axes were derived from the eigenvalues of the covariance matrix ($I_{max}, I_{min}$) (Lee \& Kim, 2019).
-    \item \textbf{Eccentricity:} Defined as $\sqrt{1 - (I_{min}/I_{max})}$, used to classify shapes as Compact, Oval, or Elongated (Garcia, 2020).
+
+\item \textbf{Area and Centroid:}  
+The area and centroid coordinates of a binary object $B(i,j)$ are defined as
+
+\begin{align}
+A &= \sum_{i=1}^{n} \sum_{j=1}^{m} B(i, j), \\
+X_c &= \frac{1}{A} \sum_{i=1}^{n} \sum_{j=1}^{m} j \, B(i,j), \\
+Y_c &= \frac{1}{A} \sum_{i=1}^{n} \sum_{j=1}^{m} i \, B(i,j),
+\end{align}
+
+where $A$ denotes the object area, and $(X_c, Y_c)$ represents the centroid location.
+
+\item \textbf{Orientation ($\theta$):}  
+The principal axis orientation is obtained by minimizing the second central moment:
+
+\begin{equation}
+\theta = \frac{1}{2} \tan^{-1}\!\left( \frac{b}{a - c} \right),
+\end{equation}
+
+where $a$, $b$, and $c$ are second-order central moments.
+
+\item \textbf{Second-Order Central Moments:}  
+These moments are computed as
+
+% \begin{shaded}
+\begin{align}
+a &= \sum_{i=1}^{n} \sum_{j=1}^{m} [X'(i,j)]^2 \, B(i,j), \\
+b &= 2 \sum_{i=1}^{n} \sum_{j=1}^{m} X'(i,j) Y'(i,j) \, B(i,j), \\
+c &= \sum_{i=1}^{n} \sum_{j=1}^{m} [Y'(i,j)]^2 \, B(i,j),
+\end{align}
+% \end{shaded}
+
+where $X'(i,j) = j - X_c$ and $Y'(i,j) = i - Y_c$ denote centroid-shifted coordinates.
+
+\item \textbf{Eccentricity:}  
+The eccentricity of the object is computed from the eigenvalues of the covariance matrix:
+
+\begin{equation}
+\text{Eccentricity} = \sqrt{1 - \frac{I_{\min}}{I_{\max}}},
+\end{equation}
+
+where $I_{\max}$ and $I_{\min}$ are the major and minor principal moments, respectively.
+\begin{shaded}
+\textbf{\textit{Note:}} Consistency of the moment calculations was verified by checking that the invariant relation $\vert (a + c) - (I_{\max} + I_{\min}) \vert$ remained close to zero. With a maximum absolute error of 
+$6.0 \times 10^{-8}$ across all tests.
+\end{shaded}
+
+
+\item \textbf{Compactness:}  
+Compactness, a measure of shape circularity, is defined as
+
+\begin{equation}
+\text{Compactness} = \frac{P^2}{A},
+\end{equation}
+
+where $P$ is the perimeter and $A$ is the area.
+
 \end{itemize}
 
-% ============================================================
-% 3. RESULTS
-% ============================================================
+
 \section{Experimental Results}
-The algorithm was tested with three minimum size thresholds: 100, 500, and 1000 pixels. The results below illustrate the trade-off between noise reduction and structural detail.
+The algorithm was evaluated across three minimum size thresholds: 100, 500, and 1000 pixels.\\
+\textbf{\textit{Note:}} Kindly correlate the Labeled Components in Figure 2, Figure 4 and Figure 6 with Component Description Table Figure 3, Figure 5 and Figure 7 respectively.
 
-% --- SIZE 100 ---
 \subsection{Case 1: Minimum Size Threshold = 100}
-At this low threshold, the algorithm captures nearly all potential objects but also retains significant noise.
+At $T_{size}=100$, the algorithm labels artifacts/noise in the image as components along with primary objects of interest as shown in $Figure \ 2$.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{Image_C_Size_100.png}
-    \caption{Labeled Components ($Size \ge 100$). \\ Visualization includes Centroids, Bounding Boxes, and Principal Axes}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Histograms_Size_100.png}
-    \caption{Feature distribution for size threshold 100.}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
+    % Labeled Components Image
+    \includegraphics[width=0.7\textwidth]{Image_C_Size_100.png}
+    \vspace{0.3cm} % small gap
+    % Table
     \includegraphics[width=0.9\textwidth]{Component_Description_Table_Size_100.pdf}
-    \caption{Extracted Features for Size $\ge$ 100.}
+    \caption{Labeled Components and Corresponding Feature Table for Case 1}
 \end{figure}
 
-\newpage
-% --- SIZE 500 ---
 \subsection{Case 2: Minimum Size Threshold = 500}
-Increasing the threshold eliminates small artifacts, leaving distinct, meaningful components.
+Increasing the threshold effectively filters out noise while correctly labelling the primary objects.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{Image_C_Size_500.png}
-    \caption{Labeled Components ($Size \ge 500$). Visualization includes Centroids, Bounding Boxes, and Principal Axes}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1.0\textwidth]{Histograms_Size_500.png}
-    \caption{Feature distribution for size threshold 500.}
+    \includegraphics[width=0.75\textwidth]{Image_C_Size_500.png}
+    \caption{Labeled Components ($Size \ge 500$).}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{Component_Description_Table_Size_500.pdf}
-    \caption{Extracted Features for Size $\ge$ 500.}
+    \caption{Extracted Features for Case 2 .}
 \end{figure}
 
-\newpage
-% --- SIZE 1000 ---
 \subsection{Case 3: Minimum Size Threshold = 1000}
-At the highest threshold, only the largest primary objects remain.
+At $T_{size}=1000$, leaves only the most significant geometric structures.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{Image_C_Size_1000.png}
+    \includegraphics[width=0.75\textwidth]{Image_C_Size_1000.png}
     \caption{Labeled Components ($Size \ge 1000$).}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{Histograms_Size_1000.png}
-    \caption{Feature distribution for size threshold 1000.}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
     \includegraphics[width=0.9\textwidth]{Component_Description_Table_Size_1000.pdf}
-    \caption{Extracted Features for Size $\ge$ 1000. \\Visualization includes Centroids, Bounding Boxes, and Principal Axes}
+    \caption{Extracted Features for Case 3 .}
 \end{figure}
 
-% ============================================================
-% 4. DISCUSSION & ANALYSIS
-% ============================================================
 \section{Discussion and Analysis}
-
 \subsection{Noise Analysis and Size Filter Trade-off}
-As the minimum size specification increases, smaller components are progressively suppressed[cite: 7]. 
+The experimental results highlight a fundamental trade-off:
 \begin{itemize}
-    \item At \textbf{T=100}, the system detects fine details but includes granular noise (likely artifacts from thresholding).
-    \item At \textbf{T=1000}, the system acts as a high-pass spatial filter, retaining only the dominant structures. 
+    \item \textbf{Lower Threshold (100 \& 500):} Small noise components are detected as objects.
+    \item \textbf{High Threshold (1000):} Fine structural details may be lost if they do not meet the pixel count $(T_{size})$ requirement.
 \end{itemize}
-This demonstrates a clear trade-off: lower thresholds provide high recall of potential features but low precision due to noise, whereas higher thresholds ensure high precision for large objects at the cost of missing finer details.
 
 \subsection{Geometric Validation}
-To verify the correctness of the moment calculations, the property $I_{max} + I_{min} = a + c$ was checked for every component. The error was consistently near 0 ($ 6.0e-{08}$), confirming that the principal axes visualization (Yellow/Red lines) correctly represents the true mass distribution of the components.
+To ensure the accuracy of the moment-based orientation, the invariant property $I_{max} + I_{min} = a + c$ was calculated. The error was consistently negligible ($6.0\times10^{-8}$), validating the orientation calculation and axis visualization.
 
 \section{Conclusion}
-The iterative CCL algorithm successfully segmented the input image. The feature extraction pipeline provided robust geometric descriptors, and the visual overlay of principal axes confirmed the accuracy of the moment-based orientation calculations.
+The iterative CCL algorithm effectively labelled the components in the test image.
+
+\begin{shaded}
+\textbf{\textit{Note:}} For source code kindly refer to appendix at the end.
+\end{shaded}
 
 \newpage
-% ============================================================
-% APPENDIX: CODE
-% ============================================================
 \section*{Appendix: Source Code}
-\textit{(Attach your Python code hardcopy here if required, or submit as separate file.)}
+The following Python script was used to perform all operations described in this report.
+
+\begin{lstlisting}
+# Paste your python code here. 
+# It will be formatted automatically with syntax highlighting.
+\end{lstlisting}
 
 \end{document}
