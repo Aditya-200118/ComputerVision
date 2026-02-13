@@ -28,3 +28,5 @@ rpn.py
 *~
 *.swp
 .DS_Store
+
+*.pdf
