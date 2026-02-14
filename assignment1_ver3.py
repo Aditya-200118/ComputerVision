@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from collections import defaultdict
+from matplotlib.ticker import MaxNLocator
 
 plt.rcParams.update(
     {
@@ -168,6 +169,13 @@ def extract_features(labels):
 
         compactness = (perimeter**2) / area
 
+        if eccentricity < 0.6:
+            shape_class = "Compact"
+        elif eccentricity < 0.9:
+            shape_class = "Oval"
+        else:
+            shape_class = "Elongated"
+
         props[lab] = {
             "area": area,
             "centroid": (xc, yc),
@@ -178,9 +186,77 @@ def extract_features(labels):
             "eccentricity": eccentricity,
             "perimeter": perimeter,
             "compactness": compactness,
+            "shape_class": shape_class,
             "moment_error": moment_error,
         }
     return props
+
+def save_analysis_table(props, size_thresh):
+    """
+    Saves the 'Analysis Table' (formerly Detailed Table) mirroring console output.
+    Cols: ID, Area, Centroid, Eccentricity, Class, Moment Check
+    """
+    if not props:
+        return
+
+    # Added Elongation column
+    column_labels = ["ID", "Area", "Centroid", "Eccentricity", "Elongation", "Class", "Moment Check"]
+    table_data = []
+
+    for lab in sorted(props.keys()):
+        p = props[lab]
+        xc, yc = p["centroid"]
+        err_flag = "OK" if p["moment_error"] < 1e-5 else "FAIL"
+
+        table_data.append(
+            [
+                lab,
+                p["area"],
+                f"({xc:.1f}, {yc:.1f})",
+                f"{p['eccentricity']:.4f}",
+                f"{p['elongation']:.2f}",  # Added value
+                p["shape_class"],
+                err_flag,
+            ]
+        )
+
+    n_rows = len(table_data) + 1
+    fig_height = max(2, n_rows * 0.4)
+
+    fig, ax = plt.subplots(figsize=(10, fig_height)) # Slightly wider for new col
+    ax.axis("off")
+
+    table = ax.table(
+        cellText=table_data,
+        colLabels=column_labels,
+        loc="center",
+        cellLoc="center",
+        # Adjusted widths to fit new column
+        colWidths=[0.08, 0.12, 0.22, 0.12, 0.20, 0.20, 0.20], 
+    )
+
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.scale(1, 1.5)
+
+    for (row, col), cell in table.get_celld().items():
+        cell.set_edgecolor("black")
+        cell.set_linewidth(0.5)
+        if row == 0:
+            cell.set_text_props(weight="bold")
+            cell.set_facecolor("#eaeaea")
+            cell.set_linewidth(1.0)
+        else:
+            cell.set_facecolor("white")
+
+    plt.title(
+        f"Analysis Table (Size ≥ {size_thresh})", pad=10, fontsize=12, fontweight="bold"
+    )
+
+    outfile = f"Analysis_Table_Size_{size_thresh}.pdf"
+    plt.savefig(outfile, format="pdf", dpi=600, bbox_inches="tight")
+    plt.close()
+    print(f"[Saved PDF] {outfile}")
 
 
 def save_component_description_table(props, size_thresh):
@@ -355,9 +431,76 @@ def visualize_results(labels, props, size_thresh, global_colors, mapping):
 
     outfile = f"Image_C_Size_{size_thresh}.png"
     plt.tight_layout()
-    plt.savefig(outfile, bbox_inches="tight", dpi=600)
+    plt.savefig(outfile, bbox_inches="tight", dpi=600, facecolor="#fdf6e3")
     plt.close()
     print(f"[Saved] {outfile}")
+
+    # --- 2. Statistical Histograms ---
+    if len(props) > 1:
+        fig_hist, axes = plt.subplots(1, 3, figsize=(15, 4))
+
+        areas = [p["area"] for p in props.values()]
+        eccs = [p["eccentricity"] for p in props.values()]
+        comps = [p["compactness"] for p in props.values()]
+
+        axes[0].hist(areas, bins=10, color="skyblue", edgecolor="black")
+        axes[0].set_title("Area Distribution")
+        axes[0].set_xlabel("Pixels")
+        axes[0].yaxis.set_major_locator(MaxNLocator(integer=True))
+        axes[1].hist(eccs, bins=10, range=(0, 1), color="salmon", edgecolor="black")
+        axes[1].set_title("Eccentricity Distribution")
+        axes[1].set_xlabel("0 (Circle) -> 1 (Line)")
+        axes[1].yaxis.set_major_locator(MaxNLocator(integer=True))
+        axes[2].hist(comps, bins=10, color="lightgreen", edgecolor="black")
+        axes[2].set_title("Compactness Distribution")
+        axes[2].set_xlabel("P^2 / Area")
+        axes[2].yaxis.set_major_locator(MaxNLocator(integer=True))
+        fig_hist.suptitle(f"Feature Statistics (Size ≥ {size_thresh})", fontsize=14)
+        hist_file = f"Histograms_Size_{size_thresh}.png"
+        plt.savefig(hist_file, bbox_inches="tight")
+        plt.close()
+        print(f"[Saved] {hist_file}")
+
+def print_statistical_report(props, size_thresh):
+    """Prints summary table to console."""
+    print(f"\n{'='*80}")
+    print(f"ANALYSIS REPORT | Minimum Size Threshold: {size_thresh} pixels")
+    print(f"{'='*80}")
+
+    if not props:
+        print("No components found.")
+        return
+
+    areas = [p["area"] for p in props.values()]
+    avg_area = np.mean(areas)
+    avg_ecc = np.mean([p["eccentricity"] for p in props.values()])
+    max_moment_error = max([p["moment_error"] for p in props.values()])
+
+    print(f"Total Components: {len(props)}")
+    print(f"Average Area:     {avg_area:.1f} pixels")
+    print(f"Avg Eccentricity: {avg_ecc:.3f}")
+    print(f"Moment Val. Err:  {max_moment_error:.1e} (Should be near 0)")
+
+    print(
+        f"\n{'ID':<4} {'Area':<8} {'Centroid':<18} {'Eccentricity':<14} {'Elongation':<12} {'Class':<10} {'Moment Check'}"
+    )
+    print("-" * 80)
+
+    for lab in sorted(props.keys()):
+        p = props[lab]
+        xc, yc = p["centroid"]
+        err_flag = "OK" if p["moment_error"] < 1e-5 else "FAIL"
+
+        print(
+            f"{lab:<4} {p['area']:<8} "
+            f"({xc:>6.1f}, {yc:>6.1f})    "
+            f"{p['eccentricity']:<14.4f} "
+            f"{p['elongation']:<12.2f} "
+            # f"{p['shape_class']:<10} "
+            f"{err_flag}"
+        )
+    print("-" * 80)
+
 
 
 if __name__ == "__main__":
@@ -376,6 +519,8 @@ if __name__ == "__main__":
         clean_labels, mapping = filter_and_relabel(raw_labels, size)
         features = extract_features(clean_labels)
 
+        print_statistical_report(features, size)
+        save_analysis_table(features, size)
         save_component_description_table(features, size)
 
         visualize_results(clean_labels, features, size, global_colors, mapping)
