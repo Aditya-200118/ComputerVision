@@ -921,7 +921,7 @@ Given the bitmaps $B^\alpha$ (i, j)
 \end{enumerate}
 
 \section{Over Segmentated Image}
-
+Need to start with a over segemented image because otherwise you will end up improper merge
 \ldots
 
 \section{Merge based segementation}
@@ -940,6 +940,119 @@ b. if the current node and its adjacent node satisfies the merge criteria then m
 - list of all pairs of adjacent nodes and select the best pair for merging
 
 \section{Mean Based}
+Boundary Contrast Based, Variance Based or Mean Based \\
 $\vert \mu_i - \mu_j \vert$
+
+\newpage
+
+% --- Algorithm Parameters ---
+\section{Merge Algorithm Parameters}
+
+\begin{itemize}
+    \item Selection of nodes for merging
+    \item Merge Criterion
+    \item Stating point over segemented image
+    \item An improper merge cannot be undone
+\end{itemize}
+
+\textbf{Split Based Algorithm}
+
+\begin{enumerate}
+    \item Start with an initial RAG
+    \item Consider a node for splitting
+    \item If the node satisfies the split criterion then split it and update RAG
+    \item Perform steps 2 and 3 until no more splits are possible
+\end{enumerate}
+
+\begin{itemize}
+\item Intial RAG - Undersegmented Image
+\item Undersegmented Image - Binary Thresholding + CCL
+\end{itemize}
+
+\textbf{Splitting Criteria for a node}
+\begin{itemize}
+    \item Variance test performed in the pixels within the region/component/node
+    \item how to split a node
+    \begin{itemize}
+        \item edge detection within region
+        \item contour following
+        \item split the region along the contours
+        \item split the region along predefined boundary (quad tree)
+    \end{itemize}
+\end{itemize}
+
+approxmiate the region by fitting to a func 
+(homogeneity test) low mean square error then good fit
+
+\section*{Parameters}
+\begin{itemize}
+    \item splitting criterion
+    \begin{itemize}
+        \item [-] Variance test 
+        \item [-] Function Fitting test (bi linear and quadratic)
+    \end{itemize}
+    \item Avg Fitting error 
+    \item Pixels where fitting error $\gg$ avg fitting error
+    \item [-] Candidate along which to split the region
+    \item [-] Where to split the region
+    \item [-] Node Selection
+\end{itemize}
+
+Split where the fit error is higher (not only tells when not to split but also where to split)
+
+\begin{enumerate}
+    \item Start with an intial RAG
+    \item Go through a split phase
+    \item [-] Selecta node that satisfies the split criterion and split it and update RAG.
+    \item Merge Phase
+    \item [-] Selecta pair of adjacent node
+    \item [-] If they satisfy the merge criteria, then merge then and update the RAG
+    \item Perform the split and merge phase alternatively
+    \item Halt when no more splits or merge are possible
+\end{enumerate}
+
+Maintain a list of previously visited k solution states \\
+if the current split\/merge results in a previosuly visited stated then reject it and select another node
+
+% tabu list
+
+% \newpage
+% \begin{equation}
+%     \hat \nabla \mathcal{L} = \frac{\mathcal{L}(\theta + \epsilon\cdot z)-\mathcal{L}(\theta - \epsilon\cdot z)}{\epsilon}
+% \end{equation}
+
+\newpage
+\section{Iterative Model Fitting (Segementation Technique) with Region growing}
+
+% Basic Premise 
+
+\begin{enumerate}
+    \item Segemented Image can be modeled as a Parititon of region approximated by a parameter function (constant, bilinear, biquadratic, bicubic)
+    \item Fitting a function $f=f(x, y, a, m) = \sum_{i+j\le m} a_{ij} x^i y^j $ - polynomial approximation a
+    \item[-] where x,y are variables and a,m are Parameters 
+    \item For a bilinear fit $f(x, y, z) = a_{00} + a_{10}x + a_{01}y +a_{20}x^2 + a_{02}y^2 + a_{11}xy$
+\end{enumerate}
+
+The fitting error
+\begin{equation}
+    X^2(R, a, m) = \sum_{(x,y)\in R}^{} [F(x, y) - f(x, y, a, m)]^2\\
+    F(x, y) \text{ is the image intensity function}
+\end{equation}
+    For a given region $R$ determine $a$ (coefficients) and $m$ (model order) that minimizes the error $X^2$
+
+\section*{Algorithm}
+\begin{enumerate}
+    \item Determine seed regions in tht image - most homogenous core of the region
+    \item [-] Use a $5 \times 5$ or $7 \times 7$ window
+    \item[-] do a bilinear fit and note the error
+    \item[-] determine the center of the window where the error is $< T_1$
+    \item For seed region perform the following
+    \item[a.] For a given model order expand the current window - region growing keeping the same \underline{\textbf{a}} and \underline{\textbf{m}}
+    and note the fitting error (model extrapolation)
+    \item[-] repeat 2(a) until fitting error > $T_2$
+    \item[b] Refit using the same m to obtain new a and repeat (a). If the refitting error $>T_3$  then increase model order and repeat.
+    \item[c] Repeat 2(a) and 2(b) until maximum model order is reached. 
+\end{enumerate}
+
 \end{document}
 
