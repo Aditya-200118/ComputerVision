@@ -1022,37 +1022,79 @@ if the current split\/merge results in a previosuly visited stated then reject i
 % \end{equation}
 
 \newpage
-\section{Iterative Model Fitting (Segementation Technique) with Region growing}
+\section{Iterative Model Fitting (Segementation Technique) with Region Growing}
 
 % Basic Premise 
 
+\subsection*{Basic Premise}
+
 \begin{enumerate}
-    \item Segemented Image can be modeled as a Parititon of region approximated by a parameter function (constant, bilinear, biquadratic, bicubic)
-    \item Fitting a function $f=f(x, y, a, m) = \sum_{i+j\le m} a_{ij} x^i y^j $ - polynomial approximation a
-    \item[-] where x,y are variables and a,m are Parameters 
-    \item For a bilinear fit $f(x, y, z) = a_{00} + a_{10}x + a_{01}y +a_{20}x^2 + a_{02}y^2 + a_{11}xy$
+    \item Segmented image can be modeled as a partition of regions approximated by a parametric function 
+    (constant, bilinear, biquadratic, bicubic).
+
+    \item Fitting a function:
+    \[
+    f = f(x, y, a, m) = \sum_{i+j \le m} a_{ij} x^i y^j
+    \]
+
+    \item[] where $x, y$ are variables and $a, m$ are parameters.
+
+    \item For a bilinear fit:
+    \[
+    f(x, y) = a_{00} + a_{10}x + a_{01}y + a_{20}x^2 + a_{02}y^2 + a_{11}xy
+    \]
 \end{enumerate}
 
-The fitting error
+\subsection*{Fitting Error}
+
+The fitting error over a region $R$ is defined as:
+
 \begin{equation}
-    X^2(R, a, m) = \sum_{(x,y)\in R}^{} [F(x, y) - f(x, y, a, m)]^2\\
-    F(x, y) \text{ is the image intensity function}
+X^2(R, a, m) 
+= \sum_{(x,y)\in R} 
+\left[ F(x, y) - f(x, y, a, m) \right]^2
 \end{equation}
-    For a given region $R$ determine $a$ (coefficients) and $m$ (model order) that minimizes the error $X^2$
+
+\noindent
+where $F(x, y)$ is the image intensity function.
+
+\vspace{0.3cm}
+
+For a given region $R$, determine the coefficients $a$ and model order $m$ that minimize the error $X^2$.
+
+% -------------------------------------------------------------------
 
 \section*{Algorithm}
+
 \begin{enumerate}
-    \item Determine seed regions in tht image - most homogenous core of the region
-    \item [-] Use a $5 \times 5$ or $7 \times 7$ window
-    \item[-] do a bilinear fit and note the error
-    \item[-] determine the center of the window where the error is $< T_1$
-    \item For seed region perform the following
-    \item[a.] For a given model order expand the current window - region growing keeping the same \underline{\textbf{a}} and \underline{\textbf{m}}
-    and note the fitting error (model extrapolation)
-    \item[-] repeat 2(a) until fitting error > $T_2$
-    \item[b] Refit using the same m to obtain new a and repeat (a). If the refitting error $>T_3$  then increase model order and repeat.
-    \item[c] Repeat 2(a) and 2(b) until maximum model order is reached. 
+    \item Determine seed regions in the image — the most homogeneous core of each region.
+    
+    \begin{itemize}
+        \item Use a $5 \times 5$ or $7 \times 7$ window.
+        \item Perform a bilinear fit and compute the fitting error.
+        \item Select the center of the window where the error is $< T_1$.
+    \end{itemize}
+
+    \item For each seed region, perform the following:
+
+    \begin{enumerate}
+        \item[(a)] For a given model order, expand the current window (region growing) 
+        while keeping the same \underline{\textbf{$a$}} and \underline{\textbf{$m$}}. 
+        Compute the fitting error (model extrapolation).
+        
+        \begin{itemize}
+            \item Repeat step (a) until the fitting error $> T_2$.
+        \end{itemize}
+
+        \item[(b)] Refit using the same $m$ to obtain a new $a$, then repeat step (a). 
+        
+        If the refitting error $> T_3$, increase the model order and repeat.
+
+        \item[(c)] Repeat steps (a) and (b) until the maximum model order is reached.
+    \end{enumerate}
+
 \end{enumerate}
+
 
 \end{document}
 
