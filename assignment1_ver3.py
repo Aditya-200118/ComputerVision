@@ -506,7 +506,7 @@ def print_statistical_report(props, size_thresh):
 if __name__ == "__main__":
     print("Starting\n")
 
-    original_img, binary_mask = load_and_preprocess("comb.img")
+    original_img, binary_mask = load_and_preprocess("restored.img")
     plt.imsave("Image_B_Original.png", original_img, cmap="gray")
     plt.imsave("Image_BT_Binary.png", binary_mask, cmap="gray")
 
