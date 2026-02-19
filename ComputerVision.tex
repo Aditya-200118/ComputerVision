@@ -1120,19 +1120,20 @@ if the current split/merge results in a previously visited state then reject it 
 \subsection*{Fitting Error}
 
 The fitting error over a region $R$ is defined as:
-
+\begin{shaded}
 \begin{equation}
 X^2(R, a, m) 
 = \sum_{(x,y)\in R} 
 \left[ F(x, y) - f(x, y, a, m) \right]^2
 \end{equation}
-
 \noindent
 where $F(x, y)$ is the image intensity function.
-
 \vspace{0.3cm}
 
 For a given region $R$, determine the coefficients $a$ and model order $m$ that minimize the error $X^2$.
+
+\end{shaded}
+
 
 % -------------------------------------------------------------------
 
@@ -1164,9 +1165,59 @@ For a given region $R$, determine the coefficients $a$ and model order $m$ that 
 
         \item[(c)] Repeat steps (a) and (b) until the maximum model order is reached.
     \end{enumerate}
-
 \end{enumerate}
 
 
+\newpage
+\section{Edge Detection}
+
+\textbf{Edge} \\
+Location of $\underbrace{\text{significant change}}_{\text{rate of change}}$ in a "local image property" \\
+Local Image property - gray level, color, texture, motion
+
+\begin{equation}
+    f(t) - \frac{df(t)}{dt}
+\end{equation}
+\begin{equation}
+    f_{\circ} = \underbrace{f(t)}_{\text{signal}} + \underbrace{n(t)}_{\text{noise}}
+\end{equation}
+\begin{equation}
+    \frac{df_{\circ}(t)}{dt} = \frac{df(t)}{dt}+\frac{dx(t)}{dt}
+\end{equation}
+
+\[
+f(t)=A_{S} \sin(2\pi f_{S}t)
+\] 
+
+\[
+n(t)=A_{n} \sin(2\pi f_{n}t)
+\] 
+
+\[
+f_{\circ}(t) = A_{S} \sin(2\pi f_{S}t) + A_{n} \sin(2\pi f_{n}t)
+\] 
+
+% \noindent
+\indent
+where, $f_{n}\gg f_{s}$
+
+\[
+SNR = \frac{A_{s}^2}{A_{n}^2}
+\]
+
+Change detection is inherently noisy \\
+Change detector is preceded by filtering or smoothing for noise removed
+
+Noise samples $n_1, n_2 \ldots n_k$
+
+$\sigma^2 \longleftarrow Noise Power$
+
+$Var(n_{i} = \sigma^2)$
+
+
+$n_s = \frac{n_1 + n_2 +\ldots + n_k}{k}$
+$var(n_s) = \sigma^2/k$
+
+Smoothing - Avg Direction
 \end{document}
 
