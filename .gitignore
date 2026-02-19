@@ -31,3 +31,5 @@ rpn.py
 
 *.pdf
 *.png
+.python-version
+.vscode/
