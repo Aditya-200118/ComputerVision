@@ -1,6 +1,8 @@
+# ---- Python files you want ignored ----
 a.py
 rpn.py
-# LaTeX intermediate/auxiliary files
+
+# ---- LaTeX intermediate / auxiliary files ----
 *.aux
 *.lof
 *.lot
@@ -22,12 +24,15 @@ rpn.py
 *.vrb
 *.log
 *.xdv
-*.fls
-*.fdb_latexmk
-# Other editor or OS files
+
+# ---- LaTeX outputs (including PDFs) ----
+*.pdf
+
+# ---- Images / generated files ----
+*.png
+*.img
+
+# ---- Editor / OS junk ----
 *~
 *.swp
 .DS_Store
-
-*.pdf
-*.png
