@@ -1,0 +1,528 @@
+\documentclass[11pt, letterpaper]{article}
+\usepackage[ruled,vlined]{algorithm2e}
+% --- Encoding & Margins ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{framed}
+
+\geometry{margin=1in}
+
+% --- Fonts ---
+\usepackage{mathptmx} % Times New Roman
+\usepackage[scaled]{helvet} 
+\usepackage{courier}
+
+% --- Graphics & Tables ---
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{array}
+
+% --- Math ---
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+% --- Code Highlighting ---
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\colorlet{shadecolor}{orange!15}
+
+\lstset{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=Python
+}
+
+% --- Links & Headers ---
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\thepage}
+\lhead{CSCI 8820: Assignment 2}
+\renewcommand{\headrulewidth}{0.5pt}
+
+% ============================================================
+% DOCUMENT START
+% ============================================================
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{1.5in}
+    \rule{\linewidth}{0.5mm} \\[0.4cm]
+    {\huge \bfseries Assignment 2: Skeletonization \par}
+    \rule{\linewidth}{0.5mm} \\[1.5cm]
+    
+    \vspace{0.3in}
+    {\Large \textbf{Aditya Bhargava} \par}
+    {\large UGA ID: 811235738 \par}
+    
+    \vfill
+    {\large CSCI 8820: Computer Vision and Pattern Recognition \par}
+    {\large School of Computing, University of Georgia \par}
+    {\large February 18, 2026 \par}
+\end{titlepage}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction and Preprocessing}
+This report implements distance transforms and the Medial Axis Transform (MAT) for image skeletonization and reconstruction. By analyzing Manhattan, Euclidean, and Chessboard metrics, we evaluate the efficiency of lossless reconstruction from a sparse skeleton.
+
+\subsection{Thresholding and Binary Mask Generation}
+The input image $B$ was converted to a binary image $B_T$ using a fixed threshold $T=128$. To ensure consistency, the mask was automatically inverted by $B_{T} = 1-B_{T}$.
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Image_B_Original_Grayscale.png}
+        \caption{Original Grayscale Image}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Original_Binary_B.png}
+        \caption{Binary Mask ($B_T$)}
+    \end{subfigure}
+    \caption{Initial preprocessing and mask generation.}
+\end{figure}
+
+\section{Experimental Results: Metric Analysis}
+The following section details the skeletonization and reconstruction results for the using three primary distance metrics and also introduces the high level peusdocode $Algorithm 1$ utilized to reconstruct the objects.
+\subsection{Medial Axis Transform and Reconstruction}
+\begin{shaded}
+\begin{equation}
+\text{MAT}(i, j) = 
+\begin{cases}   
+1, & \text{if } DT(i, j) \geq DT(u, v) \quad \forall (u, v) \in N(i, j) \\[1ex]
+0, & \text{otherwise}
+\end{cases}
+\end{equation}
+\end{shaded}
+
+\noindent
+\text{MAT}$(i, j)$ represents the skeleton of the original component.
+
+Given $\text{MAT}(i, j)$ and the corresponding $DT$ values for each nonzero pixel, the original component can be reconstructed using \textbf{reverse distance propagation}.
+\newpage
+\textbf{Halt condition:}  
+
+\begin{shaded}
+\begin{equation}
+DT^{(n)}(i, j) = DT^{(n-1)}(i, j) \quad \forall i, j
+\end{equation}
+\end{shaded}
+\subsection*{Reconstruction Psuedocode}
+\begin{algorithm}[H]
+\DontPrintSemicolon
+\SetKwFunction{FDist}{CalculateDistance}
+\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+
+\Input{Skeleton image $S$, Distance Metric $M$}
+\Output{Reconstructed Binary Image $BR$}
+
+Initialize $BR$ with zeros (Background)\;
+
+\ForEach{pixel $(y, x)$ in $S$ where $S(y,x) > 0$}{
+    $d \leftarrow S(y, x)$\;
+    $r \leftarrow \lceil d \rceil$\;
+    
+    \tcc{Define bounding box clipped to image size}
+    $y_0 \leftarrow \max(0, y - r), \quad y_1 \leftarrow \min(\text{height}-1, y + r)$\;
+    $x_0 \leftarrow \max(0, x - r), \quad x_1 \leftarrow \min(\text{width}-1, x + r)$\;
+    
+    \ForEach{pixel $(py, px)$ in bounding box $[y_0, y_1] \times [x_0, x_1]$}{
+        $dy \leftarrow py - y, \quad dx \leftarrow px - x$\;
+        
+        \eIf{$M$ is Manhattan}{
+            $CurrentDist \leftarrow |dy| + |dx|$\;
+        }{
+        \eIf{$M$ is Chessboard}{
+            $CurrentDist \leftarrow \max(|dy|, |dx|)$\;
+        }{
+            $CurrentDist \leftarrow \sqrt{dy^2 + dx^2}$\;
+        }}
+        
+        \If{$CurrentDist < d$}{
+            $BR(py, px) \leftarrow 1$ \hfill \tcp*{Set as Foreground}
+        }
+    }
+}
+\Return $BR$\;
+\caption{Lossless Reconstruction from Medial Axis Skeleton (with bounding box clipping)}
+\end{algorithm}
+\begin{shaded}
+\textbf{\textit{Note:}} Continued on next page.
+\end{shaded}
+\newpage
+\newpage
+\subsection{Case 1: Manhattan Distance (\texorpdfstring{$L_1$}{L1})}
+\begin{equation}
+    \label{eq:manhattan_distance}
+    d_{L1}(P_1, P_2) = |i_1 - i_2| + |j_1 - j_2|
+\end{equation}
+
+The Manhattan metric is represented by Eq.~\eqref{eq:manhattan_distance}. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.70\textwidth]{APA_manhattan.png}
+    \vspace{-10pt}
+    \caption{Manhattan Metric: Skeleton and Lossless Reconstruction.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{Final_Comparison_manhattan.png}
+    \vspace{-10pt}
+    \caption{Manhattan Metric: Original vs. Reconstructed.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{Error_Analysis_manhattan.png}
+    \vspace{-10pt}
+    \caption{Manhattan Error Analysis and Difference Map.}
+\end{figure}
+% \newpage
+% \newpage
+\subsection{Case 2: Euclidean Distance (\texorpdfstring{$L_2$}{L2})}
+\begin{equation}
+    \label{eq:euclidean_distance}
+    d_{L2}(P_1, P_2) = \sqrt{(i_1 - i_2)^2 + (j_1 - j_2)^2}
+\end{equation}
+
+The Euclidean metric, representing the true straight-line distance, is given by Eq.~\eqref{eq:euclidean_distance}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{APA_euclidean.png}
+    \caption{Euclidean Metric: Skeleton (Medial Axis) and Lossy Reconstruction.}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Final_Comparison_euclidean.png}
+    \caption{Euclidean Metric: Original vs. Reconstructed.}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Error_Analysis_euclidean.png}
+    \caption{Euclidean Error Analysis and Difference Map.}
+\end{figure}
+
+\newpage
+\subsection{Case 3: Chessboard Distance (\texorpdfstring{$L_\infty$}{L-infinity})}
+\begin{equation}
+    \label{eq:chessboard_distance}
+    d_{L\infty}(P_1, P_2) = \max(|i_1 - i_2|, |j_1 - j_2|)
+\end{equation}
+
+The Chessboard metric generates square-shaped expansions given by Eq.~\eqref{eq:chessboard_distance}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{APA_chessboard.png}
+    \caption{Chessboard Metric: Skeleton (Medial Axis) and Lossless Reconstruction.}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Final_Comparison_chessboard.png}
+    \caption{Chessboard Metric: Original vs. Reconstructed.}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Error_Analysis_chessboard.png}
+    \caption{Chessboard Error Analysis and Difference Map.}
+\end{figure}
+
+\section{Conclusion}
+The iterative distance transform algorithm “skeletonizes” the objects. The Manhattan and Chessboard metrics are computationally simpler. The error analysis confirms that lossless reconstruction is achievable for Manhattan and Chessboard, provided the local maximum condition is strictly enforced.
+
+\begin{shaded}
+\textbf{\textit{Note:}} For source code kindly refer to appendix on next page
+\end{shaded}
+
+\newpage
+\section{Appendix: Source Code}
+\begin{lstlisting}
+import numpy as np
+import matplotlib.pyplot as plt
+import hashlib
+
+plt.rcParams.update(
+    {
+        "font.family": "serif",
+        "font.size": 10,
+        "axes.titlesize": 12,
+        "axes.titlesize": 11,
+        "figure.dpi": 600,
+    }
+)
+
+def load_and_preprocess(path):
+    try:
+        with open(path, "rb") as f:
+            _ = f.read(512)
+            img_data = np.fromfile(f, dtype=np.uint8)
+
+        original_2d = img_data.reshape((512, 512))
+        binary = (original_2d <= 128).astype(np.uint8)
+        return original_2d, binary
+    except Exception as e:
+        print(f"Error loading file: {e}")
+        exit()
+
+
+def compute_manhattan_distance(mask):
+    H, W = mask.shape
+    dt = np.where(mask > 0, 1e6, 0).astype(np.float32)
+    for y in range(H):
+        for x in range(W):
+            if dt[y, x] > 0:
+                t = dt[y - 1, x] if y > 0 else 1e6
+                l = dt[y, x - 1] if x > 0 else 1e6
+                dt[y, x] = min(dt[y, x], min(t, l) + 1)
+    for y in range(H - 1, -1, -1):
+        for x in range(W - 1, -1, -1):
+            if dt[y, x] > 0:
+                b = dt[y + 1, x] if y < H - 1 else 1e6
+                r = dt[y, x + 1] if x < W - 1 else 1e6
+                dt[y, x] = min(dt[y, x], min(b, r) + 1)
+    return dt
+
+
+def compute_chessboard_distance(mask):
+    H, W = mask.shape
+    dt = np.where(mask > 0, 1e6, 0).astype(np.float32)
+    for y in range(H):
+        for x in range(W):
+            if dt[y, x] > 0:
+                n = [
+                    dt[y - 1, x] if y > 0 else 1e6,
+                    dt[y, x - 1] if x > 0 else 1e6,
+                    dt[y - 1, x - 1] if y > 0 and x > 0 else 1e6,
+                    dt[y - 1, x + 1] if y > 0 and x < W - 1 else 1e6,
+                ]
+                dt[y, x] = min(dt[y, x], min(n) + 1)
+    for y in range(H - 1, -1, -1):
+        for x in range(W - 1, -1, -1):
+            if dt[y, x] > 0:
+                n = [
+                    dt[y + 1, x] if y < H - 1 else 1e6,
+                    dt[y, x + 1] if x < W - 1 else 1e6,
+                    dt[y + 1, x + 1] if y < H - 1 and x < W - 1 else 1e6,
+                    dt[y + 1, x - 1] if y < H - 1 and x > 0 else 1e6,
+                ]
+                dt[y, x] = min(dt[y, x], min(n) + 1)
+    return dt
+
+
+def compute_euclidean_distance(mask):
+    H, W = mask.shape
+    dt = np.where(mask > 0, 1e6, 0).astype(np.float32)
+    s2 = np.sqrt(2)
+    for y in range(H):
+        for x in range(W):
+            if dt[y, x] > 0:
+                n = [
+                    dt[y - 1, x] + 1 if y > 0 else 1e6,
+                    dt[y, x - 1] + 1 if x > 0 else 1e6,
+                    dt[y - 1, x - 1] + s2 if y > 0 and x > 0 else 1e6,
+                    dt[y - 1, x + 1] + s2 if y > 0 and x < W - 1 else 1e6,
+                ]
+                dt[y, x] = min(dt[y, x], min(n))
+    for y in range(H - 1, -1, -1):
+        for x in range(W - 1, -1, -1):
+            if dt[y, x] > 0:
+                n = [
+                    dt[y + 1, x] + 1 if y < H - 1 else 1e6,
+                    dt[y, x + 1] + 1 if x < W - 1 else 1e6,
+                    dt[y + 1, x + 1] + s2 if y < H - 1 and x < W - 1 else 1e6,
+                    dt[y + 1, x - 1] + s2 if y < H - 1 and x > 0 else 1e6,
+                ]
+                dt[y, x] = min(dt[y, x], min(n))
+    return dt
+
+
+def get_skeleton(dt, metric):
+    H, W = dt.shape
+    skeleton = np.zeros_like(dt)
+    padded = np.pad(dt, 1, mode="constant", constant_values=0)
+    offsets = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
+
+    for y in range(H):
+        for x in range(W):
+            if dt[y, x] > 0:
+                is_max = True
+                d_curr = dt[y, x]
+                for dy, dx in offsets:
+                    if metric == "manhattan" and (dy != 0 and dx != 0):
+                        continue
+                    dist_to_neighbor = 1.0 if (dy == 0 or dx == 0) else np.sqrt(2)
+
+                    if (
+                        padded[y + 1 + dy, x + 1 + dx]
+                        >= d_curr
+                        + (1.0 if metric != "euclidean" else dist_to_neighbor)
+                        - 0.001
+                    ):
+                        is_max = False
+                        break
+                if is_max:
+                    skeleton[y, x] = d_curr
+    return skeleton
+
+
+def reconstruct_lossless(skeleton, metric):
+    H, W = skeleton.shape
+    recon = np.zeros_like(skeleton, dtype=np.uint8)
+    y_idx, x_idx = np.nonzero(skeleton)
+    for y, x in zip(y_idx, x_idx):
+        d = skeleton[y, x]
+        r = int(np.ceil(d))
+        y0, y1 = max(0, y - r), min(H, y + r + 1)
+        x0, x1 = max(0, x - r), min(W, x + r + 1)
+        Y, X = np.ogrid[y0 - y : y1 - y, x0 - x : x1 - x]
+
+        if metric == "manhattan":
+            mask = np.abs(Y) + np.abs(X) < d
+        elif metric == "chessboard":
+            mask = np.maximum(np.abs(Y), np.abs(X)) < d
+        else:
+            mask = np.sqrt(Y**2 + X**2) < d
+        recon[y0:y1, x0:x1] |= mask.astype(np.uint8)
+    return recon
+
+
+def save_final_comparison(original_binary, reconstructed_binary, label, metric_key):
+
+    fig, ax = plt.subplots(1, 2, figsize=(10, 6))
+    plt.subplots_adjust(bottom=0.2)
+
+    ax[0].imshow(original_binary, cmap="gray")
+    ax[0].set_title("Original Binary Image (B)")
+    ax[0].axis("off")
+
+    ax[1].imshow(reconstructed_binary, cmap="gray")
+    ax[1].set_title("Reconstructed Binary Image (BR)")
+    ax[1].axis("off")
+
+    fig.text(
+        0.5,
+        0.08,
+        f"Comparison of Original (B) and Lossless Reconstruction (BR) using {label} Metric.",
+        ha="center",
+        fontsize=12,
+        fontweight="bold",
+    )
+
+    output_filename = f"Final_Comparison_{metric_key}.png"
+    plt.savefig(output_filename, dpi=600, bbox_inches="tight")
+    plt.close()
+    print(f"Comparison figure saved: {output_filename}")
+
+
+def save_difference_analysis(original_binary, reconstructed_binary, label, metric_key):
+
+    difference_map = np.abs(
+        original_binary.astype(np.int32) - reconstructed_binary.astype(np.int32)
+    )
+    error_count = np.sum(difference_map)
+
+    fig, ax = plt.subplots(1, 3, figsize=(15, 6))
+    plt.subplots_adjust(bottom=0.2, wspace=0.3)
+
+    ax[0].imshow(original_binary, cmap="gray")
+    ax[0].set_title("Original (B)")
+    ax[0].axis("off")
+
+    ax[1].imshow(reconstructed_binary, cmap="gray")
+    ax[1].set_title("Reconstructed (BR)")
+    ax[1].axis("off")
+
+    ax[2].imshow(difference_map, cmap="hot")
+    ax[2].set_title(f"Difference Map (Errors: {error_count})")
+    ax[2].axis("off")
+
+    fig.text(
+        0.5,
+        0.08,
+        f"Error Analysis for {label} Metric. "
+        f"Total Pixel Discrepancy: {error_count}.",
+        ha="center",
+        fontsize=12,
+        fontweight="bold",
+    )
+
+    output_filename = f"Error_Analysis_{metric_key}.png"
+    plt.savefig(output_filename, dpi=600, bbox_inches="tight")
+    plt.close()
+    print(f"Error analysis saved: {output_filename} (Errors: {error_count})")
+
+
+if __name__ == "__main__":
+    orig_raw, binary_mask = load_and_preprocess("comb.img")
+
+    metrics = [
+        ("Manhattan", compute_manhattan_distance, "manhattan"),
+        ("Chessboard", compute_chessboard_distance, "chessboard"),
+        ("Euclidean", compute_euclidean_distance, "euclidean"),
+    ]
+
+    for label, func, key in metrics:
+        dt = func(binary_mask)
+        skel = get_skeleton(dt, key)
+        recon = reconstruct_lossless(skel, key)
+
+        fig, ax = plt.subplots(1, 2, figsize=(10, 6))
+        plt.subplots_adjust(bottom=0.2)
+        ax[0].imshow(skel > 0, cmap="gray")
+        ax[0].set_title("Medial Axis")
+        ax[0].axis("off")
+        ax[1].imshow(recon, cmap="gray")
+        ax[1].set_title("Reconstruction")
+        ax[1].axis("off")
+        fig.text(
+            0.5,
+            0.08,
+            f"{label} Metric: Skeleton and Lossless Reconstruction.",
+            ha="center",
+            fontsize=12,
+            fontweight="bold",
+        )
+        plt.savefig(f"APA_{key}.png", dpi=600, bbox_inches="tight")
+        plt.close()
+        save_final_comparison(binary_mask, recon, label, key)
+        save_difference_analysis(binary_mask, recon, label, key)
+
+    plt.imsave("Original_Binary_B.png", binary_mask, cmap="gray")
+
+\end{lstlisting}
+
+\end{document}
