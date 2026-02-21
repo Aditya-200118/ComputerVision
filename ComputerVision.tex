@@ -597,68 +597,121 @@ Two Approaches
     \end{itemize}
 \end{enumerate}
 
+% -------------------------------------------------------------------
+
 \newpage
 \section{Modal Analysis}
+
+% -------------------------------------------------------------------
+
 \subsection{Iterative Threshold Selection}
-\begin{itemize}
-\item  Determine an initial estimate for $T$ = avg of intensity values of the pixels in the image.
-\item Partition the image into two classes $R_1 \text{ and } R_2$ using $T$.
-\item Compute the mean gray levels $\mu_1 \text{ and } \mu_2$  of the pixels in $R_1 \text{ and } R_2$ respectively.
+
+\begin{enumerate}
+    \item Determine an initial estimate for $T$ = avg of intensity values of the pixels in the image.
+    
+    \item Partition the image into two classes $R_1 \text{ and } R_2$ using $T$.
+    
+    \item Compute the mean gray levels $\mu_1 \text{ and } \mu_2$ of the pixels in 
+    $R_1 \text{ and } R_2$ respectively.
+\end{enumerate}
+
 \begin{shaded}
-\[T_{new} = \frac{\mu_1 + \mu_2}{2}\]
+\[
+T_{new} = \frac{\mu_1 + \mu_2}{2}
+\]
 \end{shaded}
-\item If $T_{new} = T$ halt else update $T \longleftarrow T_{new}$ and repeat step 2 to 4
-\end{itemize}
+
+\begin{enumerate}
+    \setcounter{enumi}{3}
+    \item If $T_{new} = T$ halt else update $T \longleftarrow T_{new}$ and repeat step 2 to 4
+\end{enumerate}
 
 \begin{unnote}
-    For \textbf{step 4} we can also do 
+    For \textbf{step 4} we can also do
 \end{unnote}
 
-\[\alpha \cdot \mu_1 + \beta \cdot \mu_2\] \text{ where } $\alpha$ \text{ and } $\beta$ are the fraction of pixels in $R_1 \text{ and } R_2$ $(\alpha + \beta) =1$
+\[
+\alpha \cdot \mu_1 + \beta \cdot \mu_2
+\]
+\text{ where } $\alpha$ \text{ and } $\beta$ are the fraction of pixels in  
+$R_1 \text{ and } R_2$ $(\alpha + \beta) = 1$
+
+% -------------------------------------------------------------------
+
 \subsection{Non-Uniform Background (variable thresholding)}
-- Capture the variation in background intensity \\
-- Eliminate the variation in background intensity from the pixel values $\longrightarrow$ normalization \\
-- Threshold based on normalized pixel values
+
+\begin{itemize}
+    \item Capture the variation in background intensity
+    \item Eliminate the variation in background intensity from the pixel values $\longrightarrow$ normalization
+    \item Threshold based on normalized pixel values
+\end{itemize}
 
 \textbf{Assumptions}
+
 \begin{enumerate}
-\item Variation in background intensity values is systematic.
-\item Systematic Variation in background intensity values can be captured by a simple function. bilinear and biquadratic
-\item Assume that background pixels dominates the foreground pixels. Number of background pixels exceed the number of foreground pixels which essential employs that variation in image intensity values can be attributed to the variation in background intensity values
+    \item Variation in background intensity values is systematic.
+    
+    \item Systematic Variation in background intensity values can be captured by a simple function. bilinear and biquadratic
+    
+    \item Assume that background pixels dominates the foreground pixels. Number of background pixels exceed the number of foreground pixels which essential employs that variation in image intensity values can be attributed to the variation in background intensity values
 \end{enumerate}
+
+% -------------------------------------------------------------------
 
 \subsection{Bilinear Regression}
 
 \begin{equation}
-    \frac{1}{N^2}\sum_{x_i}\sum_{y_i}\vert F(x_i, y_i) - F\prime(x_i, y_i) \vert
+\frac{1}{N^2}
+\sum_{x_i}
+\sum_{y_i}
+\vert F(x_i, y_i) - F'(x_i, y_i) \vert
 \end{equation}
+
 \newpage
 
 Compute the normalized pixel values
-$F_n = F(x, y)- F\prime(x, y)$
 
-Map $(F_n)_{min} \ldots F(n)_{max}$  $\implies $ (0, max gray level)
+\[
+F_n = F(x, y) - F'(x, y)
+\]
+
+Map $(F_n)_{min} \ldots (F_n)_{max} \implies (0, \text{max gray level})$
 
 use iterative thresholding to threshold the normalized image
+
+% -------------------------------------------------------------------
+
 \subsection{Model Fitting}
-\begin{equation}F_L(x,y) = Ax + By\end{equation}
+
+\begin{equation}
+F_L(x,y) = Ax + By
+\end{equation}
 \begin{center}
-    linear
+linear
 \end{center}
-\begin{equation}Q (x, y)= Ax^2 + Bxy+ Cy^2 + Dx + Ey + F\end{equation}
+
+\begin{equation}
+Q(x, y) = Ax^2 + Bxy + Cy^2 + Dx + Ey + F
+\end{equation}
 \begin{center}
-    biquadratic
+biquadratic
 \end{center}
-\begin{equation}R(x,y = Ax^3 + Bx^2 + Cxy^2 + Dy^3 + Ex^2 + Fxy + Gy^2 + Hx + Iy + J )\end{equation}
+
+\begin{equation}
+R(x,y) = Ax^3 + Bx^2 + Cxy^2 + Dy^3 + Ex^2 + Fxy + Gy^2 + Hx + Iy + J
+\end{equation}
 \begin{center}
-    bicubic
+bicubic
 \end{center}
+
 As the number of coeff increases so does the computational complexity increases.
+
 \begin{enumerate}
     \item Pro's
     \begin{itemize}
         \item Less fitting error (higher fitting accuracy)
     \end{itemize}
+    
     \item Con's
     \begin{itemize}
         \item Computational complexity
@@ -921,7 +974,7 @@ Given the bitmaps $B^\alpha$ (i, j)
 \end{enumerate}
 
 \section{Over Segmentated Image}
-
+Need to start with a over segemented image because otherwise you will end up improper merge
 \ldots
 
 \section{Merge based segementation}
@@ -940,6 +993,231 @@ b. if the current node and its adjacent node satisfies the merge criteria then m
 - list of all pairs of adjacent nodes and select the best pair for merging
 
 \section{Mean Based}
+Boundary Contrast Based, Variance Based or Mean Based \\
 $\vert \mu_i - \mu_j \vert$
+
+% -------------------------------------------------------------------
+
+\newpage
+\section{Split and Merge Segmentation using RAG}
+
+% -------------------------------------------------------------------
+
+\subsection*{Merge Algorithm Parameters}
+
+\begin{itemize}
+    \item Selection of nodes for merging
+    \item Merge Criterion
+    \item Stating point over segmented image
+    \item An improper merge cannot be undone
+\end{itemize}
+
+% -------------------------------------------------------------------
+
+\subsection*{Split Based Algorithm}
+
+\begin{enumerate}
+    \item Start with an initial RAG
+    \item Consider a node for splitting
+    \item If the node satisfies the split criterion then split it and update RAG
+    \item Perform steps 2 and 3 until no more splits are possible
+\end{enumerate}
+
+\begin{itemize}
+    \item Initial RAG - Undersegmented Image
+    \item Undersegmented Image - Binary Thresholding + CCL
+\end{itemize}
+
+% -------------------------------------------------------------------
+
+\subsection*{Splitting Criteria for a node}
+
+\begin{itemize}
+    \item Variance test performed in the pixels within the region/component/node
+    
+    \item how to split a node
+    \begin{itemize}
+        \item edge detection within region
+        \item contour following
+        \item split the region along the contours
+        \item split the region along predefined boundary (quad tree)
+    \end{itemize}
+\end{itemize}
+
+approxmiate the region by fitting to a func \\
+(homogeneity test) low mean square error then good fit
+
+% -------------------------------------------------------------------
+
+\section*{Parameters}
+
+\begin{itemize}
+    \item splitting criterion
+    \begin{itemize}
+        \item[-] Variance test
+        \item[-] Function Fitting test (bi linear and quadratic)
+    \end{itemize}
+    
+    \item Avg Fitting error
+    \item Pixels where fitting error $\gg$ avg fitting error
+    \item[-] Candidate along which to split the region
+    \item[-] Where to split the region
+    \item[-] Node Selection
+\end{itemize}
+
+Split where the fit error is higher (not only tells when not to split but also where to split)
+
+% -------------------------------------------------------------------
+
+\subsection*{Combined Split and Merge Algorithm}
+
+\begin{enumerate}
+    \item Start with an initial RAG
+    \item Go through a split phase
+    \item[-] Select a node that satisfies the split criterion and split it and update RAG.
+    \item Merge Phase
+    \item[-] Select a pair of adjacent node
+    \item[-] If they satisfy the merge criteria, then merge them and update the RAG
+    \item Perform the split and merge phase alternatively
+    \item Halt when no more splits or merge are possible
+\end{enumerate}
+
+Maintain a list of previously visited $k$ solution states \\
+
+if the current split/merge results in a previously visited state then reject it and select another node
+
+% tabu list
+
+% \newpage
+% \begin{equation}
+%     \hat \nabla \mathcal{L} = \frac{\mathcal{L}(\theta + \epsilon\cdot z)-\mathcal{L}(\theta - \epsilon\cdot z)}{\epsilon}
+% \end{equation}
+
+\newpage
+\section{Iterative Model Fitting (Segementation Technique) with Region Growing}
+
+% Basic Premise 
+
+\subsection*{Basic Premise}
+
+\begin{enumerate}
+    \item Segmented image can be modeled as a partition of regions approximated by a parametric function 
+    (constant, bilinear, biquadratic, bicubic).
+
+    \item Fitting a function:
+    \[
+    f = f(x, y, a, m) = \sum_{i+j \le m} a_{ij} x^i y^j
+    \]
+
+    \item[] where $x, y$ are variables and $a, m$ are parameters.
+
+    \item For a bilinear fit:
+    \[
+    f(x, y) = a_{00} + a_{10}x + a_{01}y + a_{20}x^2 + a_{02}y^2 + a_{11}xy
+    \]
+\end{enumerate}
+
+\subsection*{Fitting Error}
+
+The fitting error over a region $R$ is defined as:
+\begin{shaded}
+\begin{equation}
+X^2(R, a, m) 
+= \sum_{(x,y)\in R} 
+\left[ F(x, y) - f(x, y, a, m) \right]^2
+\end{equation}
+\noindent
+where $F(x, y)$ is the image intensity function.
+\vspace{0.3cm}
+
+For a given region $R$, determine the coefficients $a$ and model order $m$ that minimize the error $X^2$.
+
+\end{shaded}
+
+
+% -------------------------------------------------------------------
+
+\section*{Algorithm}
+
+\begin{enumerate}
+    \item Determine seed regions in the image — the most homogeneous core of each region.
+    
+    \begin{itemize}
+        \item Use a $5 \times 5$ or $7 \times 7$ window.
+        \item Perform a bilinear fit and compute the fitting error.
+        \item Select the center of the window where the error is $< T_1$.
+    \end{itemize}
+
+    \item For each seed region, perform the following:
+
+    \begin{enumerate}
+        \item[(a)] For a given model order, expand the current window (region growing) 
+        while keeping the same \underline{\textbf{$a$}} and \underline{\textbf{$m$}}. 
+        Compute the fitting error (model extrapolation).
+        
+        \begin{itemize}
+            \item Repeat step (a) until the fitting error $> T_2$.
+        \end{itemize}
+
+        \item[(b)] Refit using the same $m$ to obtain a new $a$, then repeat step (a). 
+        
+        If the refitting error $> T_3$, increase the model order and repeat.
+
+        \item[(c)] Repeat steps (a) and (b) until the maximum model order is reached.
+    \end{enumerate}
+\end{enumerate}
+
+
+\newpage
+\section{Edge Detection}
+
+\textbf{Edge} \\
+Location of $\underbrace{\text{significant change}}_{\text{rate of change}}$ in a "local image property" \\
+Local Image property - gray level, color, texture, motion
+
+\begin{equation}
+    f(t) - \frac{df(t)}{dt}
+\end{equation}
+\begin{equation}
+    f_{\circ} = \underbrace{f(t)}_{\text{signal}} + \underbrace{n(t)}_{\text{noise}}
+\end{equation}
+\begin{equation}
+    \frac{df_{\circ}(t)}{dt} = \frac{df(t)}{dt}+\frac{dx(t)}{dt}
+\end{equation}
+
+\[
+f(t)=A_{S} \sin(2\pi f_{S}t)
+\] 
+
+\[
+n(t)=A_{n} \sin(2\pi f_{n}t)
+\] 
+
+\[
+f_{\circ}(t) = A_{S} \sin(2\pi f_{S}t) + A_{n} \sin(2\pi f_{n}t)
+\] 
+
+% \noindent
+\indent
+where, $f_{n}\gg f_{s}$
+
+\[
+SNR = \frac{A_{s}^2}{A_{n}^2}
+\]
+
+Change detection is inherently noisy \\
+Change detector is preceded by filtering or smoothing for noise removed
+
+Noise samples $n_1, n_2 \ldots n_k$
+
+$\sigma^2 \longleftarrow Noise Power$
+
+$Var(n_{i} = \sigma^2)$
+
+
+$n_s = \frac{n_1 + n_2 +\ldots + n_k}{k}$
+$var(n_s) = \sigma^2/k$
+
+Smoothing - Avg Direction
 \end{document}
 

@@ -1,38 +1,36 @@
-# ---- Python files you want ignored ----
-a.py
-rpn.py
+# Python files
+*.py[cod]
 
-# ---- LaTeX intermediate / auxiliary files ----
-*.aux
-*.lof
-*.lot
-*.fls
-*.out
-*.toc
-*.fmt
-*.fot
-*.cb
-*.cb2
-*.blg
-*.bbl
-*.bcf
-*.run.xml
-*.fdb_latexmk
-*.synctex.gz
-*.nav
-*.snm
-*.vrb
-*.log
-*.xdv
+# LaTeX intermediate / auxiliary files (recursive)
+**/*.aux
+**/*.lof
+**/*.lot
+**/*.fls
+**/*.out
+**/*.toc
+**/*.fmt
+**/*.fot
+**/*.cb
+**/*.cb2
+**/*.blg
+**/*.bbl
+**/*.bcf
+**/*.run.xml
+**/*.fdb_latexmk
+**/*.synctex.gz
+**/*.nav
+**/*.snm
+**/*.vrb
+**/*.log
+**/*.xdv
 
-# ---- LaTeX outputs (including PDFs) ----
-*.pdf
+# Other editor or OS files (recursive)
+**/*~
+**/*.swp
+**/.DS_Store
 
-# ---- Images / generated files ----
-*.png
-*.img
-
-# ---- Editor / OS junk ----
-*~
-*.swp
-.DS_Store
+# PDF, images, version / config files (recursive)
+**/*.pdf
+**/*.png
+**/.python-version
+**/.vscode/
