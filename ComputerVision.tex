@@ -1172,52 +1172,107 @@ For a given region $R$, determine the coefficients $a$ and model order $m$ that 
 \section{Edge Detection}
 
 \textbf{Edge} \\
-Location of $\underbrace{\text{significant change}}_{\text{rate of change}}$ in a "local image property" \\
-Local Image property - gray level, color, texture, motion
+Location of \textbf{significant change} (rate of change) in a local image property.
 
-\begin{equation}
-    f(t) - \frac{df(t)}{dt}
-\end{equation}
-\begin{equation}
-    f_{\circ} = \underbrace{f(t)}_{\text{signal}} + \underbrace{n(t)}_{\text{noise}}
-\end{equation}
-\begin{equation}
-    \frac{df_{\circ}(t)}{dt} = \frac{df(t)}{dt}+\frac{dx(t)}{dt}
-\end{equation}
+\medskip
+\noindent \textbf{Local Image Properties}
+\begin{itemize}
+    \item Gray level
+    \item Color
+    \item Texture
+    \item Motion
+\end{itemize}
 
-\[
-f(t)=A_{S} \sin(2\pi f_{S}t)
-\] 
+\subsection*{Basic Concept}
+
+Edges correspond to large derivatives (rates of change).
 
 \[
-n(t)=A_{n} \sin(2\pi f_{n}t)
-\] 
-
-\[
-f_{\circ}(t) = A_{S} \sin(2\pi f_{S}t) + A_{n} \sin(2\pi f_{n}t)
-\] 
-
-% \noindent
-\indent
-where, $f_{n}\gg f_{s}$
-
-\[
-SNR = \frac{A_{s}^2}{A_{n}^2}
+f(t) - \frac{df(t)}{dt}
 \]
 
-Change detection is inherently noisy \\
-Change detector is preceded by filtering or smoothing for noise removed
+\subsection*{Signal and Noise Model}
 
-Noise samples $n_1, n_2 \ldots n_k$
+\[
+f_{\circ}(t) = f(t) + n(t)
+\]
 
-$\sigma^2 \longleftarrow Noise Power$
+\[
+\frac{df_{\circ}(t)}{dt} = \frac{df(t)}{dt} + \frac{dn(t)}{dt}
+\]
 
-$Var(n_{i} = \sigma^2)$
+\subsection*{Sinusoidal Example}
+
+\[
+f(t) = A_s \sin(2\pi f_s t)
+\]
+
+\[
+n(t) = A_n \sin(2\pi f_n t)
+\]
+
+\[
+f_{\circ}(t) = A_s \sin(2\pi f_s t) + A_n \sin(2\pi f_n t)
+\]
+
+where 
+\[
+f_n \gg f_s
+\]
+
+\subsection*{Signal-to-Noise Ratio}
+
+\[
+SNR = \frac{A_s^2}{A_n^2}
+\]
+
+\subsection*{Noise and Smoothing}
+
+Change detection is inherently noisy. Edge detectors are usually preceded by smoothing.
+
+\subsection*{Noise Averaging}
+
+Noise samples: 
+\[
+n_1, n_2, \ldots, n_k
+\]
+
+Noise power: 
+\[
+\sigma^2
+\]
+
+Variance of each sample: 
+\[
+Var(n_i) = \sigma^2
+\]
+
+Average noise: 
+\[
+n_s = \frac{n_1 + n_2 + \ldots + n_k}{k}
+\]
+
+Variance after averaging:
+\[
+Var(n_s) = \frac{\sigma^2}{k}
+\]
+
+\subsection*{Key Insight}
+
+Smoothing (averaging) reduces noise variance and improves edge detection.
 
 
-$n_s = \frac{n_1 + n_2 +\ldots + n_k}{k}$
-$var(n_s) = \sigma^2/k$
+\section{Averaging Filter}
+\[
+I_{s} (i, j) = \sum_{l = -\frac{\mathcal{M} - 1}{1}}^{\frac{\mathcal{M} - 1}{1}}
+\]
 
-Smoothing - Avg Direction
+For a smoothing filter
+
+\begin{itemize}
+    \item [A.] $W(k,l) = 0$
+    \item [B.] $\sum \sum w(k, l) = 1$
+\end{itemize}
+
 \end{document}
 
