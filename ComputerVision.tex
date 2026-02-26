@@ -4,6 +4,7 @@
 \usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
 \usepackage{multirow,booktabs}
 \usepackage[table]{xcolor}
+\usepackage{graphicx}
 \usepackage{fullpage}
 \usepackage{lastpage}
 \usepackage{enumitem}
@@ -39,6 +40,8 @@
 \newtheorem{exer}{Exercise}
 \newtheorem{note}{Note}  % Numbered Note
 \newtheorem*{unnote}{Note}  % Unnumbered Note
+\newtheorem{mynote}{Note:}  % Numbered Note:
+\newtheorem*{myunnote}{Note:} % Unnumbered Note:
 \begin{document}
 \setcounter{section}{0}
 \title{Computer Vision Notes}
@@ -130,7 +133,9 @@ For $n = 8$,
 
 \item \textbf{Local Level Computation (Parallelizable but not easy) (edge)}
   \begin{itemize}
-    \item Output Pixel Value = $f(\text{input pixel value, values of pixels in the neighborhood of the input pixel})$
+    \item Output Pixel Value is equal to\\
+    $f(\text{input pixel value, }\allowbreak
+    \text{values of pixels in the neighborhood of the input pixel})$
     (overlapping neighbourhood)
   \end{itemize}
 
@@ -974,13 +979,13 @@ Given the bitmaps $B^\alpha$ (i, j)
 \end{enumerate}
 
 \section{Over Segmentated Image}
-Need to start with a over segemented image because otherwise you will end up improper merge
+Need to start with a over segmented image because otherwise you will end up improper merge
 \ldots
 
-\section{Merge based segementation}
+\section{Merge based segmentation}
 
-Over segement the image\\
-Create initial RAG for the over segemented image\\
+Over segment the image\\
+Create initial RAG for the over segmented image\\
 visit each node in the RAG\\
 a. conside the adjacent nodes\\
 b. if the current node and its adjacent node satisfies the merge criteria then merge the nodes and update RAG\\
@@ -1082,7 +1087,7 @@ Split where the fit error is higher (not only tells when not to split but also w
     \item Halt when no more splits or merge are possible
 \end{enumerate}
 
-Maintain a list of previously visited $k$ solution states \\
+Maintain a list of previously visited $k$ solution states
 
 if the current split/merge results in a previously visited state then reject it and select another node
 
@@ -1094,7 +1099,7 @@ if the current split/merge results in a previously visited state then reject it 
 % \end{equation}
 
 \newpage
-\section{Iterative Model Fitting (Segementation Technique) with Region Growing}
+\section{Iterative Model Fitting (segmentation Technique) with Region Growing}
 
 % Basic Premise 
 
@@ -1274,5 +1279,115 @@ For a smoothing filter
     \item [B.] $\sum \sum w(k, l) = 1$
 \end{itemize}
 
-\end{document}
 
+
+Given Images $I_1, I_2$ and filter $W$ of size $M\times M$ where $M$ is odd.
+
+\[
+I_{1S} (i, j) = \sum_{k,l=+}^{k,l=-}\sum_{\frac{\mathcal{M} - 1}{2}}^{\frac{\mathcal{M} - 1}{2}}W(k,l) I_1 (i+k, j+k)
+\]
+
+corrected:
+
+\[
+I_{1S}(i,j) = \sum_{k=-\frac{M-1}{2}}^{\frac{M-1}{2}}
+\sum_{l=-\frac{M-1}{2}}^{\frac{M-1}{2}}
+W(k,l)\, I_1(i+k, j+l)
+\]
+
+\[
+= W \circledast I_1
+\]
+
+
+
+
+
+Key Insight:
+Smoothing Filter is a linear operator.
+
+\section{Noise}
+Guassian Noise can be smoothed out by convolution filter
+
+Blurring is essentially uncertainty localization.
+
+\subsection{Salt and Pepper Noise (outlines noise)}
+
+Noise takes 2 values
+
+\begin{itemize}
+    \item[-] Min 0 (pepper)
+    \item[-] Max 1 (salt)
+\end{itemize}
+
+
+
+\begin{align}
+I(i,j) &= \min && \text{with probability } p, \\
+I(i,j) &= \max && \text{with probability } g, \\
+I(i,j) &= I(i,j) && \text{with probability (unchanged)} 1-p-g
+\end{align}
+
+\begin{myunnote}
+Look into rank order filter and median filter for salt and pepper
+\end{myunnote}
+
+\section{Guassian Smoothing Filters}
+Looking at 1 D Filters
+\[
+G(\sigma, x) = \frac{1}{\sigma\sqrt{2\pi}} \cdot e^{\frac{-x^2}{2\sigma^2}}
+\]
+
+\section*{Normalization Property}
+
+\[
+\int_{-\infty}^{+\infty} G(x; \sigma)\, dx = 1
+\]
+
+\section*{Probability Mass Condition}
+
+\[
+\int_{-\infty}^{+\infty} G(x; \sigma)\, dx \ge 0.99
+\]
+
+Sample $G(x; \sigma)$ within $[-3\sigma, +3\sigma]$
+
+Compute the values in the range $[0, +3\sigma]$ and determine the values $[-3\sigma, 0]$ by Symmetry.
+
+
+\begin{myunnote}
+    How to reso
+
+\end{myunnote}
+
+\subsection*{How to deal with discretization errors and truncation?}
+
+Normalize the weights and (1, dividing by the sum of the raw weights)
+
+\[(-3\sigma, +3 \sigma) \longrightarrow \text{Mass size of }(6\sigma+1)\]
+
+\begin{figure}[htbp]
+    \centering
+    % First Image
+    \begin{minipage}{0.31\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/IMG_6511.png}
+        \caption{Gaussian Kernels}
+    \end{minipage}
+    \hfill
+    % Second Image
+    \begin{minipage}{0.31\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/IMG_6512_top.png}
+        \caption{Step Edge $I(x)$}
+    \end{minipage}
+    \hfill
+    % Third Image
+    \begin{minipage}{0.31\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/IMG_6512_bottom.png}
+        \caption{Convolved Signal}
+    \end{minipage}
+\end{figure}
+
+\end{document}
