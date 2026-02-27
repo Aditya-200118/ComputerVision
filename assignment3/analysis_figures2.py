@@ -1,3 +1,4 @@
+
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -43,6 +44,33 @@ def extract_image_profile(img, filename, output_dir):
     std_val = np.std(flat_img)
     min_val, max_val = np.min(flat_img), np.max(flat_img)
     
+    # --- NEW ADVANCED METRICS ---
+    # Skewness (3rd Moment) and Kurtosis (4th Moment)
+    if std_val > 0:
+        skewness = np.mean(((flat_img - mean_val) / std_val) ** 3)
+        kurtosis = np.mean(((flat_img - mean_val) / std_val) ** 4) - 3 # Fisher's definition (excess kurtosis)
+    else:
+        skewness = 0
+        kurtosis = 0
+
+    # Intra-Class Variance Heuristic Prep: 
+    # Quickly find iterative T_H to isolate the foreground class, then get its StdDev
+    T_iter = mean_val
+    for _ in range(50): # Cap iterations just for profiling safety
+        G1 = flat_img[flat_img > T_iter]
+        G2 = flat_img[flat_img <= T_iter]
+        mu1 = np.mean(G1) if len(G1) > 0 else 0
+        mu2 = np.mean(G2) if len(G2) > 0 else 0
+        T_new = (mu1 + mu2) / 2.0
+        if abs(T_new - T_iter) < 1.0:
+            break
+        T_iter = T_new
+        
+    T_H_profile = T_iter
+    fg_pixels = flat_img[flat_img >= T_H_profile]
+    fg_std = np.std(fg_pixels) if len(fg_pixels) > 0 else 0
+    # ----------------------------
+
     # Percentiles for CDF heuristics
     p10, p25, p75, p90, p95 = np.percentile(flat_img, [10, 25, 75, 90, 95])
     
@@ -89,7 +117,6 @@ def extract_image_profile(img, filename, output_dir):
     ax1.axis('off')
     
     # Plot B: Histogram and CDF
-    
     ax2 = fig.add_subplot(grid[0, 1])
     ax2.plot(smoothed_hist, color='black', label='Smoothed Hist')
     ax2_cdf = ax2.twinx()
@@ -129,6 +156,8 @@ def extract_image_profile(img, filename, output_dir):
     # Console Output (The Raw Data)
     print(f"========== DEEP PROFILE: {filename} ==========")
     print(f"Intensity Stats: Mean={mean_val:.2f}, Median={median_val:.2f}, StdDev={std_val:.2f}")
+    print(f"Shape Metrics: Skewness={skewness:.3f}, Kurtosis={kurtosis:.3f}")
+    print(f"Intra-Class Base: T_H(Iterative)={T_H_profile:.1f}, Foreground StdDev (sigma_fg)={fg_std:.2f}")
     print(f"Spread: Min={min_val}, Max={max_val}, Entropy={entropy:.3f} bits/pixel")
     print(f"Percentiles: 10%={int(p10)}, 25%={int(p25)}, 75%={int(p75)}, 90%={int(p90)}, 95%={int(p95)}")
     print(f"Top Peaks (Intensity, Freq): {[(int(p[0]), int(p[1])) for p in peaks[:3]]}")
