@@ -1,8 +1,8 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 import math
+from matplotlib.backends.backend_pdf import PdfPages
 
 # Maintain the exact requested styling
 plt.rcParams.update(
@@ -24,6 +24,51 @@ def load_raw_img(path):
         print(f"Error loading {path}: {e}")
         return None
 
+def optimized_iterative_threshold(flat_img, max_iter=100, tol=0.01):
+    """
+    Multi-start iterative threshold optimizer.
+    Returns threshold minimizing intra-class variance.
+    """
+    best_T = None
+    best_intra_var = float('inf')
+
+    # Multiple starting guesses across intensity range
+    initial_guesses = np.linspace(np.min(flat_img), np.max(flat_img), 7)
+
+    for T_start in initial_guesses:
+        T = T_start
+
+        for _ in range(max_iter):
+            G1 = flat_img[flat_img > T]
+            G2 = flat_img[flat_img <= T]
+
+            if len(G1) == 0 or len(G2) == 0:
+                break
+
+            mu1 = np.mean(G1)
+            mu2 = np.mean(G2)
+            T_new = (mu1 + mu2) / 2.0
+
+            if abs(T_new - T) < tol:
+                break
+
+            T = T_new
+
+        # Compute intra-class variance
+        if len(G1) > 0 and len(G2) > 0:
+            var1 = np.var(G1)
+            var2 = np.var(G2)
+            w1 = len(G1) / len(flat_img)
+            w2 = len(G2) / len(flat_img)
+
+            intra_var = w1 * var1 + w2 * var2
+
+            if intra_var < best_intra_var:
+                best_intra_var = intra_var
+                best_T = T
+
+    return best_T, best_intra_var
+
 def calculate_gradients(img):
     """Calculates spatial pixel-to-pixel differences (edges)."""
     gx = np.zeros_like(img)
@@ -35,7 +80,20 @@ def calculate_gradients(img):
     magnitude = np.sqrt(gx**2 + gy**2)
     return magnitude
 
-def extract_image_profile(img, filename, output_dir):
+def save_pdf_table(pdf, filename, stats_data):
+    fig, ax = plt.subplots(figsize=(11, 8.5))
+    ax.axis('tight')
+    ax.axis('off')
+    ax.set_title(f"DEEP PROFILE: {filename}", fontweight='bold', pad=20)
+    
+    table = ax.table(cellText=stats_data, colLabels=["Metric", "Value"], loc='center', cellLoc='left')
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.scale(1.2, 2.5)
+    pdf.savefig(fig)
+    plt.close()
+
+def extract_image_profile(img, filename, output_dir, pdf_handle):
     flat_img = img.ravel()
     
     # 1. Core Statistics
@@ -55,21 +113,26 @@ def extract_image_profile(img, filename, output_dir):
 
     # Intra-Class Variance Heuristic Prep: 
     # Quickly find iterative T_H to isolate the foreground class, then get its StdDev
-    T_iter = mean_val
-    for _ in range(50): # Cap iterations just for profiling safety
-        G1 = flat_img[flat_img > T_iter]
-        G2 = flat_img[flat_img <= T_iter]
-        mu1 = np.mean(G1) if len(G1) > 0 else 0
-        mu2 = np.mean(G2) if len(G2) > 0 else 0
-        T_new = (mu1 + mu2) / 2.0
-        if abs(T_new - T_iter) < 1.0:
-            break
-        T_iter = T_new
+    # T_iter = mean_val
+    # for _ in range(50): # Cap iterations just for profiling safety
+    #     G1 = flat_img[flat_img > T_iter]
+    #     G2 = flat_img[flat_img <= T_iter]
+    #     mu1 = np.mean(G1) if len(G1) > 0 else 0
+    #     mu2 = np.mean(G2) if len(G2) > 0 else 0
+    #     T_new = (mu1 + mu2) / 2.0
+    #     if abs(T_new - T_iter) < 1.0:
+    #         break
+    #     T_iter = T_new
         
-    T_H_profile = T_iter
+    # T_H_profile = T_iter
+    # fg_pixels = flat_img[flat_img >= T_H_profile]
+    # fg_std = np.std(fg_pixels) if len(fg_pixels) > 0 else 0
+    # ----------------------------
+
+    T_H_profile, intra_var = optimized_iterative_threshold(flat_img)
+
     fg_pixels = flat_img[flat_img >= T_H_profile]
     fg_std = np.std(fg_pixels) if len(fg_pixels) > 0 else 0
-    # ----------------------------
 
     # Percentiles for CDF heuristics
     p10, p25, p75, p90, p95 = np.percentile(flat_img, [10, 25, 75, 90, 95])
@@ -151,32 +214,42 @@ def extract_image_profile(img, filename, output_dir):
     # Save
     out_path = os.path.join(output_dir, f"{filename.split('.')[0]}_deep_profile.png")
     plt.savefig(out_path, bbox_inches='tight')
+    pdf_handle.savefig(fig, bbox_inches='tight')
     plt.close()
     
-    # Console Output (The Raw Data)
-    print(f"========== DEEP PROFILE: {filename} ==========")
-    print(f"Intensity Stats: Mean={mean_val:.2f}, Median={median_val:.2f}, StdDev={std_val:.2f}")
-    print(f"Shape Metrics: Skewness={skewness:.3f}, Kurtosis={kurtosis:.3f}")
-    print(f"Intra-Class Base: T_H(Iterative)={T_H_profile:.1f}, Foreground StdDev (sigma_fg)={fg_std:.2f}")
-    print(f"Spread: Min={min_val}, Max={max_val}, Entropy={entropy:.3f} bits/pixel")
-    print(f"Percentiles: 10%={int(p10)}, 25%={int(p25)}, 75%={int(p75)}, 90%={int(p90)}, 95%={int(p95)}")
-    print(f"Top Peaks (Intensity, Freq): {[(int(p[0]), int(p[1])) for p in peaks[:3]]}")
-    print(f"Edge Stats: Mean Gradient Magnitude={mean_grad:.2f}")
-    print("==================================================\n")
+    # Prepare Table Data
+    stats_data = [
+        ["Mean Intensity", f"{mean_val:.2f}"],
+        ["Median Intensity", f"{median_val:.2f}"],
+        ["StdDev", f"{std_val:.2f}"],
+        ["Skewness", f"{skewness:.3f}"],
+        ["Kurtosis", f"{kurtosis:.3f}"],
+        ["T_H (Iterative)", f"{T_H_profile:.1f}"],
+        ["Min Intra-Class Variance", f"{intra_var:.2f}"],
+        ["Foreground StdDev", f"{fg_std:.2f}"],
+        ["Min / Max", f"{int(min_val)} / {int(max_val)}"],
+        ["Entropy", f"{entropy:.3f} bits/pixel"],
+        ["Percentiles (10/25/75/90/95)", f"{int(p10)}, {int(p25)}, {int(p75)}, {int(p90)}, {int(p95)}"],
+        ["Top Peaks", f"{[int(p[0]) for p in peaks[:3]]}"],
+        ["Mean Gradient", f"{mean_grad:.2f}"],
+    ]
+    save_pdf_table(pdf_handle, filename, stats_data)
 
 if __name__ == "__main__":
     output_dir = "assignment3_profiling"
     os.makedirs(output_dir, exist_ok=True)
     
     files = ["test1.img", "test2.img", "test3.img"]
+    pdf_path = os.path.join(output_dir, "Summary_Report.pdf")
     
-    for file in files:
-        if os.path.exists(file):
-            print(f"Analyzing {file}...")
-            img = load_raw_img(file)
-            if img is not None:
-                extract_image_profile(img, file, output_dir)
-        else:
-            print(f"File {file} not found.")
+    with PdfPages(pdf_path) as pdf:
+        for file in files:
+            if os.path.exists(file):
+                print(f"Analyzing {file}...")
+                img = load_raw_img(file)
+                if img is not None:
+                    extract_image_profile(img, file, output_dir, pdf)
+            else:
+                print(f"File {file} not found.")
             
-    print(f"Profiling complete. High-res visuals saved to '{output_dir}'.")
+    print(f"Profiling complete. Table report saved to '{pdf_path}'.")
