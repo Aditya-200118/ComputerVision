@@ -148,21 +148,25 @@ $BestPeakiness \leftarrow -1$, $BestValley \leftarrow 0$\;
 
 $B \leftarrow (I \ge T)$\;
 \Return $B, T$\;
-\caption{Peakiness-Based Automatic Thresholding}
+\caption{Peakiness-Based Thresholding}
 \end{algorithm}
 
 \subsubsection{Design and Heuristics}
 \begin{itemize}
-    \item \textbf{Dynamic Smoothing Window ($W$):} Hardcoding a smoothing window fails across varying distributions, especially in cases where the distribution could be heavily skewed. The window size was mapped inversely to the 4th statistical moment, Kurtosis. 
-    \[W = 5 - (\text{Kurtosis} \times 2)\] 
-    High kurtosis (leptokurtic curve) means that distribution has has less variance yields a smaller window to preserve valid peaks, while negative kurtosis (flat, noisy plateaus) yields a larger window to aggressively flatten structural noise. This is clamped between 3 and 15 and forced to an odd integer for symmetrical convolution.
-    \item \textbf{height ratio Filter:} To prevent the algorithm from evaluating intra-class noise as distinct objects, the prominence requirement was dynamically linked to Kurtosis: $\text{Prominence} = 0.05 + (\text{Kurtosis} \times 0.015)$. Spiky histograms (e.g., heavy shadows) receive a stricter filter to ignore heavy-tail noise, while flat histograms receive a relaxed filter to catch subtle secondary modes. This is clamped between $2\%$ and $10\%$ to respect the physical limits of 8-bit image clusters.
-    \item \textbf{Minimum Peak Distance:} The minimum distance between valid peaks was set to $0.6 \sigma$, clamped at a lower bound of 40. In a 256-intensity range, a distance of 40 represents approximately $15\%$ of the total dynamic range. Peaks closer than $15\%$ are statistically highly likely to be intra-class illumination variations rather than distinct inter-class objects.
+    \item \textbf{Smoothing Window ($W$):} Hardcoding a smoothing window fails across varying distributions, particularly when distributions exhibit heavy skewness or unbounded kurtosis. The 4th statistical moment (Excess Kurtosis, $K$) is first normalized using a hyperbolic tangent function, and mapped it to a strictly bounded range $K_{norm} = \tanh(K) \in (-1, 1)$. The window size is then linearly interpolated:
+    \[ W = W_{max} - \left( \frac{K_{norm} + 1}{2} \right) \times (W_{max} - W_{min}) \]
+    where $W_{min} = 3$ and $W_{max} = 15$. A high kurtosis (leptokurtic distribution) indicates heavy tails and a sharply concentrated peak; this formulation results in a smaller window to preserve valid structural peaks without destroying adjacent valleys. Conversely, a negative kurtosis (platykurtic distribution) results in a larger window to aggressively flatten noise across broad, flat plateaus. The final value is rounded to the nearest odd integer to maintain symmetrical convolution.
+    
+    \item \textbf{Height Ratio Filter:} To prevent the algorithm from evaluating intra-class noise as distinct objects, the minimum height requirement for a peak is dynamically linked to the normalized kurtosis: 
+    \[ \text{Height Ratio} = 0.05 + (0.02 \times K_{norm}) \]
+    Spiky histograms (e.g., dominated by heavy shadows) receive a stricter height requirement to successfully filter out the heavy-tail noise. While, flat histograms receive a relaxed filter to capture subtle secondary modes. To respect the physical limits of 8-bit image clustering, the final ratio is \textbf{clamped} between $2\%$ and $10\%$ of the global maximum frequency.
+    
+    \item \textbf{Minimum Peak Distance:} The minimum distance between valid peaks was set to $0.6 \sigma$, clamped at a lower absolute bound of 40 bins. In a 256-intensity spectrum, a distance of 40 represents approximately $15.6\%$ of the total dynamic range.
 \end{itemize}
 \newpage
 \subsection{Task 2: Iterative Thresholding}
 \subsubsection{Algorithm Overview}
-This algorithm iteratively converges on a threshold. It splits the image into two groups (foreground and background) based on an initial estimate, calculates the mean of both groups, and updates the threshold to the midpoint of those means until convergence ($\Delta T < 1.0$).
+This algorithm iteratively converges on a threshold. It splits the image into two groups (foreground and background) based on an initial estimate, calculates the mean of both groups, and updates the threshold to the midpoint of those means until convergence ($\Delta T < 1.0$). Where, \[\Delta T = |T_{new} - T_{old}|\]
 
 \begin{algorithm}[H]
 \DontPrintSemicolon
@@ -189,17 +193,17 @@ $T \leftarrow \lfloor T_{new} \rfloor$\;
 $B \leftarrow (I \ge T)$\;
 
 \Return $B, T$\;
-\caption{Iterative Intermeans Thresholding}
+\caption{Iterative Thresholding}
 \end{algorithm}
 
-\subsubsection{Dynamic Heuristics Justification}
+\subsubsection{Design and Heuristics}
 \begin{itemize}
-    \item \textbf{Initial Seed ($T_0$):} Standard iterative algorithms often start at the global mean. However, in heavily skewed images (e.g., dominated by dark shadows), the mean is dragged away from the visual center. To combat skewness, the initial seed is set to the average of the Mean and Median: $T_0 = (\text{Mean} + \text{Median}) / 2.0$.
+    \item \textbf{Initial Seed ($T_0$):} Standard iterative algorithms start at the global mean. However, in heavily skewed images (e.g., dominated by dark shadows), the mean skew's away from the center. To combat this skewness, the initial seed is set to the average of the Mean and Median: $T_0 = (\text{Mean} + \text{Median}) / 2.0$ (this provides a \textbf{middle ground} in case of extreme outliers).
 \end{itemize}
 \newpage
 \subsection{Task 3: Dual Thresholding with Region Growing}
 \subsubsection{Algorithm Overview}
-This algorithm uses a strict High Threshold ($T_H$) to confidently identify core object pixels (seeds). A Breadth-First Search (BFS) algorithm then evaluates 8-connected neighbors, allowing the region to grow outward as long as connected pixels satisfy a relaxed Low Threshold ($T_L$). 
+This algorithm uses a strict High Threshold ($T_H$) to confidently identify core object pixels. A Breadth-First Search (BFS) algorithm then evaluates 8-connected neighbors, allowing the region to grow outward as long as connected pixels satisfy a Low Threshold ($T_L$). 
 
 \begin{algorithm}[H]
 \DontPrintSemicolon
@@ -246,11 +250,11 @@ Initialize queue $Q$ with pixels where $I \ge T_H$\;
 \caption{Dual Thresholding with BFS Region Growing}
 \end{algorithm}
 
-\subsubsection{Dynamic Heuristics Justification}
+\subsubsection{Design and Heuristics}
 \begin{itemize}
     \item \textbf{Foreground Variance ($T_L$ Base):} The low threshold is established by subtracting a multiple of the foreground standard deviation ($\sigma_{fg}$) from the high threshold: $T_L = T_H - (\sigma_{fg} \times \text{Multiplier})$.
-    \item \textbf{Dynamic Multiplier (Leash):} To prevent "leakage" into the background on images with smooth gradients, the multiplier dictates the strictness of the region growth. It is inversely linked to the 3rd statistical moment (Skewness): $\text{Multiplier} = \max(0.3, 1.0 - |\text{Skewness}|)$. Highly skewed images receive a tight leash to prevent shadows from bleeding into the background.
-    \item \textbf{The Hysteresis Clamp:} The multiplier is clamped at a minimum of $0.3$. Dropping below $0.3 \sigma$ practically eliminates the hysteresis band, causing $T_L$ to equal $T_H$, which degenerates the algorithm back into Single Global Thresholding.
+    \item \textbf{Multiplier:} To prevent "leakage" into the background on images with smooth gradients, the multiplier dictates the strictness of the region growth. It is inversely linked to the 3rd statistical moment (Skewness): $\text{Multiplier} = \max(0.3, 1.0 - |\text{Skewness}|)$. Highly skewed images receive a higher penalty to prevent shadows from bleeding into the background.
+    \item \textbf{The Hysteresis Clamp:} The multiplier is clamped at a minimum of $0.3$. Dropping below $0.3 \sigma$ practically eliminates the band, causing $T_L$ to equal $T_H$, in which case the algorithm would fall to Single Global Thresholding.
 \end{itemize}
 
 \newpage
@@ -260,25 +264,27 @@ Initialize queue $Q$ with pixels where $I \ge T_H$\;
 % TEST 1 RESULTS
 % ---------------------------------------------------------
 \subsection{Results: test1.img}
-Image \texttt{test1.img} presents a relatively balanced illumination profile with a mild negative kurtosis of -0.617[cite: 63]. The dynamic heuristics successfully relaxed the height ratio to accommodate the balanced lighting.
-
+Image \texttt{test1.img} presents a relatively balanced illumination profile with a mild negative kurtosis of -0.617. The heuristics successfully relaxed the height ratio to accommodate the balanced lighting.
+\captionsetup[subfigure]{skip=2pt} % Shrinks gap under subfigures
+\captionsetup[figure]{skip=5pt}    % Shrinks gap under main figures
 \begin{figure}[H]
     \centering
+    % Row 1: Original and CDF Side-by-Side
     \begin{subfigure}{0.48\textwidth}
         \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test1_original.pdf}
+        \caption{Original Image}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test1_stats_table.pdf}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test1_cdf_histogram.pdf}
+        \caption{Intensity Distribution \& CDF}
     \end{subfigure}
     
     \vspace{0.5cm}
-    \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test1_cdf_histogram.pdf}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test1_height_analysis.pdf}
+    % Row 2: Full-width Table
+    \begin{subfigure}{0.55\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test1_stats_table.pdf}
+        \caption{Statistical Profile Table}
     \end{subfigure}
     \caption{Statistical Deep Profile for \texttt{test1.img}}
 \end{figure}
@@ -307,25 +313,26 @@ Image \texttt{test1.img} presents a relatively balanced illumination profile wit
 % TEST 2 RESULTS
 % ---------------------------------------------------------
 \subsection{Results: test2.img}
-Image \texttt{test2.img} is heavily impacted by shadows, creating a high positive skewness of 1.116[cite: 131]. The dynamic multiplier heuristic successfully tightened the region growing leash to prevent leakage into the dark desk gradients.
+Image \texttt{test2.img} is heavily impacted by shadows, creating a high positive skewness of 1.116. The multiplier heuristic successfully tightened the region growing penalty to prevent leakage into the dark desk gradients.
 
 \begin{figure}[H]
     \centering
+    % Row 1: Original and CDF Side-by-Side
     \begin{subfigure}{0.48\textwidth}
         \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test2_original.pdf}
+        \caption{Original Image}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test2_stats_table.pdf}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test2_cdf_histogram.pdf}
+        \caption{Intensity Distribution \& CDF}
     \end{subfigure}
     
     \vspace{0.5cm}
-    \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test2_cdf_histogram.pdf}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test2_height_analysis.pdf}
+    % Row 2: Full-width Table
+    \begin{subfigure}{0.55\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test2_stats_table.pdf}
+        \caption{Statistical Profile Table}
     \end{subfigure}
     \caption{Statistical Deep Profile for \texttt{test2.img}}
 \end{figure}
@@ -354,25 +361,26 @@ Image \texttt{test2.img} is heavily impacted by shadows, creating a high positiv
 % TEST 3 RESULTS
 % ---------------------------------------------------------
 \subsection{Results: test3.img}
-Image \texttt{test3.img} features a large, flat background causing a highly platykurtic distribution (Kurtosis: -1.132)[cite: 199]. The dynamic smoothing heuristic automatically increased the convolution window size to aggressively filter structural noise on the flat plateaus.
+Image \texttt{test3.img} features a large, flat background causing a highly platykurtic distribution (Kurtosis: -1.132). In this case accomodating the kurtosis, increased the window size to aggressively filter structural noise on the flat plateaus.
 
 \begin{figure}[H]
     \centering
+    % Row 1: Original and CDF Side-by-Side
     \begin{subfigure}{0.48\textwidth}
         \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test3_original.pdf}
+        \caption{Original Image}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test3_stats_table.pdf}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test3_cdf_histogram.pdf}
+        \caption{Intensity Distribution \& CDF}
     \end{subfigure}
     
     \vspace{0.5cm}
-    \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test3_cdf_histogram.pdf}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test3_height_analysis.pdf}
+    % Row 2: Full-width Table
+    \begin{subfigure}{0.55\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test3_stats_table.pdf}
+        \caption{Statistical Profile Table}
     \end{subfigure}
     \caption{Statistical Deep Profile for \texttt{test3.img}}
 \end{figure}
@@ -396,10 +404,9 @@ Image \texttt{test3.img} features a large, flat background causing a highly plat
     \caption{Segmentation Results for \texttt{test3.img}}
 \end{figure}
 
-
 \newpage
 \section{Conclusion}
-By transitioning from hardcoded empirical dictionaries to an adaptive, moment-driven heuristic extraction pipeline, the thresholding algorithms demonstrated significant robustness. Linking spatial constraints to Standard Deviation, algorithm strictness to Skewness, and filter sensitivity to Kurtosis proved highly effective at producing reliable segmentation across varied, unseen illumination conditions.
+
 
 \begin{shaded}
 \textbf{\textit{Note:}} For source code kindly refer to the appendix on the next page.
@@ -408,7 +415,6 @@ By transitioning from hardcoded empirical dictionaries to an adaptive, moment-dr
 \newpage
 \section{Appendix: Source Code}
 \begin{lstlisting}
-# Place your final assignment3.py code here.
 \end{lstlisting}
 
 \end{document}
