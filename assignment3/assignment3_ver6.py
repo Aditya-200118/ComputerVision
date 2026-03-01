@@ -82,7 +82,9 @@ def extract_dynamic_heuristics(image):
     sigma_fg = np.std(fg_pixels) if len(fg_pixels) > 0 else 0
     print(f"window size: {window_size}\n")
     # window_size = 5
-    return min_distance, t0_estimate, sigma_fg, window_size, dynamic_multiplier
+    raw_prominence = 0.05 + (kurtosis * 0.015)
+    dynamic_prominence = max(0.02, min(0.10, raw_prominence))
+    return min_distance, t0_estimate, sigma_fg, window_size, dynamic_multiplier, dynamic_prominence
 
 # def threshold_peakiness(image, min_distance, win_size, prominence_ratio=0.05):
 #     """
@@ -203,7 +205,7 @@ def threshold_iterative(image, t0_estimate, epsilon=1.0):
     T_final = int(T_new)
     return (image >= T_final).astype(np.uint8) * 255, T_final
 
-def threshold_dual_region_growing(image, sigma_fg, multiplier=0.75):
+def threshold_dual_region_growing(image, sigma_fg, multiplier=0.5):
     """
     Task 3: Dual thresholding with Breadth-First region growing.
     T_H is found iteratively. T_L is derived from foreground variance.
@@ -253,10 +255,10 @@ if __name__ == "__main__":
             
         print(f"\nProcessing {file}...")
         img = load_and_preprocess(file)
-        min_dist, t0_seed, sigma_fg, win_size, dyn_mult = extract_dynamic_heuristics(img)
+        min_dist, t0_seed, sigma_fg, win_size, dyn_mult, dyn_pro = extract_dynamic_heuristics(img)
         base_name = file.split('.')[0]
         
-        res_peak, t_peak = threshold_peakiness(img, min_dist, win_size)
+        res_peak, t_peak = threshold_peakiness(img, min_dist, win_size, dyn_pro)
         plt.imsave(f"{output_dir}/{base_name}_peakiness.png", res_peak, cmap='gray')
         
         res_iter, t_iter = threshold_iterative(img, t0_seed)

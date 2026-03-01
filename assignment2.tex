@@ -140,7 +140,7 @@ Given $\text{MAT}(i, j)$ and the corresponding $DT$ values for each nonzero pixe
 DT^{(n)}(i, j) = DT^{(n-1)}(i, j) \quad \forall i, j
 \end{equation}
 \end{shaded}
-\subsection*{Reconstruction Psuedocode}
+\subsection{Reconstruction Psuedocode}
 \begin{algorithm}[H]
 \DontPrintSemicolon
 \SetKwFunction{FDist}{CalculateDistance}
@@ -265,7 +265,13 @@ The Chessboard metric generates square-shaped expansions given by Eq.~\eqref{eq:
 The iterative distance transform algorithm “skeletonizes” the objects. The Manhattan and Chessboard metrics are computationally simpler. The error analysis confirms that lossless reconstruction is achievable for Manhattan and Chessboard, provided the local maximum condition is strictly enforced.
 
 \begin{shaded}
-\textbf{\textit{Note:}} For source code kindly refer to appendix on next page
+\textbf{\textit{Note on Difference Maps:}} In the error analysis heatmaps (Figures 4 and 10), a \textbf{completely black image} signifies that the pixel-wise difference between the original and reconstructed images is zero. This visual evidence confirms a \textbf{perfectly lossless reconstruction} for the Manhattan and Chessboard metrics.
+
+In contrast, the Euclidean distance (\texorpdfstring{$L_2$}{L2}) result (Figure 7) is inherently \textbf{lossy} in a discrete domain. Because Euclidean relies on floating-point arithmetic, they do not align perfectly with square pixels, resulting in boundary discrepancies (aliasing) and a non-zero error count (2,462 pixels).
+\end{shaded}
+
+\begin{shaded}
+\textbf{\textit{Note:}} For source code kindly refer to appendix on next page.
 \end{shaded}
 
 \newpage
@@ -433,15 +439,6 @@ def save_final_comparison(original_binary, reconstructed_binary, label, metric_k
     ax[1].set_title("Reconstructed Binary Image (BR)")
     ax[1].axis("off")
 
-    fig.text(
-        0.5,
-        0.08,
-        f"Comparison of Original (B) and Lossless Reconstruction (BR) using {label} Metric.",
-        ha="center",
-        fontsize=12,
-        fontweight="bold",
-    )
-
     output_filename = f"Final_Comparison_{metric_key}.png"
     plt.savefig(output_filename, dpi=600, bbox_inches="tight")
     plt.close()
@@ -469,16 +466,6 @@ def save_difference_analysis(original_binary, reconstructed_binary, label, metri
     ax[2].imshow(difference_map, cmap="hot")
     ax[2].set_title(f"Difference Map (Errors: {error_count})")
     ax[2].axis("off")
-
-    fig.text(
-        0.5,
-        0.08,
-        f"Error Analysis for {label} Metric. "
-        f"Total Pixel Discrepancy: {error_count}.",
-        ha="center",
-        fontsize=12,
-        fontweight="bold",
-    )
 
     output_filename = f"Error_Analysis_{metric_key}.png"
     plt.savefig(output_filename, dpi=600, bbox_inches="tight")
@@ -508,14 +495,7 @@ if __name__ == "__main__":
         ax[1].imshow(recon, cmap="gray")
         ax[1].set_title("Reconstruction")
         ax[1].axis("off")
-        fig.text(
-            0.5,
-            0.08,
-            f"{label} Metric: Skeleton and Lossless Reconstruction.",
-            ha="center",
-            fontsize=12,
-            fontweight="bold",
-        )
+
         plt.savefig(f"APA_{key}.png", dpi=600, bbox_inches="tight")
         plt.close()
         save_final_comparison(binary_mask, recon, label, key)

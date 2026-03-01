@@ -160,15 +160,6 @@ def save_final_comparison(original_binary, reconstructed_binary, label, metric_k
     ax[1].set_title("Reconstructed Binary Image (BR)")
     ax[1].axis("off")
 
-    # fig.text(
-    #     0.5,
-    #     0.08,
-    #     f"Comparison of Original (B) and Lossless Reconstruction (BR) using {label} Metric.",
-    #     ha="center",
-    #     fontsize=12,
-    #     fontweight="bold",
-    # )
-
     output_filename = f"Final_Comparison_{metric_key}.png"
     plt.savefig(output_filename, dpi=600, bbox_inches="tight")
     plt.close()
@@ -196,16 +187,6 @@ def save_difference_analysis(original_binary, reconstructed_binary, label, metri
     ax[2].imshow(difference_map, cmap="hot")
     ax[2].set_title(f"Difference Map (Errors: {error_count})")
     ax[2].axis("off")
-
-    # fig.text(
-    #     0.5,
-    #     0.08,
-    #     f"Error Analysis for {label} Metric. "
-    #     f"Total Pixel Discrepancy: {error_count}.",
-    #     ha="center",
-    #     fontsize=12,
-    #     fontweight="bold",
-    # )
 
     output_filename = f"Error_Analysis_{metric_key}.png"
     plt.savefig(output_filename, dpi=600, bbox_inches="tight")
@@ -235,14 +216,7 @@ if __name__ == "__main__":
         ax[1].imshow(recon, cmap="gray")
         ax[1].set_title("Reconstruction")
         ax[1].axis("off")
-        # fig.text(
-        #     0.5,
-        #     0.08,
-        #     f"{label} Metric: Skeleton and Lossless Reconstruction.",
-        #     ha="center",
-        #     fontsize=12,
-        #     fontweight="bold",
-        # )
+
         plt.savefig(f"APA_{key}.png", dpi=600, bbox_inches="tight")
         plt.close()
         save_final_comparison(binary_mask, recon, label, key)

@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib.pyplot import subplots # Added to fix potential matplotlib namespace issue internally
 import matplotlib.pyplot as plt
 import os
 import math
@@ -170,8 +171,10 @@ def extract_image_profile(img, filename, output_dir, pdf_handle):
     mean_grad = np.mean(grad_mag)
 
     # 4. Plotting
-    fig = plt.figure(figsize=(14, 10))
-    grid = plt.GridSpec(2, 2, hspace=0.3, wspace=0.2)
+    # CHANGED: Increased height to 15 to accommodate 3 rows
+    fig = plt.figure(figsize=(14, 15))
+    # CHANGED: Made grid 3 rows instead of 2
+    grid = plt.GridSpec(3, 2, hspace=0.35, wspace=0.2)
     
     # Plot A: Original Image
     ax1 = fig.add_subplot(grid[0, 0])
@@ -196,7 +199,7 @@ def extract_image_profile(img, filename, output_dir, pdf_handle):
     ax2_cdf.set_ylabel("Cumulative Probability", color='red')
     ax2.legend(loc='upper left')
     
-    # Plot C: Gradient Magnitude (Edge Strength)
+    # Plot C: Gradient Magnitude (Edges Strength)
     ax3 = fig.add_subplot(grid[1, 0])
     im3 = ax3.imshow(grad_mag, cmap='hot')
     ax3.set_title(f"Pixel Gradient Magnitude (Edges)\nMean Gradient: {mean_grad:.2f}")
@@ -209,7 +212,41 @@ def extract_image_profile(img, filename, output_dir, pdf_handle):
     ax4.set_title(f"Gradient Strength Distribution")
     ax4.set_xlabel("Gradient Magnitude")
     ax4.set_ylabel("Frequency")
-    ax4.set_yscale('log') # Log scale to see the tail of strong edges
+    ax4.set_yscale('log')
+    
+    # --- NEW PLOT E: Prominence Ratio Analysis ---
+    ax5 = fig.add_subplot(grid[2, :]) # Spans both columns on the bottom row
+    ax5.plot(smoothed_hist, color='black', linewidth=1.5)
+    ax5.set_title("Prominence Ratio Threshold Analysis")
+    ax5.set_xlabel("Grayscale Intensity")
+    ax5.set_ylabel("Pixel Frequency")
+    ax5.set_xlim([0, 255])
+    
+    max_h = np.max(smoothed_hist)
+    
+    # Define the ratios we want to test visually
+    test_ratios = [0.02, 0.05, 0.10]
+    colors = ['green', 'orange', 'red']
+    
+    for r, c in zip(test_ratios, colors):
+        thresh_val = max_h * r
+        ax5.axhline(thresh_val, color=c, linestyle='--', alpha=0.7, 
+                    label=f'{int(r*100)}% Threshold ({int(thresh_val)} px)')
+        
+        # Find peaks that pass this specific threshold
+        valid_peaks_x = []
+        valid_peaks_y = []
+        for i in range(1, 255):
+            if smoothed_hist[i] > smoothed_hist[i-1] and smoothed_hist[i] > smoothed_hist[i+1]:
+                if smoothed_hist[i] > thresh_val:
+                    valid_peaks_x.append(i)
+                    valid_peaks_y.append(smoothed_hist[i])
+        
+        # Plot dots on the peaks that survive this ratio
+        if valid_peaks_x:
+            ax5.scatter(valid_peaks_x, valid_peaks_y, color=c, zorder=5, s=50)
+
+    ax5.legend(loc='upper right')
 
     # Save
     out_path = os.path.join(output_dir, f"{filename.split('.')[0]}_deep_profile.png")
