@@ -21,6 +21,8 @@ def load_and_preprocess(path):
 
 import numpy as np
 
+import numpy as np
+
 def extract_dynamic_heuristics(image):
     """
     Automatically derives heuristics from the image's statistical profile.
@@ -39,6 +41,9 @@ def extract_dynamic_heuristics(image):
         skewness = 0
         kurtosis = 0
 
+    # Normalize kurtosis using tanh (bounded response) to prevent explosion
+    k_norm = np.tanh(kurtosis)
+
     # Heuristic 1: Iterative Seed (Combats skewness) 
     t0_estimate = (mean_val + median_val) / 2.0
 
@@ -52,18 +57,38 @@ def extract_dynamic_heuristics(image):
     # Heuristic 3: Dynamic Window Size (based on Kurtosis)
     # High kurtosis (sharp peaks) -> smaller window to preserve peaks.
     # Low/Negative kurtosis (flat/noisy) -> larger window to smooth noise aggressively.
-    raw_window = 5 - (kurtosis * 2)
-    window_size = int(round(raw_window))
+    
+    # --- OLD CODE ---
+    # raw_window = 5 - (kurtosis * 2)
+    # window_size = int(round(raw_window))
+    # if window_size % 2 == 0:
+    #     window_size += 1  # Force to an odd integer for symmetrical convolution
+    # window_size = max(3, min(15, window_size)) # Clamp valid kernel sizes
+    # ----------------
+    
+    # --- NEW STABLE CODE ---
+    min_w, max_w = 3, 15
+    window_float = max_w - ((k_norm + 1) / 2.0) * (max_w - min_w)
+    window_size = int(round(window_float))
+    
     if window_size % 2 == 0:
-        window_size += 1  # Force to an odd integer for symmetrical convolution
-    window_size = max(3, min(15, window_size)) # Clamp valid kernel sizes
+        window_size += 1
+    # -----------------------
 
     # Heuristic 4: Dynamic Region Growing Multiplier (based on Skewness)
     # JUSTIFICATION for 0.3: Dropping below 0.3 standard deviations practically eliminates 
     # the hysteresis band. If the multiplier drops to 0, T_L equals T_H, which degenerates 
     # the Dual-Threshold algorithm back into a Single Global Threshold algorithm, entirely 
     # defeating the purpose of region growing. 0.3 ensures a minimal functional hysteresis band.
-    dynamic_multiplier = max(0.3, 1.0 - abs(skewness))
+    
+    # --- OLD CODE ---
+    # dynamic_multiplier = max(0.3, 1.0 - abs(skewness))
+    # ----------------
+    
+    # --- NEW STABLE CODE ---
+    s_norm = min(1.0, abs(skewness))
+    dynamic_multiplier = max(0.3, 1.0 - s_norm)
+    # -----------------------
 
     # Calculate Foreground Standard Deviation (sigma_fg) for Region Growing
     T_temp = t0_estimate
@@ -78,15 +103,25 @@ def extract_dynamic_heuristics(image):
         if abs(T_new - T_temp) < 1.0: break
         T_temp = T_new
     
-    fg_pixels = image[image >= T_temp]
+    fg_pixels = image[image > T_temp]
     sigma_fg = np.std(fg_pixels) if len(fg_pixels) > 0 else 0
     print(f"window size: {window_size}\n")
     # window_size = 5
-    raw_prominence = 0.05 + (kurtosis * 0.015)
+    
+    # Heuristic 5: Peak Prominence (Height Ratio)
+    # Smooth, bounded modulation using normalized kurtosis
+    # --- OLD CODE ---
+    # raw_prominence = 0.05 + (kurtosis * 0.015)
+    # dynamic_prominence = max(0.02, min(0.10, raw_prominence))
+    # ----------------
+    
+    # --- NEW STABLE CODE ---
+    raw_prominence = 0.05 + 0.02 * k_norm
     dynamic_prominence = max(0.02, min(0.10, raw_prominence))
+    # -----------------------
+    
     return min_distance, t0_estimate, sigma_fg, window_size, dynamic_multiplier, dynamic_prominence
-
-# def threshold_peakiness(image, min_distance, win_size, prominence_ratio=0.05):
+# def threshold_peakiness(image, min_distance, win_size, height_ratio=0.05):
 #     """
 #     Task 1: Thresholding using peakiness detection.
 #     Evaluates peak pairs based on prominence and distance, selecting the 
@@ -98,11 +133,11 @@ def extract_dynamic_heuristics(image):
 #     hist = np.bincount(image.ravel(), minlength=256)
 #     smoothed_hist = np.convolve(hist, np.ones(kernel_size)/kernel_size, mode='same')
     
-#     prominence_threshold = np.max(smoothed_hist) * prominence_ratio
+#     height_thereshold = np.max(smoothed_hist) * height_ratio
 #     peaks = [i for i in range(1, 255) 
 #              if smoothed_hist[i] > smoothed_hist[i-1] 
 #              and smoothed_hist[i] > smoothed_hist[i+1] 
-#              and smoothed_hist[i] > prominence_threshold]
+#              and smoothed_hist[i] > height_thereshold]
                 
 #     best_valley = 0
 #     max_peakiness = -1
@@ -126,10 +161,10 @@ def extract_dynamic_heuristics(image):
 #     T = best_valley if best_valley > 0 else int(np.mean(image))
 #     return (image >= T).astype(np.uint8) * 255, T
 
-def threshold_peakiness(image, min_distance, win_size, prominence_ratio=0.05):
+def threshold_peakiness(image, min_distance, win_size, height_ratio=0.05):
     """
     Task 1: Thresholding using peakiness detection.
-    Relies on dynamically calculated 'min_distance', 'win_size', and 'prominence_ratio' 
+    Relies on dynamically calculated 'min_distance', 'win_size', and 'height_ratio' 
     to filter out local clustering and structural noise based on the image's statistical profile.
     """
     hist = np.zeros(256, dtype=int)
@@ -145,12 +180,12 @@ def threshold_peakiness(image, min_distance, win_size, prominence_ratio=0.05):
         smoothed_hist[i] = np.mean(hist[start:end+1])
         
     max_hist_val = np.max(smoothed_hist)
-    prominence_threshold = max_hist_val * prominence_ratio
+    height_thereshold = max_hist_val * height_ratio
     
     peaks = []
     for i in range(1, 255):
         if smoothed_hist[i] > smoothed_hist[i-1] and smoothed_hist[i] > smoothed_hist[i+1]:
-            if smoothed_hist[i] > prominence_threshold:
+            if smoothed_hist[i] > height_thereshold:
                 peaks.append(i)
                 
     best_peak_pair = None
