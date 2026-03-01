@@ -63,7 +63,7 @@
 \pagestyle{fancy}
 \fancyhf{}
 \rhead{\thepage}
-\lhead{CSCI 8820: Assignment 2}
+\lhead{CSCI 8820: Assignment 3}
 \renewcommand{\headrulewidth}{0.5pt}
 
 % ============================================================
@@ -93,22 +93,320 @@
 \newpage
 
 \section{Introduction and Preprocessing}
+This report details the implementation and mathematical justification of three distinct automated image thresholding techniques: Peakiness Detection, Iterative Thresholding, and Dual-Threshold Region Growing. To ensure robustness across varying lighting conditions, all heuristic parameters were dynamically derived from the statistical moments (Mean, Median, Standard Deviation, Skewness, and Kurtosis) of the input images' intensity distributions.
 
-\subsection{Thresholding}
+\section{Thresholding Algorithms and Heuristics}
 
+\subsection{Task 1: Peakiness Detection}
+\subsubsection{Algorithm Overview}
+The Peakiness algorithm smooths the image histogram to identify local maxima (peaks) representing distinct object classes. It evaluates pairs of peaks based on their prominence and spatial distance, selecting the intervening valley that maximizes the peak-to-valley ratio as the optimal threshold boundary.
+
+\begin{algorithm}[H]
+\DontPrintSemicolon
+\SetKwInOut{Input}{input}
+\SetKwInOut{Output}{output}
+
+\Input{Grayscale image $I$, minimum peak distance $d_{min}$, smoothing window $w$, prominence ratio $\rho$}
+\Output{Binary image $B$, threshold $T$}
+
+Compute histogram $H[0..255]$ from $I$\;
+
+\For{$i \leftarrow 0$ \KwTo $255$}{
+    $H_s[i] \leftarrow$ mean of $H[j]$ for $j \in [i-w, i+w]$\;
+}
+
+$P_{th} \leftarrow \rho \cdot \max(H_s)$\;
+Initialize empty list $Peaks$\;
+
+\For{$i \leftarrow 1$ \KwTo $254$}{
+    \If{$H_s[i] > H_s[i-1]$ \textbf{and} $H_s[i] > H_s[i+1]$ \textbf{and} $H_s[i] > P_{th}$}{
+        Append $i$ to $Peaks$\;
+    }
+}
+
+$BestPeakiness \leftarrow -1$, $BestValley \leftarrow 0$\;
+
+\ForEach{$(p_1, p_2)$ in $Peaks$ with $|p_1 - p_2| \ge d_{min}$}{
+    $v \leftarrow$ index of minimum $H_s$ between $p_1$ and $p_2$\;
+    \eIf{$H_s[v] = 0$}{
+        $Peakiness \leftarrow \infty$\;
+    }{
+        $Peakiness \leftarrow \frac{\min(H_s[p_1], H_s[p_2])}{H_s[v]}$\;
+    }
+    
+    \If{$Peakiness > BestPeakiness$}{
+        $BestPeakiness \leftarrow Peakiness$\;
+        $BestValley \leftarrow v$\;
+    }
+}
+
+\eIf{$BestValley > 0$}{
+    $T \leftarrow BestValley$\;
+}{
+    $T \leftarrow \text{mean}(I)$\;
+}
+
+$B \leftarrow (I \ge T)$\;
+\Return $B, T$\;
+\caption{Peakiness-Based Automatic Thresholding}
+\end{algorithm}
+
+\subsubsection{Dynamic Heuristics Justification}
+\begin{itemize}
+    \item \textbf{Dynamic Smoothing Window ($W$):} Hardcoding a smoothing window fails across varying distributions. The window size was mapped inversely to the 4th statistical moment, Kurtosis, using $W = 5 - (\text{Kurtosis} \times 2)$. High kurtosis (sharp spikes) yields a smaller window to preserve valid peaks, while negative kurtosis (flat, noisy plateaus) yields a larger window to aggressively flatten structural noise. This is clamped between 3 and 15 and forced to an odd integer for symmetrical convolution.
+    \item \textbf{Prominence Ratio Filter:} To prevent the algorithm from evaluating intra-class noise as distinct objects, the prominence requirement was dynamically linked to Kurtosis: $\text{Prominence} = 0.05 + (\text{Kurtosis} \times 0.015)$. Spiky histograms (e.g., heavy shadows) receive a stricter filter to ignore heavy-tail noise, while flat histograms receive a relaxed filter to catch subtle secondary modes. This is clamped between $2\%$ and $10\%$ to respect the physical limits of 8-bit image clusters.
+    \item \textbf{Minimum Peak Distance:} The minimum distance between valid peaks was set to $0.6 \sigma$, clamped at a lower bound of 40. In a 256-intensity range, a distance of 40 represents approximately $15\%$ of the total dynamic range. Peaks closer than $15\%$ are statistically highly likely to be intra-class illumination variations rather than distinct inter-class objects.
+\end{itemize}
+\newpage
+\subsection{Task 2: Iterative Thresholding}
+\subsubsection{Algorithm Overview}
+This algorithm iteratively converges on a threshold that minimizes intra-class variance. It splits the image into two groups (foreground and background) based on an initial estimate, calculates the mean of both groups, and updates the threshold to the midpoint of those means until convergence ($\Delta T < 1.0$).
+
+\begin{algorithm}[H]
+\DontPrintSemicolon
+\SetKwInOut{Input}{input}
+\SetKwInOut{Output}{output}
+
+\Input{Grayscale image $I$, initial estimate $T_0$, tolerance $\epsilon$}
+\Output{Binary image $B$, final threshold $T$}
+
+$T_{old} \leftarrow T_0$\;
+
+\Repeat{$|T_{new} - T_{old}| < \epsilon$ \tcp*{Converged}}{
+    $G_1 \leftarrow \{x \in I \mid x > T_{old}\}$\;
+    $G_2 \leftarrow \{x \in I \mid x \le T_{old}\}$\;
+    
+    $\mu_1 \leftarrow \text{mean}(G_1)$ \tcp*{0 if empty}\;
+    $\mu_2 \leftarrow \text{mean}(G_2)$ \tcp*{0 if empty}\;
+    
+    $T_{new} \leftarrow \frac{\mu_1 + \mu_2}{2}$\;
+    $T_{old} \leftarrow T_{new}$\;
+}
+
+$T \leftarrow \lfloor T_{new} \rfloor$\;
+$B \leftarrow (I \ge T)$\;
+
+\Return $B, T$\;
+\caption{Iterative Intermeans Thresholding}
+\end{algorithm}
+
+\subsubsection{Dynamic Heuristics Justification}
+\begin{itemize}
+    \item \textbf{Initial Seed ($T_0$):} Standard iterative algorithms often start at the global mean. However, in heavily skewed images (e.g., dominated by dark shadows), the mean is dragged away from the visual center. To combat skewness, the initial seed is set to the average of the Mean and Median: $T_0 = (\text{Mean} + \text{Median}) / 2.0$.
+\end{itemize}
+\newpage
+\subsection{Task 3: Dual Thresholding with Region Growing}
+\subsubsection{Algorithm Overview}
+This algorithm uses a strict High Threshold ($T_H$) to confidently identify core object pixels (seeds). A Breadth-First Search (BFS) algorithm then evaluates 8-connected neighbors, allowing the region to grow outward as long as connected pixels satisfy a relaxed Low Threshold ($T_L$). 
+
+\begin{algorithm}[H]
+\DontPrintSemicolon
+\SetKwInOut{Input}{input}
+\SetKwInOut{Output}{output}
+
+\Input{Grayscale image $I$, foreground std $\sigma_{fg}$, multiplier $m$}
+\Output{Binary image $B$, high threshold $T_H$, low threshold $T_L$}
+
+\tcc{Step 1: Compute High Threshold Iteratively}
+$T_{old} \leftarrow \text{mean}(I)$\;
+
+\Repeat{$|T_{new} - T_{old}| < 1$}{
+    $G_1 \leftarrow \{x \in I \mid x > T_{old}\}$\;
+    $G_2 \leftarrow \{x \in I \mid x \le T_{old}\}$\;
+    $T_{new} \leftarrow \frac{\text{mean}(G_1) + \text{mean}(G_2)}{2}$\;
+    $T_{old} \leftarrow T_{new}$\;
+}
+
+$T_H \leftarrow \lfloor T_{new} \rfloor$\;
+
+\tcc{Step 2: Compute Low Threshold}
+$T_L \leftarrow \max(0, T_H - m \cdot \sigma_{fg})$\;
+
+\tcc{Step 3: Breadth-First Region Growing}
+Initialize $B$ as zeros\;
+Initialize queue $Q$ with pixels where $I \ge T_H$\;
+
+\ForEach{seed pixel $(r,c)$ in $Q$}{
+    $B(r,c) \leftarrow 1$\;
+}
+
+\While{$Q$ not empty}{
+    Pop $(r,c)$ from $Q$\;
+    \ForEach{8-neighbor $(r',c')$ of $(r,c)$}{
+        \If{$B(r',c') = 0$ \textbf{and} $I(r',c') \ge T_L$}{
+            $B(r',c') \leftarrow 1$\;
+            Push $(r',c')$ into $Q$\;
+        }
+    }
+}
+
+\Return $B, T_H, T_L$\;
+\caption{Dual Thresholding with BFS Region Growing}
+\end{algorithm}
+
+\subsubsection{Dynamic Heuristics Justification}
+\begin{itemize}
+    \item \textbf{Foreground Variance ($T_L$ Base):} The low threshold is established by subtracting a multiple of the foreground standard deviation ($\sigma_{fg}$) from the high threshold: $T_L = T_H - (\sigma_{fg} \times \text{Multiplier})$.
+    \item \textbf{Dynamic Multiplier (Leash):} To prevent "leakage" into the background on images with smooth gradients, the multiplier dictates the strictness of the region growth. It is inversely linked to the 3rd statistical moment (Skewness): $\text{Multiplier} = \max(0.3, 1.0 - |\text{Skewness}|)$. Highly skewed images receive a tight leash to prevent shadows from bleeding into the background.
+    \item \textbf{The Hysteresis Clamp:} The multiplier is clamped at a minimum of $0.3$. Dropping below $0.3 \sigma$ practically eliminates the hysteresis band, causing $T_L$ to equal $T_H$, which degenerates the algorithm back into Single Global Thresholding.
+\end{itemize}
+
+\newpage
 \section{Experimental Results}
 
+% ---------------------------------------------------------
+% TEST 1 RESULTS
+% ---------------------------------------------------------
+\subsection{Results: test1.img}
+Image \texttt{test1.img} presents a relatively balanced illumination profile with a mild negative kurtosis of -0.617[cite: 63]. The dynamic heuristics successfully relaxed the prominence ratio to accommodate the balanced lighting.
 
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test1_original.pdf}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test1_stats_table.pdf}
+    \end{subfigure}
+    
+    \vspace{0.5cm}
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test1_cdf_histogram.pdf}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test1_prominence_analysis.pdf}
+    \end{subfigure}
+    \caption{Statistical Deep Profile for \texttt{test1.img}}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_ver7_figures/test1_peakiness.png}
+        \caption{Peakiness}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_ver7_figures/test1_iterative.png}
+        \caption{Iterative}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_ver7_figures/test1_dual_region.png}
+        \caption{Dual Region}
+    \end{subfigure}
+    \caption{Segmentation Results for \texttt{test1.img}}
+\end{figure}
+
+\newpage
+% ---------------------------------------------------------
+% TEST 2 RESULTS
+% ---------------------------------------------------------
+\subsection{Results: test2.img}
+Image \texttt{test2.img} is heavily impacted by shadows, creating a high positive skewness of 1.116[cite: 131]. The dynamic multiplier heuristic successfully tightened the region growing leash to prevent leakage into the dark desk gradients.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test2_original.pdf}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test2_stats_table.pdf}
+    \end{subfigure}
+    
+    \vspace{0.5cm}
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test2_cdf_histogram.pdf}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test2_prominence_analysis.pdf}
+    \end{subfigure}
+    \caption{Statistical Deep Profile for \texttt{test2.img}}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_ver7_figures/test2_peakiness.png}
+        \caption{Peakiness}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_ver7_figures/test2_iterative.png}
+        \caption{Iterative}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_ver7_figures/test2_dual_region.png}
+        \caption{Dual Region}
+    \end{subfigure}
+    \caption{Segmentation Results for \texttt{test2.img}}
+\end{figure}
+
+\newpage
+% ---------------------------------------------------------
+% TEST 3 RESULTS
+% ---------------------------------------------------------
+\subsection{Results: test3.img}
+Image \texttt{test3.img} features a large, flat background causing a highly platykurtic distribution (Kurtosis: -1.132)[cite: 199]. The dynamic smoothing heuristic automatically increased the convolution window size to aggressively filter structural noise on the flat plateaus.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test3_original.pdf}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test3_stats_table.pdf}
+    \end{subfigure}
+    
+    \vspace{0.5cm}
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test3_cdf_histogram.pdf}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test3_prominence_analysis.pdf}
+    \end{subfigure}
+    \caption{Statistical Deep Profile for \texttt{test3.img}}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_ver7_figures/test3_peakiness.png}
+        \caption{Peakiness}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_ver7_figures/test3_iterative.png}
+        \caption{Iterative}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{assignment3_ver7_figures/test3_dual_region.png}
+        \caption{Dual Region}
+    \end{subfigure}
+    \caption{Segmentation Results for \texttt{test3.img}}
+\end{figure}
+
+
+\newpage
 \section{Conclusion}
+By transitioning from hardcoded empirical dictionaries to an adaptive, moment-driven heuristic extraction pipeline, the thresholding algorithms demonstrated significant robustness. Linking spatial constraints to Standard Deviation, algorithm strictness to Skewness, and filter sensitivity to Kurtosis proved highly effective at producing reliable segmentation across varied, unseen illumination conditions.
 
 \begin{shaded}
-\textbf{\textit{Note:}} For source code kindly refer to appendix on next page.
+\textbf{\textit{Note:}} For source code kindly refer to the appendix on the next page.
 \end{shaded}
 
 \newpage
 \section{Appendix: Source Code}
 \begin{lstlisting}
-
+# Place your final assignment3.py code here.
 \end{lstlisting}
 
 \end{document}
