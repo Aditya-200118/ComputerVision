@@ -30,30 +30,34 @@
 \usepackage{listings}
 \usepackage{xcolor}
 
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+% Professional ICLR-style Syntax Colors
+\definecolor{py_comment}{rgb}{0.4, 0.4, 0.4}
+\definecolor{py_keyword}{rgb}{0.0, 0.0, 0.7}
+\definecolor{py_string}{rgb}{0.0, 0.5, 0.0}
+\definecolor{py_num}{rgb}{0.6, 0.1, 0.1}
+\definecolor{backcolour}{rgb}{0.98, 0.98, 0.98}
 \colorlet{shadecolor}{orange!15}
 
 \lstset{
     backgroundcolor=\color{backcolour},   
-    commentstyle=\color{codegreen},
-    keywordstyle=\color{magenta},
-    numberstyle=\tiny\color{codegray},
-    stringstyle=\color{codepurple},
+    commentstyle=\color{py_comment}\itshape,
+    keywordstyle=\color{py_keyword}\bfseries,
+    numberstyle=\tiny\color{gray},
+    stringstyle=\color{py_string},
     basicstyle=\ttfamily\footnotesize,
     breakatwhitespace=false,         
     breaklines=true,                 
     captionpos=b,                    
     keepspaces=true,                 
     numbers=left,                    
-    numbersep=5pt,                  
+    numbersep=8pt,                  
     showspaces=false,                
     showstringspaces=false,
     showtabs=false,                  
-    tabsize=2,
-    language=Python
+    tabsize=4,
+    language=Python,
+    frame=single,
+    rulecolor=\color{lightgray}
 }
 
 % --- Links & Headers ---
@@ -203,7 +207,7 @@ $B \leftarrow (I \ge T)$\;
 \newpage
 \subsection{Task 3: Dual Thresholding with Region Growing}
 \subsubsection{Algorithm Overview}
-This algorithm uses a strict High Threshold ($T_H$) to confidently identify core object pixels. A Breadth-First Search (BFS) algorithm then evaluates 8-connected neighbors, allowing the region to grow outward as long as connected pixels satisfy a Low Threshold ($T_L$). 
+This algorithm uses a strict High Threshold ($T_H$) to identify object pixels. A Breadth-First Search (BFS) algorithm then evaluates 8-connected neighbors, allowing the region to grow outward as long as connected pixels satisfy a Low Threshold ($T_L$). 
 
 \begin{algorithm}[H]
 \DontPrintSemicolon
@@ -247,14 +251,14 @@ Initialize queue $Q$ with pixels where $I \ge T_H$\;
 }
 
 \Return $B, T_H, T_L$\;
-\caption{Dual Thresholding with BFS Region Growing}
+\caption{Dual Thresholding with Region Growing}
 \end{algorithm}
 
 \subsubsection{Design and Heuristics}
 \begin{itemize}
     \item \textbf{Foreground Variance ($T_L$ Base):} The low threshold is established by subtracting a multiple of the foreground standard deviation ($\sigma_{fg}$) from the high threshold: $T_L = T_H - (\sigma_{fg} \times \text{Multiplier})$.
     \item \textbf{Multiplier:} To prevent "leakage" into the background on images with smooth gradients, the multiplier dictates the strictness of the region growth. It is inversely linked to the 3rd statistical moment (Skewness): $\text{Multiplier} = \max(0.3, 1.0 - |\text{Skewness}|)$. Highly skewed images receive a higher penalty to prevent shadows from bleeding into the background.
-    \item \textbf{The Hysteresis Clamp:} The multiplier is clamped at a minimum of $0.3$. Dropping below $0.3 \sigma$ practically eliminates the band, causing $T_L$ to equal $T_H$, in which case the algorithm would fall to Single Global Thresholding.
+    \item \textbf{Clamping:} The multiplier is clamped to a minimum of $0.3$. Dropping below $0.3 \sigma$ practically eliminates the band, causing $T_L$ to equal $T_H$, in which case the algorithm would fall to Single Global Thresholding.
 \end{itemize}
 
 \newpage
@@ -279,15 +283,31 @@ Image \texttt{test1.img} presents a relatively balanced illumination profile wit
         \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test1_cdf_histogram.pdf}
         \caption{Intensity Distribution \& CDF}
     \end{subfigure}
-    \caption{Statistical Deep Profile (Plots) for \texttt{test1.img}}
+    \caption{Original Image and CDF for \texttt{test1.img}}
 \end{figure}
 
 % --- PART 2: THE TABLE ---
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=10cm]{assignment3_profiling_ver3/test1_stats_table.pdf}
-    \caption{Statistical Profile Table for \texttt{test1.img}}
-\end{figure}
+\begin{table}[h]
+\centering
+\caption{Statistical properties for \texttt{test1.img}.}
+\label{tab:intensity_stats}
+\begin{tabular}{l r}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Mean Intensity & 93.89 \\
+Median Intensity & 81.00 \\
+Standard Deviation & 68.76 \\
+Skewness & 0.495 \\
+Kurtosis & -0.617 \\
+Foreground Standard Deviation & 42.38 \\
+Min / Max & 0 / 255 \\
+Entropy (bits/pixel) & 7.375 \\
+Percentiles (10\%, 25\%, 75\%, 90\%, 95\%) & 0, 43, 143, 196, 220 \\
+Top Peaks & [53, 55, 51] \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % --- PART 3: SEGMENTATION RESULTS ---
 \begin{figure}[H]
@@ -306,10 +326,10 @@ Image \texttt{test1.img} presents a relatively balanced illumination profile wit
         \includegraphics[width=\textwidth]{assignment3_ver7_figures/test1_dual_region.png}
         \caption{Dual Region}
     \end{subfigure}
-    \caption{Segmentation Results for \texttt{test1.img}}
+    \caption{Thresholding Results for \texttt{test1.img}}
 \end{figure}
 
-\newpage
+% \newpage
 % ---------------------------------------------------------
 % TEST 2 RESULTS
 % ---------------------------------------------------------
@@ -328,15 +348,33 @@ Image \texttt{test2.img} is heavily impacted by shadows, creating a high positiv
         \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test2_cdf_histogram.pdf}
         \caption{Intensity Distribution \& CDF}
     \end{subfigure}
-    \caption{Statistical Deep Profile (Plots) for \texttt{test2.img}}
+    \caption{Original Image and CDF for \texttt{test2.img}}
 \end{figure}
 
 % --- PART 2: THE TABLE ---
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=10cm]{assignment3_profiling_ver3/test2_stats_table.pdf}
-    \caption{Statistical Profile Table for \texttt{test2.img}}
-\end{figure}
+% LaTeX Table for test2.img
+\begin{table}[h]
+\centering
+\caption{Statistical properties for \texttt{test2.img}.}
+\label{tab:test2_stats}
+\begin{tabular}{l r}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Mean Intensity & 68.63 \\
+Median Intensity & 52.00 \\
+Standard Deviation & 68.15 \\
+Skewness & 1.116 \\
+Kurtosis & 0.435 \\
+Foreground Standard Deviation & 48.09 \\
+Min / Max & 0 / 255 \\
+Entropy (bits/pixel) & 6.989 \\
+Percentiles (10\%, 25\%, 75\%, 90\%, 95\%) & 0, 14, 98, 183, 222 \\
+Top Peaks & [19, 17, 77] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 
 % --- PART 3: SEGMENTATION RESULTS ---
 \begin{figure}[H]
@@ -355,7 +393,7 @@ Image \texttt{test2.img} is heavily impacted by shadows, creating a high positiv
         \includegraphics[width=\textwidth]{assignment3_ver7_figures/test2_dual_region.png}
         \caption{Dual Region}
     \end{subfigure}
-    \caption{Segmentation Results for \texttt{test2.img}}
+    \caption{Thresholding Results for \texttt{test2.img}}
 \end{figure}
 
 % \newpage
@@ -364,28 +402,48 @@ Image \texttt{test2.img} is heavily impacted by shadows, creating a high positiv
 % ---------------------------------------------------------
 \subsection{Results: test3.img}
 Image \texttt{test3.img} features a large, flat background causing a highly platykurtic distribution (Kurtosis: -1.132). In this case accomodating the kurtosis, increased the window size to aggressively filter structural noise on the flat plateaus.
+\begin{shaded}
+    \textbf{Continued on next page}
+\end{shaded}
+\newpage
 
 \begin{figure}[H]
     \centering
     % Row 1: Original and CDF Side-by-Side
     \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test3_original.pdf}
+        \includegraphics[width=0.8\textwidth]{assignment3_profiling_ver3/test3_original.pdf}
         \caption{Original Image}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test3_cdf_histogram.pdf}
+        \includegraphics[width=0.8\textwidth]{assignment3_profiling_ver3/test3_cdf_histogram.pdf}
         \caption{Intensity Distribution \& CDF}
     \end{subfigure}
-    \caption{Statistical Deep Profile (Plots) for \texttt{test3.img}}
+    \caption{Original Image and CDF for \texttt{test3.img}}
 \end{figure}
 
 % --- PART 2: THE TABLE ---
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=10cm]{assignment3_profiling_ver3/test3_stats_table.pdf}
-    \caption{Statistical Profile Table for \texttt{test3.img}}
-\end{figure}
+\begin{table}[h]
+\centering
+\caption{Statistical properties for  \texttt{test3.img}.}
+\label{tab:test3_stats}
+\begin{tabular}{l r}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Mean Intensity & 116.63 \\
+Median Intensity & 104.00 \\
+Standard Deviation & 75.47 \\
+Skewness & 0.187 \\
+Kurtosis & -1.132 \\
+Foreground Standard Deviation & 31.63 \\
+Min / Max & 0 / 255 \\
+Entropy (bits/pixel) & 7.567 \\
+Percentiles (10\%, 25\%, 75\%, 90\%, 95\%) & 12, 60, 190, 230, 236 \\
+Top Peaks & [235, 233, 231] \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % --- PART 3: SEGMENTATION RESULTS ---
 \begin{figure}[H]
@@ -404,12 +462,14 @@ Image \texttt{test3.img} features a large, flat background causing a highly plat
         \includegraphics[width=\textwidth]{assignment3_ver7_figures/test3_dual_region.png}
         \caption{Dual Region}
     \end{subfigure}
-    \caption{Segmentation Results for \texttt{test3.img}}
+    \caption{Thresholding Results for \texttt{test3.img}}
 \end{figure}
 
 \newpage
 \section{Conclusion}
+This report implemented three thresholding algorithms: Peakiness Detection, Iterative Thresholding, and Dual Thresholding with Region Growing. Testing across three different images showed that each method performs differently based on the image's intensity distribution. The Peakiness algorithm is effective when the histogram has clear modes, but it requires smoothing to correctly identify the peaks. Iterative thresholding provided a stable boundary, and setting the initial seed based on the mean and median helps it converge in skewed images. Dual thresholding with region growing uses a high threshold for seeds and a lower threshold for growth, it prevents foreground pixels from leaking into background gradients. 
 
+Calculating algorithm parameters from statistical moments like skewness and kurtosis allowed the methods to work across balanced, shadowed, and flat-background images without manual tuning.
 
 \begin{shaded}
 \textbf{\textit{Note:}} For source code kindly refer to the appendix on the next page.
@@ -418,6 +478,221 @@ Image \texttt{test3.img} features a large, flat background causing a highly plat
 \newpage
 \section{Appendix: Source Code}
 \begin{lstlisting}
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+from collections import deque
+
+plt.rcParams.update(
+    {
+        "font.family": "serif",
+        "font.size": 10,
+        "axes.titlesize": 12,
+        "figure.dpi": 600,
+    }
+)
+
+
+def load_and_preprocess(path):
+    try:
+        with open(path, "rb") as f:
+            _ = f.read(512)
+            img_data = np.fromfile(f, dtype=np.uint8)
+        return img_data.reshape((512, 512))
+    except Exception as e:
+        print(f"Error loading file: {e}")
+        exit()
+
+
+def calculate_stats(image):
+
+    mean_val = np.mean(image)
+    median_val = np.median(image)
+    std_val = np.std(image)
+
+    if std_val > 0:
+        skewness = np.mean(((image - mean_val) / std_val) ** 3)
+        kurtosis = np.mean(((image - mean_val) / std_val) ** 4) - 3
+    else:
+        skewness = 0
+        kurtosis = 0
+
+    k_norm = np.tanh(kurtosis)
+
+    t0_estimate = (mean_val + median_val) / 2.0
+
+    min_distance = int(max(40, std_val * 0.6))
+
+    min_w, max_w = 3, 15
+    window_float = max_w - ((k_norm + 1) / 2.0) * (max_w - min_w)
+    window_size = int(round(window_float))
+
+    if window_size % 2 == 0:
+        window_size += 1
+
+    s_norm = min(1.0, abs(skewness))
+    dynamic_multiplier = max(0.3, 1.0 - s_norm)
+
+    T_temp = t0_estimate
+    while True:
+        G1 = image[image > T_temp]
+        G2 = image[image <= T_temp]
+        mu1 = np.mean(G1) if len(G1) > 0 else 0
+        mu2 = np.mean(G2) if len(G2) > 0 else 0
+
+        T_new = (mu1 + mu2) / 2.0
+        if abs(T_new - T_temp) < 1.0:
+            break
+        T_temp = T_new
+
+    fg_pixels = image[image > T_temp]
+    sigma_fg = np.std(fg_pixels) if len(fg_pixels) > 0 else 0
+
+    raw_prominence = 0.05 + 0.02 * k_norm
+    dynamic_prominence = max(0.02, min(0.10, raw_prominence))
+
+    return (
+        min_distance,
+        t0_estimate,
+        sigma_fg,
+        window_size,
+        dynamic_multiplier,
+        dynamic_prominence,
+    )
+
+
+def threshold_peakiness(image, min_distance, win_size, height_ratio=0.05):
+
+    hist = np.zeros(256, dtype=int)
+    for val in image.ravel():
+        hist[val] += 1
+
+    window = win_size
+    smoothed_hist = np.zeros(256, dtype=float)
+    for i in range(256):
+        start = max(0, i - window)
+        end = min(255, i + window)
+        smoothed_hist[i] = np.mean(hist[start : end + 1])
+
+    max_hist_val = np.max(smoothed_hist)
+    height_thereshold = max_hist_val * height_ratio
+
+    peaks = []
+    for i in range(1, 255):
+        if (
+            smoothed_hist[i] > smoothed_hist[i - 1]
+            and smoothed_hist[i] > smoothed_hist[i + 1]
+        ):
+            if smoothed_hist[i] > height_thereshold:
+                peaks.append(i)
+
+    best_valley = 0
+    max_peakiness = -1
+
+    for i in range(len(peaks)):
+        for j in range(i + 1, len(peaks)):
+            p1 = peaks[i]
+            p2 = peaks[j]
+
+            if abs(p1 - p2) < min_distance:
+                continue
+
+            valley_idx = p1 + np.argmin(smoothed_hist[p1 : p2 + 1])
+            valley_height = smoothed_hist[valley_idx]
+
+            h_p1 = smoothed_hist[p1]
+            h_p2 = smoothed_hist[p2]
+
+            if valley_height == 0:
+                peakiness = float("inf")
+            else:
+                peakiness = min(h_p1, h_p2) / valley_height
+
+            if peakiness > max_peakiness:
+                max_peakiness = peakiness
+                
+                best_valley = valley_idx
+
+    T = best_valley if best_valley > 0 else int(np.mean(image))
+    binary_image = (image >= T).astype(np.uint8) * 255
+    return binary_image, T
+
+
+def threshold_iterative(image, t0_estimate, epsilon=1.0):
+
+    T_old = t0_estimate
+    while True:
+        G1 = image[image > T_old]
+        G2 = image[image <= T_old]
+        mu1 = np.mean(G1) if len(G1) > 0 else 0
+        mu2 = np.mean(G2) if len(G2) > 0 else 0
+        T_new = (mu1 + mu2) / 2.0
+
+        if abs(T_new - T_old) < epsilon:
+            break
+        T_old = T_new
+
+    T_final = int(T_new)
+    return (image >= T_final).astype(np.uint8) * 255, T_final
+
+
+def threshold_dual_region_growing(image, sigma_fg, multiplier=0.5):
+    T_old = np.mean(image)
+    while True:
+        G1 = image[image > T_old]
+        G2 = image[image <= T_old]
+        T_new = (np.mean(G1) + np.mean(G2)) / 2.0
+        if abs(T_new - T_old) < 1.0:
+            break
+        T_old = T_new
+    T_H = int(T_new)
+
+    T_L = max(0, int(T_H - (sigma_fg * multiplier)))
+
+    rows, cols = image.shape
+    binary_image = np.zeros((rows, cols), dtype=np.uint8)
+
+    seed_r, seed_c = np.where(image >= T_H)
+    seeds = deque(zip(seed_r, seed_c))
+
+    for r, c in seeds:
+        binary_image[r, c] = 255
+
+    directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+
+    while seeds:
+        r, c = seeds.popleft()
+        for dr, dc in directions:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols:
+                if binary_image[nr, nc] == 0 and image[nr, nc] >= T_L:
+                    binary_image[nr, nc] = 255
+                    seeds.append((nr, nc))
+
+    return binary_image, T_H, T_L
+
+
+if __name__ == "__main__":
+    output_dir = "figures"
+    os.makedirs(output_dir, exist_ok=True)
+    files = ["test1.img", "test2.img", "test3.img"]
+
+    for file in files:
+        if not os.path.exists(file):
+            continue
+
+        img = load_and_preprocess(file)
+        min_dist, t0_seed, sigma_fg, win_size, dyn_mult, dyn_pro = calculate_stats(img)
+        base_name = file.split(".")[0]
+
+        res_peak, t_peak = threshold_peakiness(img, min_dist, win_size, dyn_pro)
+        plt.imsave(f"{output_dir}/{base_name}_peakiness.png", res_peak, cmap="gray")
+
+        res_iter, t_iter = threshold_iterative(img, t0_seed)
+        plt.imsave(f"{output_dir}/{base_name}_iterative.png", res_iter, cmap="gray")
+
+        res_dual, th, tl = threshold_dual_region_growing(img, sigma_fg, dyn_mult)
+        plt.imsave(f"{output_dir}/{base_name}_dual_region.png", res_dual, cmap="gray")
 \end{lstlisting}
 
 \end{document}
