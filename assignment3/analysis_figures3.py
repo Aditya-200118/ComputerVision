@@ -141,9 +141,7 @@ def extract_image_profile(img, filename, output_dir):
     p10, p25, p75, p90, p95 = np.percentile(flat_img, [10, 25, 75, 90, 95])
     
     # 2. Histogram & Entropy
-    hist = np.zeros(256, dtype=int)
-    for val in flat_img.astype(int):
-        hist[val] += 1
+    hist = np.bincount(flat_img.astype(int), minlength=256)
         
     # Calculate Entropy (Information Content)
     probabilities = hist / flat_img.size
@@ -188,7 +186,7 @@ def extract_image_profile(img, filename, output_dir):
     fig2, ax2 = plt.subplots(figsize=(8, 6))
     
     # NEW: Plot raw histogram first so it sits behind the smoothed one
-    ax2.bar(range(256), hist, color='gray', alpha=0.5, width=1.0, label='Raw Hist')
+    ax2.bar(range(256), hist, color='gray', alpha=0.5, width=1.0, label='Histogram')
     ax2.plot(smoothed_hist, color='black', label='Smoothed Hist')
     
     ax2_cdf = ax2.twinx()
@@ -230,10 +228,10 @@ def extract_image_profile(img, filename, output_dir):
     plt.savefig(os.path.join(output_dir, f"{filename.split('.')[0]}_gradient_histogram.pdf"), format='pdf', bbox_inches='tight')
     plt.close(fig4)
     
-    # --- NEW PLOT E: Prominence Ratio Analysis ---
+    # --- NEW PLOT E: Height ratio Analysis ---
     fig5, ax5 = plt.subplots(figsize=(10, 5))
     ax5.plot(smoothed_hist, color='black', linewidth=1.5)
-    ax5.set_title("Prominence Ratio Threshold Analysis")
+    ax5.set_title("Height ratio Threshold Analysis")
     ax5.set_xlabel("Grayscale Intensity")
     ax5.set_ylabel("Pixel Frequency")
     ax5.set_xlim([0, 255])
@@ -265,7 +263,7 @@ def extract_image_profile(img, filename, output_dir):
     ax5.legend(loc='upper right')
 
     # Save
-    plt.savefig(os.path.join(output_dir, f"{filename.split('.')[0]}_prominence_analysis.pdf"), format='pdf', bbox_inches='tight')
+    plt.savefig(os.path.join(output_dir, f"{filename.split('.')[0]}_height_analysis.pdf"), format='pdf', bbox_inches='tight')
     plt.close(fig5)
     
     # Prepare Table Data
