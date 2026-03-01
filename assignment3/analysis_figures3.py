@@ -6,14 +6,19 @@ import math
 from matplotlib.backends.backend_pdf import PdfPages
 
 # Maintain the exact requested styling
-plt.rcParams.update(
-    {
-        "font.family": "serif",
-        "font.size": 10,
-        "axes.titlesize": 12,
-        "figure.dpi": 600,
-    }
-)
+plt.rcParams.update({
+    "font.family": "serif",
+    "font.size": 10,
+    "axes.titlesize": 12,
+    "axes.labelsize": 10,
+    "xtick.labelsize": 9,
+    "ytick.labelsize": 9,
+    "legend.fontsize": 8,
+    "figure.dpi": 600,
+    "axes.grid": False,
+    "axes.spines.top": True,
+    "axes.spines.right": True,
+})
 
 def load_raw_img(path):
     try:
@@ -81,19 +86,56 @@ def calculate_gradients(img):
     magnitude = np.sqrt(gx**2 + gy**2)
     return magnitude
 
+import matplotlib.pyplot as plt
+import os
+
+# Instead of save_pdf_table, add this to your Python script:
+def print_latex_table(filename, stats_data):
+    print(f"\n% LaTeX Table for {filename}")
+    print("\\begin{table}[h]")
+    print("\\centering")
+    print("\\begin{tabular}{ll}")
+    print("\\toprule")
+    for row in stats_data:
+        print(f"{row[0]} & {row[1]} \\\\")
+    print("\\bottomrule")
+    print("\\end{tabular}")
+    print("\\end{table}")
+
 def save_pdf_table(output_dir, filename, stats_data):
-    fig, ax = plt.subplots(figsize=(11, 8.5))
-    ax.axis('tight')
+    # Narrower figure to prevent horizontal stretching
+    fig, ax = plt.subplots(figsize=(6, 3))
     ax.axis('off')
-    ax.set_title(f"DEEP PROFILE: {filename}", fontweight='bold', pad=20)
     
-    table = ax.table(cellText=stats_data, colLabels=["Metric", "Value"], loc='center', cellLoc='left')
+    # Create the table
+    table = ax.table(
+        cellText=stats_data, 
+        colLabels=["Metric", "Value"], 
+        loc='center', 
+        cellLoc='left',
+        edges='horizontal' # Removes vertical lines for a cleaner academic look
+    )
+    
     table.auto_set_font_size(False)
-    table.set_fontsize(10)
-    table.scale(1.2, 2.5)
+    table.set_fontsize(9) # Standard ICLR body text size
+    
+    # Style the header and lines
+    for (row, col), cell in table.get_celld().items():
+        # Make the header bold and add a thicker line
+        if row == 0:
+            cell.set_text_props(weight='bold')
+            cell.set_linewidth(1.5) 
+        else:
+            cell.set_linewidth(0.5) # Thin interior lines
+            
+        # Optional: Add padding to cells
+        cell.set_edgecolor('#333333') # Dark gray lines instead of harsh black
+        
+    table.scale(1.0, 1.4) # Tighten row height for a compact profile
     
     out_path = os.path.join(output_dir, f"{filename.split('.')[0]}_stats_table.pdf")
-    plt.savefig(out_path, format='pdf', bbox_inches='tight')
+    # Use 'tight' with a small pad to ensure no text is clipped
+    plt.savefig(out_path, format='pdf', bbox_inches='tight', pad_inches=0.05)
     plt.close()
 
 def extract_image_profile(img, filename, output_dir):
@@ -173,81 +215,93 @@ def extract_image_profile(img, filename, output_dir):
     # 4. Plotting
     # CHANGED: Increased height to 15 to accommodate 3 rows
     # CHANGED: Made grid 3 rows instead of 2
-    
+        
+    # Replace all fig creation lines with a fixed size
+    FIG_WIDTH = 6
+    FIG_HEIGHT = 6  # Make all plots square for alignment
+
     # Plot A: Original Image
-    fig1, ax1 = plt.subplots(figsize=(6, 6))
+    fig1, ax1 = plt.subplots(figsize=(FIG_WIDTH, FIG_HEIGHT))
     ax1.imshow(img, cmap='gray', vmin=0, vmax=255)
-    ax1.set_title(f"Original: {filename}")
     ax1.axis('off')
     plt.savefig(os.path.join(output_dir, f"{filename.split('.')[0]}_original.pdf"), format='pdf', bbox_inches='tight')
     plt.close(fig1)
-    
+
     # Plot B: Histogram and CDF
-    fig2, ax2 = plt.subplots(figsize=(8, 6))
+    fig2, ax2 = plt.subplots(figsize=(FIG_WIDTH, FIG_HEIGHT))
     
-    # NEW: Plot raw histogram first so it sits behind the smoothed one
-    ax2.bar(range(256), hist, color='gray', alpha=0.5, width=1.0, label='Histogram')
-    ax2.plot(smoothed_hist, color='black', label='Smoothed Hist')
+    # 1. Histogram: Use a sophisticated Charcoal with slight transparency
+    ax2.bar(range(256), hist, color='#2c3e50', alpha=0.3, width=1.0, label='Histogram', zorder=1)
     
+    # 2. Smoothed Trend: Solid Slate Blue line
+    ax2.plot(smoothed_hist, color='#34495e', linewidth=1.5, label='Smoothed Distribution', zorder=2)
+
+    # 3. CDF: Use a high-contrast Crimson or Deep Blue for the secondary axis
     ax2_cdf = ax2.twinx()
-    ax2_cdf.plot(cdf, color='red', linestyle='--', alpha=0.7, label='CDF')
+    ax2_cdf.plot(cdf, color='#c0392b', linestyle='-', linewidth=2, alpha=0.8, label='CDF', zorder=3)
     
-    # NEW: Mean and Median lines
-    ax2.axvline(mean_val, color='green', linestyle='-', linewidth=1.5, label=f'Mean ({mean_val:.1f})')
-    ax2.axvline(median_val, color='magenta', linestyle='-.', linewidth=1.5, label=f'Median ({median_val:.1f})')
+    # 4. Statistical Markers: Coordinated palette
+    # Mean (Green), Median (Deep Orange), Percentiles (Muted Blue/Gray)
+    ax2.axvline(mean_val, color='#27ae60', linestyle='-', linewidth=1.2, label=f'Mean ({mean_val:.1f})')
+    ax2.axvline(median_val, color='#e67e22', linestyle='--', linewidth=1.2, label=f'Median ({median_val:.1f})')
     
-    ax2.axvline(p25, color='blue', linestyle=':', label=f'25th % ({int(p25)})')
-    ax2.axvline(p75, color='purple', linestyle=':', label=f'75th % ({int(p75)})')
-    ax2.axvline(p95, color='orange', linestyle=':', label=f'95th % ({int(p95)})')
-    
-    ax2.set_title(f"Intensity Distribution & CDF")
-    ax2.set_xlim([-5, 255])
-    ax2.set_xlabel("Grayscale Intensity")
+    # Use vertical spans or lighter lines for percentiles to reduce clutter
+    ax2.axvline(p25, color='#7f8c8d', linestyle=':', alpha=0.6, label=f'25th% ({int(p25)})')
+    ax2.axvline(p75, color='#7f8c8d', linestyle=':', alpha=0.6, label=f'75th% ({int(p75)})')
+    ax2.axvline(p95, color='#2980b9', linestyle=':', alpha=0.9, label=f'95th% ({int(p95)})')
+
+    # Formatting
+    ax2.set_xlim([-2, 257])
+    ax2.set_ylim(bottom=0)
+    ax2.set_xlabel("Grayscale Intensity (0-255)")
     ax2.set_ylabel("Pixel Frequency")
-    ax2_cdf.set_ylabel("Cumulative Probability", color='red')
-    ax2.legend(loc='upper left')
-    plt.savefig(os.path.join(output_dir, f"{filename.split('.')[0]}_cdf_histogram.pdf"), format='pdf', bbox_inches='tight')
-    plt.close(fig2)
     
+    ax2_cdf.set_ylabel("Cumulative Probability", color='#c0392b', weight='bold')
+    ax2_cdf.tick_params(axis='y', labelcolor='#c0392b')
+    ax2_cdf.set_ylim([0, 1.05])
+
+    # Clean Legend: Combine both axes into one legend box
+    lines, labels = ax2.get_legend_handles_labels()
+    lines2, labels2 = ax2_cdf.get_legend_handles_labels()
+    ax2.legend(lines + lines2, labels + labels2, loc='upper left', frameon=True, framealpha=0.9)
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, f"{filename.split('.')[0]}_cdf_histogram.pdf"), 
+                format='pdf', bbox_inches='tight', pad_inches=0.1)
+    plt.close(fig2)
+
     # Plot C: Gradient Magnitude (Edges Strength)
-    fig3, ax3 = plt.subplots(figsize=(7, 6))
+    fig3, ax3 = plt.subplots(figsize=(FIG_WIDTH, FIG_HEIGHT))
     im3 = ax3.imshow(grad_mag, cmap='hot')
-    ax3.set_title(f"Pixel Gradient Magnitude (Edges)\nMean Gradient: {mean_grad:.2f}")
     ax3.axis('off')
     plt.colorbar(im3, ax=ax3, fraction=0.046, pad=0.04)
     plt.savefig(os.path.join(output_dir, f"{filename.split('.')[0]}_gradient_magnitude.pdf"), format='pdf', bbox_inches='tight')
     plt.close(fig3)
-    
+
     # Plot D: Gradient Histogram
-    fig4, ax4 = plt.subplots(figsize=(8, 6))
+    fig4, ax4 = plt.subplots(figsize=(FIG_WIDTH, FIG_HEIGHT))
     ax4.hist(grad_mag.ravel(), bins=50, range=(1, 50), color='crimson', alpha=0.7)
-    ax4.set_title(f"Gradient Strength Distribution")
     ax4.set_xlabel("Gradient Magnitude")
     ax4.set_ylabel("Frequency")
     ax4.set_yscale('log')
     plt.savefig(os.path.join(output_dir, f"{filename.split('.')[0]}_gradient_histogram.pdf"), format='pdf', bbox_inches='tight')
     plt.close(fig4)
-    
-    # --- NEW PLOT E: Height ratio Analysis ---
-    fig5, ax5 = plt.subplots(figsize=(10, 5))
+
+    # Plot E: Height ratio Analysis
+    fig5, ax5 = plt.subplots(figsize=(FIG_WIDTH, FIG_HEIGHT))
     ax5.plot(smoothed_hist, color='black', linewidth=1.5)
-    ax5.set_title("Height ratio Threshold Analysis")
     ax5.set_xlabel("Grayscale Intensity")
     ax5.set_ylabel("Pixel Frequency")
     ax5.set_xlim([0, 255])
-    
+
     max_h = np.max(smoothed_hist)
-    
-    # Define the ratios we want to test visually
     test_ratios = [0.02, 0.05, 0.10]
     colors = ['green', 'orange', 'red']
-    
+
     for r, c in zip(test_ratios, colors):
         thresh_val = max_h * r
-        ax5.axhline(thresh_val, color=c, linestyle='--', alpha=0.7, 
-                    label=f'{int(r*100)}% Threshold ({int(thresh_val)} px)')
+        ax5.axhline(thresh_val, color=c, linestyle='--', alpha=0.7, label=f'{int(r*100)}% Threshold ({int(thresh_val)} px)')
         
-        # Find peaks that pass this specific threshold
         valid_peaks_x = []
         valid_peaks_y = []
         for i in range(1, 255):
@@ -256,13 +310,10 @@ def extract_image_profile(img, filename, output_dir):
                     valid_peaks_x.append(i)
                     valid_peaks_y.append(smoothed_hist[i])
         
-        # Plot dots on the peaks that survive this ratio
         if valid_peaks_x:
             ax5.scatter(valid_peaks_x, valid_peaks_y, color=c, zorder=5, s=50)
 
     ax5.legend(loc='upper right')
-
-    # Save
     plt.savefig(os.path.join(output_dir, f"{filename.split('.')[0]}_height_analysis.pdf"), format='pdf', bbox_inches='tight')
     plt.close(fig5)
     
@@ -273,17 +324,17 @@ def extract_image_profile(img, filename, output_dir):
         ["StdDev", f"{std_val:.2f}"],
         ["Skewness", f"{skewness:.3f}"],
         ["Kurtosis", f"{kurtosis:.3f}"],
-        ["T_H (Iterative)", f"{T_H_profile:.1f}"],
-        ["Min Intra-Class Variance", f"{intra_var:.2f}"],
+        # ["T_H (Iterative)", f"{T_H_profile:.1f}"],
+        # ["Min Intra-Class Variance", f"{intra_var:.2f}"],
         ["Foreground StdDev", f"{fg_std:.2f}"],
         ["Min / Max", f"{int(min_val)} / {int(max_val)}"],
         ["Entropy", f"{entropy:.3f} bits/pixel"],
         ["Percentiles (10/25/75/90/95)", f"{int(p10)}, {int(p25)}, {int(p75)}, {int(p90)}, {int(p95)}"],
         ["Top Peaks", f"{[int(p[0]) for p in peaks[:3]]}"],
-        ["Mean Gradient", f"{mean_grad:.2f}"],
+        # ["Mean Gradient", f"{mean_grad:.2f}"],
     ]
     save_pdf_table(output_dir, filename, stats_data)
-
+    print_latex_table(filename, stats_data)
 if __name__ == "__main__":
     output_dir = "assignment3_profiling_ver3"
     os.makedirs(output_dir, exist_ok=True)
