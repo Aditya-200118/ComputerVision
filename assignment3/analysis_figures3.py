@@ -186,16 +186,24 @@ def extract_image_profile(img, filename, output_dir):
     
     # Plot B: Histogram and CDF
     fig2, ax2 = plt.subplots(figsize=(8, 6))
+    
+    # NEW: Plot raw histogram first so it sits behind the smoothed one
+    ax2.bar(range(256), hist, color='gray', alpha=0.5, width=1.0, label='Raw Hist')
     ax2.plot(smoothed_hist, color='black', label='Smoothed Hist')
+    
     ax2_cdf = ax2.twinx()
     ax2_cdf.plot(cdf, color='red', linestyle='--', alpha=0.7, label='CDF')
+    
+    # NEW: Mean and Median lines
+    ax2.axvline(mean_val, color='green', linestyle='-', linewidth=1.5, label=f'Mean ({mean_val:.1f})')
+    ax2.axvline(median_val, color='magenta', linestyle='-.', linewidth=1.5, label=f'Median ({median_val:.1f})')
     
     ax2.axvline(p25, color='blue', linestyle=':', label=f'25th % ({int(p25)})')
     ax2.axvline(p75, color='purple', linestyle=':', label=f'75th % ({int(p75)})')
     ax2.axvline(p95, color='orange', linestyle=':', label=f'95th % ({int(p95)})')
     
     ax2.set_title(f"Intensity Distribution & CDF")
-    ax2.set_xlim([0, 255])
+    ax2.set_xlim([-5, 255])
     ax2.set_xlabel("Grayscale Intensity")
     ax2.set_ylabel("Pixel Frequency")
     ax2_cdf.set_ylabel("Cumulative Probability", color='red')
