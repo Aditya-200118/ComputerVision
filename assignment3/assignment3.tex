@@ -93,20 +93,20 @@
 \newpage
 
 \section{Introduction and Preprocessing}
-This report details the implementation and mathematical justification of three distinct automated image thresholding techniques: Peakiness Detection, Iterative Thresholding, and Dual-Threshold Region Growing. To ensure robustness across varying lighting conditions, all heuristic parameters were dynamically derived from the statistical moments (Mean, Median, Standard Deviation, Skewness, and Kurtosis) of the input images' intensity distributions.
+This report details the implementation and mathematical justification of three distinct image thresholding techniques; Peakiness Detection, Iterative Thresholding, and Region Growing with Dual Thresholding. To ensure robust results across varying lighting conditions, all heuristic parameters were derived from the statistical moments (Mean, Median, Standard Deviation, Skewness, and Kurtosis) of the input image intensity distributions.
 
 \section{Thresholding Algorithms and Heuristics}
 
 \subsection{Task 1: Peakiness Detection}
 \subsubsection{Algorithm Overview}
-The Peakiness algorithm smooths the image histogram to identify local maxima (peaks) representing distinct object classes. It evaluates pairs of peaks based on their prominence and spatial distance, selecting the intervening valley that maximizes the peak-to-valley ratio as the optimal threshold boundary.
+The Peakiness algorithm smooths the image histogram to identify local maxima (peaks) which represents distinct object classes. It evaluates the pairs of peaks based on how prominent they are and the distance between them. Selecting the intervening valley that maximizes the peak-to-valley ratio as the optimal threshold boundary.
 
 \begin{algorithm}[H]
 \DontPrintSemicolon
 \SetKwInOut{Input}{input}
 \SetKwInOut{Output}{output}
 
-\Input{Grayscale image $I$, minimum peak distance $d_{min}$, smoothing window $w$, prominence ratio $\rho$}
+\Input{Grayscale image $I$, minimum peak distance $d_{min}$, smoothing window $w$, height ratio $\rho$}
 \Output{Binary image $B$, threshold $T$}
 
 Compute histogram $H[0..255]$ from $I$\;
@@ -151,16 +151,18 @@ $B \leftarrow (I \ge T)$\;
 \caption{Peakiness-Based Automatic Thresholding}
 \end{algorithm}
 
-\subsubsection{Dynamic Heuristics Justification}
+\subsubsection{Design and Heuristics}
 \begin{itemize}
-    \item \textbf{Dynamic Smoothing Window ($W$):} Hardcoding a smoothing window fails across varying distributions. The window size was mapped inversely to the 4th statistical moment, Kurtosis, using $W = 5 - (\text{Kurtosis} \times 2)$. High kurtosis (sharp spikes) yields a smaller window to preserve valid peaks, while negative kurtosis (flat, noisy plateaus) yields a larger window to aggressively flatten structural noise. This is clamped between 3 and 15 and forced to an odd integer for symmetrical convolution.
-    \item \textbf{Prominence Ratio Filter:} To prevent the algorithm from evaluating intra-class noise as distinct objects, the prominence requirement was dynamically linked to Kurtosis: $\text{Prominence} = 0.05 + (\text{Kurtosis} \times 0.015)$. Spiky histograms (e.g., heavy shadows) receive a stricter filter to ignore heavy-tail noise, while flat histograms receive a relaxed filter to catch subtle secondary modes. This is clamped between $2\%$ and $10\%$ to respect the physical limits of 8-bit image clusters.
+    \item \textbf{Dynamic Smoothing Window ($W$):} Hardcoding a smoothing window fails across varying distributions, especially in cases where the distribution could be heavily skewed. The window size was mapped inversely to the 4th statistical moment, Kurtosis. 
+    \[W = 5 - (\text{Kurtosis} \times 2)\] 
+    High kurtosis (leptokurtic curve) means that distribution has has less variance yields a smaller window to preserve valid peaks, while negative kurtosis (flat, noisy plateaus) yields a larger window to aggressively flatten structural noise. This is clamped between 3 and 15 and forced to an odd integer for symmetrical convolution.
+    \item \textbf{height ratio Filter:} To prevent the algorithm from evaluating intra-class noise as distinct objects, the prominence requirement was dynamically linked to Kurtosis: $\text{Prominence} = 0.05 + (\text{Kurtosis} \times 0.015)$. Spiky histograms (e.g., heavy shadows) receive a stricter filter to ignore heavy-tail noise, while flat histograms receive a relaxed filter to catch subtle secondary modes. This is clamped between $2\%$ and $10\%$ to respect the physical limits of 8-bit image clusters.
     \item \textbf{Minimum Peak Distance:} The minimum distance between valid peaks was set to $0.6 \sigma$, clamped at a lower bound of 40. In a 256-intensity range, a distance of 40 represents approximately $15\%$ of the total dynamic range. Peaks closer than $15\%$ are statistically highly likely to be intra-class illumination variations rather than distinct inter-class objects.
 \end{itemize}
 \newpage
 \subsection{Task 2: Iterative Thresholding}
 \subsubsection{Algorithm Overview}
-This algorithm iteratively converges on a threshold that minimizes intra-class variance. It splits the image into two groups (foreground and background) based on an initial estimate, calculates the mean of both groups, and updates the threshold to the midpoint of those means until convergence ($\Delta T < 1.0$).
+This algorithm iteratively converges on a threshold. It splits the image into two groups (foreground and background) based on an initial estimate, calculates the mean of both groups, and updates the threshold to the midpoint of those means until convergence ($\Delta T < 1.0$).
 
 \begin{algorithm}[H]
 \DontPrintSemicolon
@@ -258,7 +260,7 @@ Initialize queue $Q$ with pixels where $I \ge T_H$\;
 % TEST 1 RESULTS
 % ---------------------------------------------------------
 \subsection{Results: test1.img}
-Image \texttt{test1.img} presents a relatively balanced illumination profile with a mild negative kurtosis of -0.617[cite: 63]. The dynamic heuristics successfully relaxed the prominence ratio to accommodate the balanced lighting.
+Image \texttt{test1.img} presents a relatively balanced illumination profile with a mild negative kurtosis of -0.617[cite: 63]. The dynamic heuristics successfully relaxed the height ratio to accommodate the balanced lighting.
 
 \begin{figure}[H]
     \centering
@@ -276,7 +278,7 @@ Image \texttt{test1.img} presents a relatively balanced illumination profile wit
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test1_prominence_analysis.pdf}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test1_height_analysis.pdf}
     \end{subfigure}
     \caption{Statistical Deep Profile for \texttt{test1.img}}
 \end{figure}
@@ -323,7 +325,7 @@ Image \texttt{test2.img} is heavily impacted by shadows, creating a high positiv
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test2_prominence_analysis.pdf}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test2_height_analysis.pdf}
     \end{subfigure}
     \caption{Statistical Deep Profile for \texttt{test2.img}}
 \end{figure}
@@ -370,7 +372,7 @@ Image \texttt{test3.img} features a large, flat background causing a highly plat
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test3_prominence_analysis.pdf}
+        \includegraphics[width=\textwidth]{assignment3_profiling_ver3/test3_height_analysis.pdf}
     \end{subfigure}
     \caption{Statistical Deep Profile for \texttt{test3.img}}
 \end{figure}
