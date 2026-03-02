@@ -12,6 +12,7 @@
 \pgfplotsset{compat=1.18}
 \usepackage{fancyhdr}
 \usepackage{mathrsfs}
+\usepackage{fancyhdr}
 \usepackage{wrapfig}
 \usepackage{setspace}
 \usepackage{calc}
@@ -42,12 +43,15 @@
 \newtheorem*{unnote}{Note}  % Unnumbered Note
 \newtheorem{mynote}{Note:}  % Numbered Note:
 \newtheorem*{myunnote}{Note:} % Unnumbered Note:
+\thispagestyle{empty}
+\pagestyle{fancy}
+\fancyhf{}
 \begin{document}
 \setcounter{section}{0}
 \title{Computer Vision Notes}
 
 
-\thispagestyle{empty}
+% \thispagestyle{empty}
 
 \begin{center}
 {\LARGE \bf Lecture Notes}\\
@@ -1303,6 +1307,29 @@ W(k,l)\, I_1(i+k, j+l)
 
 
 
+
+Given Images $I_1, I_2$ and filter $W$ of size $M\times M$ where $M$ is odd.
+
+\[
+I_{1S} (i, j) = \sum_{k,l=+}^{k,l=-}\sum_{\frac{\mathcal{M} - 1}{2}}^{\frac{\mathcal{M} - 1}{2}}W(k,l) I_1 (i+k, j+k)
+\]
+
+corrected:
+
+\[
+I_{1S}(i,j) = \sum_{k=-\frac{M-1}{2}}^{\frac{M-1}{2}}
+\sum_{l=-\frac{M-1}{2}}^{\frac{M-1}{2}}
+W(k,l)\, I_1(i+k, j+l)
+\]
+
+\[
+= W \circledast I_1
+\]
+
+
+
+
+
 Key Insight:
 Smoothing Filter is a linear operator.
 
@@ -1356,7 +1383,7 @@ Compute the values in the range $[0, +3\sigma]$ and determine the values $[-3\si
 
 
 \begin{myunnote}
-    How to reso
+    How to resolve 
 
 \end{myunnote}
 
@@ -1389,5 +1416,106 @@ Normalize the weights and (1, dividing by the sum of the raw weights)
 %         \caption{Convolved Signal}
 %     \end{minipage}
 % \end{figure}
+
+
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 26 Feb, 2026, 14:50 PM}  
+\begin{equation}
+\begin{aligned}
+G(x, y, \sigma) &= \frac{1}{2\pi\sigma^2}\mathrm{e}^{\frac{-(x^2+y^2)}{2\sigma^2}} \\
+G(\delta, \theta, \sigma) &= \frac{1}{2\pi\sigma^2}\mathrm{e}^{\frac{-(\delta^2)}{2\sigma^2}}
+\quad \longleftarrow \textbf{Independent of }\theta
+\end{aligned}
+\end{equation}
+
+\textbf{Gaussian Filtering in 2D:}  
+
+- Truncate \\
+- Normalize  
+
+\[
+\int_{-\infty}^{\infty} G(x, y, \sigma)\, dx\, dy
+\]
+
+\textbf{Computational complexity:}  
+
+- $O(M^2)$ operations at each pixel location $(i, j)$  \\
+- $O(M^2 N^2)$ overall complexity for the entire image
+
+Sequential application of 1D convolve operations (essentialy a 2d convolution operation)
+\begin{equation}
+\begin{aligned}
+I(x,y) \circledast G(x, y) &= I(x,y) \circledast \underbrace{(G(x,\sigma) G(y,\sigma))} \\
+&= (I(x,y) \circledast G(x,\sigma))\circledast G(y, \sigma)
+\end{aligned}
+\end{equation}
+
+\[
+G(x, \sigma) = G^{\mathit{T}}(y, \sigma)
+\]
+
+
+Conisder a linear smoothing filter of a given size $(M\times M)$
+
+\begin{itemize}
+    \item[-] High SNR
+    \item[-] Low Edge Dislocation error $\in$ proportional to the edge localization confidence interval
+    \[
+    \textbf{Figure of merit} = \frac{SNR}{\in}
+    \]
+\end{itemize}
+
+Gaussian Filter maximizes the figure of merit
+best noise reduction with the least Dislocation error
+$7*7$
+
+Gaussian smoothing filter of Size M*M optimizers the figure of merit compared to all other smoothing filters of size M*M
+
+\newpage
+\pagestyle{plain}
+
+
+Edge - Significant local change in an image property
+
+Image property - gray level, color, texture, Motion
+
+Significant Local Changes - Noise
+
+3D Scene -> Object Boundaries -> 3D surface discontinuity 
+
+2D Image -> local change in image property (gray level)
+
+Shadowing is an illuminating artifacts
+
+\[
+\text{Operating Hypothesis} = \begin{cases}
+    \text{3D surface discontinuity} \\
+    \text{local change in image property (gray level)}
+\end{cases}
+\]
+
+Definition
+
+\begin{itemize}
+    \item Edge Point - Pixel/point in the image that signifies significant local change in the image
+    \item  Edge Fragment - Edge pixel/point + the local orientation/direction of the significant change
+\end{itemize}
+
+Edge -> Edge Pixels and Edge Fragment
+
+Edge Detector 
+Algorithm that produces a set of edge given an input image
+
+Involves convolution with a edge detector mask.
+
+Edge Contour 
+
+(ordered) list of edge pixel/edge fragments - enumeration 
+mathematical expresion describing the contour - analytical
+
+fitting and endering 
+
+Edge Linking -> To generate an ordered list of Edges from an unordered list
 
 \end{document}
