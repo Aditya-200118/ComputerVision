@@ -218,7 +218,7 @@ def threshold_peakiness(image, min_distance, win_size, height_ratio=0.05):
                 best_valley = valley_idx
                 
     T = best_valley if best_valley > 0 else int(np.mean(image))
-    binary_image = (image >= T).astype(np.uint8) * 255
+    binary_image = (image > T).astype(np.uint8) * 255
     return binary_image, T
 
 def threshold_iterative(image, t0_estimate, epsilon=1.0):
@@ -238,7 +238,7 @@ def threshold_iterative(image, t0_estimate, epsilon=1.0):
         T_old = T_new
         
     T_final = int(T_new)
-    return (image >= T_final).astype(np.uint8) * 255, T_final
+    return (image > T_final).astype(np.uint8) * 255, T_final
 
 def threshold_dual_region_growing(image, sigma_fg, multiplier=0.5):
     """

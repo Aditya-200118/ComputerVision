@@ -84,7 +84,7 @@
     
     \vspace{0.3in}
     {\Large \textbf{Aditya Bhargava} \par}
-    {\large UGA ID: --------- \par}
+    {\large UGA ID: 811235738 \par}
     
     \vfill
     {\large CSCI 8820: Computer Vision and Pattern Recognition \par}
@@ -103,7 +103,7 @@ This report details the implementation and mathematical justification of three d
 
 \subsection{Task 1: Peakiness Detection}
 \subsubsection{Algorithm Overview}
-The Peakiness algorithm smooths the image histogram to identify local maxima (peaks) which represents distinct object classes. It evaluates the pairs of peaks based on how prominent they are and the distance between them. Selecting the intervening valley that maximizes the peak-to-valley ratio as the optimal threshold boundary.
+The Peakiness algorithm smooths the image histogram to identify local maxima (peaks) which represents distinct object classes. It evaluates the \textbf{pairs of peaks} based on how prominent \textbf{(height ratio)} they are and the distance between them, selecting the \textbf{intervening valley} that maximizes the peak-to-valley ratio as the optimal threshold boundary.
 
 \begin{algorithm}[H]
 \DontPrintSemicolon
@@ -155,17 +155,17 @@ $B \leftarrow (I \ge T)$\;
 \caption{Peakiness-Based Thresholding}
 \end{algorithm}
 
-\subsubsection{Design and Heuristics}
+\subsubsection{Design and Heuristics for Peakiness Thresholding}
 \begin{itemize}
     \item \textbf{Smoothing Window ($W$):} Hardcoding a smoothing window fails across varying distributions, particularly when distributions exhibit heavy skewness or unbounded kurtosis. The 4th statistical moment (Excess Kurtosis, $K$) is first normalized using a hyperbolic tangent function, and mapped it to a strictly bounded range $K_{norm} = \tanh(K) \in (-1, 1)$. The window size is then linearly interpolated:
     \[ W = W_{max} - \left( \frac{K_{norm} + 1}{2} \right) \times (W_{max} - W_{min}) \]
     where $W_{min} = 3$ and $W_{max} = 15$. A high kurtosis (leptokurtic distribution) indicates heavy tails and a sharply concentrated peak; this formulation results in a smaller window to preserve valid structural peaks without destroying adjacent valleys. Conversely, a negative kurtosis (platykurtic distribution) results in a larger window to aggressively flatten noise across broad, flat plateaus. The final value is rounded to the nearest odd integer to maintain symmetrical convolution.
     
-    \item \textbf{Height Ratio Filter:} To prevent the algorithm from evaluating intra-class noise as distinct objects, the minimum height requirement for a peak is dynamically linked to the normalized kurtosis: 
+    \item \textbf{Height Ratio:} To prevent the algorithm from evaluating intra-class noise as distinct objects, the minimum height requirement for a peak is dynamically linked to the normalized kurtosis: 
     \[ \text{Height Ratio} = 0.05 + (0.02 \times K_{norm}) \]
-    Spiky histograms (e.g., dominated by heavy shadows) receive a stricter height requirement to successfully filter out the heavy-tail noise. While, flat histograms receive a relaxed filter to capture subtle secondary modes. To respect the physical limits of 8-bit image clustering, the final ratio is \textbf{clamped} between $2\%$ and $10\%$ of the global maximum frequency.
+    Spiky histograms (e.g., dominated by heavy shadows) receive a stricter height requirement to successfully filter out the heavy-tail noise. While, flat histograms receive a relaxed filter to capture subtle secondary modes. The final ratio is \textbf{clamped} between $2\%$ and $10\%$ of the global maximum frequency.
     
-    \item \textbf{Minimum Peak Distance:} The minimum distance between valid peaks was set to $0.6 \sigma$, clamped at a lower absolute bound of 40 bins. In a 256-intensity spectrum, a distance of 40 represents approximately $15.6\%$ of the total dynamic range.
+    \item \textbf{Minimum Peak Distance:} The minimum distance between valid peaks was set to $0.6 \sigma$, clamped at a lower absolute bound of 40 bins. In a 256-intensity spectrum, a distance of 40 represents approximately $15.6\%$ of the total dynamic range. This minimum value of $40$ was chosen as a safety net to maintain a gap between peaks even when the image has a narrow contrast range. Without having such a lower bound the algorithm might identify two adjacent spikes within the same group of pixels (cluster) as foreground/background pair leading to noisy thresholding. 
 \end{itemize}
 \newpage
 \subsection{Task 2: Iterative Thresholding}
@@ -200,7 +200,7 @@ $B \leftarrow (I \ge T)$\;
 \caption{Iterative Thresholding}
 \end{algorithm}
 
-\subsubsection{Design and Heuristics}
+\subsubsection{Design and Heuristics for Iterative Thresholding}
 \begin{itemize}
     \item \textbf{Initial Seed ($T_0$):} Standard iterative algorithms start at the global mean. However, in heavily skewed images (e.g., dominated by dark shadows), the mean skew's away from the center. To combat this skewness, the initial seed is set to the average of the Mean and Median: $T_0 = (\text{Mean} + \text{Median}) / 2.0$ (this provides a \textbf{middle ground} in case of extreme outliers).
 \end{itemize}
@@ -254,14 +254,16 @@ Initialize queue $Q$ with pixels where $I \ge T_H$\;
 \caption{Dual Thresholding with Region Growing}
 \end{algorithm}
 
-\subsubsection{Design and Heuristics}
+\subsubsection{Design and Heuristics for Dual Thresholding with Region Growing}
 \begin{itemize}
-    \item \textbf{Foreground Variance ($T_L$ Base):} The low threshold is established by subtracting a multiple of the foreground standard deviation ($\sigma_{fg}$) from the high threshold: $T_L = T_H - (\sigma_{fg} \times \text{Multiplier})$.
+    \item \textbf{Foreground Variance ($T_L$ Base):} The \textbf{high threshold} ($T_H$) is  computed using an iterative thresholding approach, starting at the global mean and converging on the midpoint of the foreground and background means. 
+    The \textbf{low threshold} is established by subtracting a multiple of the foreground standard deviation ($\sigma_{fg}$) from the high threshold: $T_L = T_H - (\sigma_{fg} \times \text{Multiplier})$.
     \item \textbf{Multiplier:} To prevent "leakage" into the background on images with smooth gradients, the multiplier dictates the strictness of the region growth. It is inversely linked to the 3rd statistical moment (Skewness): $\text{Multiplier} = \max(0.3, 1.0 - |\text{Skewness}|)$. Highly skewed images receive a higher penalty to prevent shadows from bleeding into the background.
+\newpage
     \item \textbf{Clamping:} The multiplier is clamped to a minimum of $0.3$. Dropping below $0.3 \sigma$ practically eliminates the band, causing $T_L$ to equal $T_H$, in which case the algorithm would fall to Single Global Thresholding.
 \end{itemize}
 
-\newpage
+% \newpage
 \section{Experimental Results}
 
 % ---------------------------------------------------------
@@ -469,7 +471,7 @@ Top Peaks & [235, 233, 231] \\
 \section{Conclusion}
 This report implemented three thresholding algorithms: Peakiness Detection, Iterative Thresholding, and Dual Thresholding with Region Growing. Testing across three different images showed that each method performs differently based on the image's intensity distribution. The Peakiness algorithm is effective when the histogram has clear modes, but it requires smoothing to correctly identify the peaks. Iterative thresholding provided a stable boundary, and setting the initial seed based on the mean and median helps it converge in skewed images. Dual thresholding with region growing uses a high threshold for seeds and a lower threshold for growth, it prevents foreground pixels from leaking into background gradients. 
 
-Calculating algorithm parameters from statistical moments like skewness and kurtosis allowed the methods to work across balanced, shadowed, and flat-background images without manual tuning.
+Calculating algorithm parameters from statistical moments, such as skewness and kurtosis, enabled the algorithms to work across balanced, shadowed, and flat-background images.
 
 \begin{shaded}
 \textbf{\textit{Note:}} For source code kindly refer to the appendix on the next page.
@@ -548,8 +550,8 @@ def calculate_stats(image):
     fg_pixels = image[image > T_temp]
     sigma_fg = np.std(fg_pixels) if len(fg_pixels) > 0 else 0
 
-    raw_prominence = 0.05 + 0.02 * k_norm
-    dynamic_prominence = max(0.02, min(0.10, raw_prominence))
+    height = 0.05 + 0.02 * k_norm
+    height_ratio = max(0.02, min(0.10, height))
 
     return (
         min_distance,
@@ -557,7 +559,7 @@ def calculate_stats(image):
         sigma_fg,
         window_size,
         dynamic_multiplier,
-        dynamic_prominence,
+        height_ratio,
     )
 
 
@@ -610,11 +612,11 @@ def threshold_peakiness(image, min_distance, win_size, height_ratio=0.05):
 
             if peakiness > max_peakiness:
                 max_peakiness = peakiness
-                
+
                 best_valley = valley_idx
 
     T = best_valley if best_valley > 0 else int(np.mean(image))
-    binary_image = (image >= T).astype(np.uint8) * 255
+    binary_image = (image > T).astype(np.uint8) * 255
     return binary_image, T
 
 
@@ -633,7 +635,7 @@ def threshold_iterative(image, t0_estimate, epsilon=1.0):
         T_old = T_new
 
     T_final = int(T_new)
-    return (image >= T_final).astype(np.uint8) * 255, T_final
+    return (image > T_final).astype(np.uint8) * 255, T_final
 
 
 def threshold_dual_region_growing(image, sigma_fg, multiplier=0.5):
@@ -682,10 +684,10 @@ if __name__ == "__main__":
             continue
 
         img = load_and_preprocess(file)
-        min_dist, t0_seed, sigma_fg, win_size, dyn_mult, dyn_pro = calculate_stats(img)
+        min_dist, t0_seed, sigma_fg, win_size, dyn_mult, height_ratio = calculate_stats(img)
         base_name = file.split(".")[0]
 
-        res_peak, t_peak = threshold_peakiness(img, min_dist, win_size, dyn_pro)
+        res_peak, t_peak = threshold_peakiness(img, min_dist, win_size, height_ratio)
         plt.imsave(f"{output_dir}/{base_name}_peakiness.png", res_peak, cmap="gray")
 
         res_iter, t_iter = threshold_iterative(img, t0_seed)

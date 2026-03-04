@@ -68,8 +68,8 @@ def calculate_stats(image):
     fg_pixels = image[image > T_temp]
     sigma_fg = np.std(fg_pixels) if len(fg_pixels) > 0 else 0
 
-    raw_prominence = 0.05 + 0.02 * k_norm
-    dynamic_prominence = max(0.02, min(0.10, raw_prominence))
+    height = 0.05 + 0.02 * k_norm
+    height_ratio = max(0.02, min(0.10, height))
 
     return (
         min_distance,
@@ -77,7 +77,7 @@ def calculate_stats(image):
         sigma_fg,
         window_size,
         dynamic_multiplier,
-        dynamic_prominence,
+        height_ratio,
     )
 
 
@@ -106,7 +106,6 @@ def threshold_peakiness(image, min_distance, win_size, height_ratio=0.05):
             if smoothed_hist[i] > height_thereshold:
                 peaks.append(i)
 
-    # best_peak_pair = None
     best_valley = 0
     max_peakiness = -1
 
@@ -131,11 +130,11 @@ def threshold_peakiness(image, min_distance, win_size, height_ratio=0.05):
 
             if peakiness > max_peakiness:
                 max_peakiness = peakiness
-                # best_peak_pair = (p1, p2)
+
                 best_valley = valley_idx
 
     T = best_valley if best_valley > 0 else int(np.mean(image))
-    binary_image = (image >= T).astype(np.uint8) * 255
+    binary_image = (image > T).astype(np.uint8) * 255
     return binary_image, T
 
 
@@ -154,7 +153,7 @@ def threshold_iterative(image, t0_estimate, epsilon=1.0):
         T_old = T_new
 
     T_final = int(T_new)
-    return (image >= T_final).astype(np.uint8) * 255, T_final
+    return (image > T_final).astype(np.uint8) * 255, T_final
 
 
 def threshold_dual_region_growing(image, sigma_fg, multiplier=0.5):
@@ -203,10 +202,10 @@ if __name__ == "__main__":
             continue
 
         img = load_and_preprocess(file)
-        min_dist, t0_seed, sigma_fg, win_size, dyn_mult, dyn_pro = calculate_stats(img)
+        min_dist, t0_seed, sigma_fg, win_size, dyn_mult, height_ratio = calculate_stats(img)
         base_name = file.split(".")[0]
 
-        res_peak, t_peak = threshold_peakiness(img, min_dist, win_size, dyn_pro)
+        res_peak, t_peak = threshold_peakiness(img, min_dist, win_size, height_ratio)
         plt.imsave(f"{output_dir}/{base_name}_peakiness.png", res_peak, cmap="gray")
 
         res_iter, t_iter = threshold_iterative(img, t0_seed)
