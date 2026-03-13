@@ -1518,4 +1518,89 @@ fitting and endering
 
 Edge Linking -> To generate an ordered list of Edges from an unordered list
 
+
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 03 March, 2026, 14:50 PM}  
+
+Gradient of $F(x,y) = \hat{i} + \frac{\delta F(x,y)}{\delta x} + \hat{j} + \frac{\delta F(x,y)}{\delta y}$
+
+$\hat{i}$ and $\hat{j}$ are unit vectors along the x and y axis.
+
+\begin{equation}
+    \vert F(x,y)\vert = \sqrt{[\frac{\delta F(x,y)^2}{\delta x}]+[\frac{\delta F(x,y)^2}{\delta y}]}
+    \tan \theta = [\frac{\frac{\delta F(x,y)}{\delta y}}{\frac{\delta F(x,y)}{\delta x}}]
+\end{equation}
+
+Manhattan Approximation to the gradient magnitude
+
+\[
+\left| F(x, y) \right|_{M}
+=
+\left| \frac{\delta F(x,y)}{\delta x} \right|
++
+\left| \frac{\delta F(x,y)}{\delta y} \right|
+\]
+
+\[
+\text{Discrete Approximation}
+\]
+
+\[
+\theta = \tan^{-1}\!\left(\frac{V_y}{V_x}\right)
+\]
+
+\[
+\frac{\delta F(x,y)}{\delta x} \approx F(i, j+1) - F(i, j) \longrightarrow \text{ j - x direction}
+\]
+\[
+\frac{\delta F(x,y)}{\delta y} \approx F(i, j) - F(i+1, j) \longrightarrow \text{ i - y direction}
+\]
+
+Gradeint Orientation Image
+
+\[
+I(i,j) \circledast G_x = I_{gx}(i,j)
+\]
+
+\[
+I(i,j) \circledast G_y  = I_{gy}(i,j)
+\]
+
+\begin{equation}
+    \begin{aligned}
+        G_{\theta}(i, j) &= \tan^{-1} \left[I_{gy}(i,j)/I_{gx}(i,j)\right]\\
+        G_x &= \underbrace{F(i, j+1) - F(i, j)}_{i, \frac{j+1}{2}}\\
+        G_y &= \underbrace{F(i, j) - F(i+1, j)}_{\frac{i+1}{2}, j}
+    \end{aligned} 
+\end{equation}
+
+Gradient Magnitude Image
+\[
+G_{mag} (i,j) = \sqrt{I_{gx}^{2}(i,j) + I_{gy}^{2}(i,j)}  \approx \left|I_{gx}(i,j)\right| + \left|I_{gy}(i,j)\right|
+\]
+
+The weights should add up to 0 (gradient smoothing filter)
+\newpage
+\section{Steps in Edge Detection}
+
+\begin{enumerate}
+    \item Filtering/smoothing for noise removal
+    \item[-] Median Filtering followed by Gaussian Smoothing
+    \item Enhancement
+    \item[-] emphasize pixels that characterize significant local change in image intensity (or any image property)
+    \item[-] Image Gradient computation is one way of enhancement
+    \item Detection
+    \item[-] Select the enhanced pixels that represent edge pixels
+    \item[-] classification problem $\underbrace{\text{thresholding is a simple option}}_{\text{local maxima detection}}$
+    \item[] Localization 
+    \item[-] Estimate the position and Orientation of the edge pixel (edge deblurring) 
+\end{enumerate}
+
+\section{Edge operators for Image Enhancement}
+\begin{enumerate}
+    \item Roberts Operator
+    \item Prewitt Operator
+    \item Sobel Operator
+\end{enumerate}
 \end{document}
