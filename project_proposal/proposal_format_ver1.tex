@@ -1,0 +1,86 @@
+% !BIB program = biber
+\documentclass[stu]{apa7}
+
+\raggedbottom
+
+\usepackage[american]{babel}
+\usepackage{lipsum}
+\usepackage{csquotes}
+\usepackage{booktabs}
+\usepackage[style=apa,backend=biber]{biblatex}
+
+\addbibresource{ppb.bib}
+% \bibliographystyle{unsrt} % Or use a specific apa-numeric style
+% \bibliography{ppb.bib}
+
+%% --- Proposal Metadata ---
+\title{Physics Informed Hyperspectral Image Reconstruction from RGB}
+\shorttitle{Project Proposal} % Required for APA headers
+
+\authorsnames{Aditya Bhargava}
+\authorsaffiliations{University of Georgia}
+\course{CSCI 8820: Computer Vision and Pattern Recognition}
+\professor{Dr. Suchendra Bhandarkar}
+\duedate{March 18, 2026}
+
+%% --- Abstract (Proposal Executive Summary) ---
+\abstract{This proposal outlines the development of a system, aiming to solve HSI reconstruction. We discuss the motivation, the proposed technical approach using computer vision techniques, and the expected deliverables.}
+
+\keywords{Computer Vision, HSI, RGB, Physics Informed}
+
+\begin{document}
+\maketitle
+
+\section{Introduction and Problem Statement}
+
+% Describe the "Why". What is the gap in current computer vision research or applications?
+Hyperspectral imaging (HSI) is an advanced optical sensing technique that assembles spectroscopy and digital photography into a single system  \parencite{hong2026hyperspectralimaging}. The imaging collects and processes scene information by dividing the whole spectrum into tens of hundreds of bands, typically covering wavelengths from 380 nm to 2500 nm \parencite{Rybicki:847173}. The technique has been widely adopted in many fields, eg., medical diagnosis, healthcare, remote sensing and identifying foreign objects in food products \parencite{ghimpeteanu2025hyperspectralimagingidentifyingforeign}. The hyperspectral images possesses a three-dimensional structure, comprising two dimensions of spatial information and one dimension of spectral information. However, conventional spectrometers often operate in 1D line or 2D plane scanning, which is time-consuming and not suitable for dynamic scenes. Also, the devices for acquring the HSIs are typically more complicated and expensive than common cameras. In order to obtain the spectral information more effectively by extracting the required spectral information from the RGB images. The need to reconstruct the spectral properties of scene reflectance (and illumination) from a three-channel device or standard color space was recognized as early as 1980s \parencite{Hall1988IlluminationAC,Jaaskelainen:90, Maloney:86, Maloney:86, Parkkinen:89}. But this is an ill-posed problem since a large amount of information is lost during the process of spectral integration when RGB sensors capture the light. Recent approaches involve deeplearning methods to solve this by learning the mapping from RGB to HSI. But this method is purely datadriven
+
+The goal is to incorporate physics based formulations into the Architecture itself to achieve a higher accuracy 
+
+\section{Literature Review}
+
+
+\section{Proposed Methodology}
+% How are you going to build it?
+\subsection{Data Acquisition and Preprocessing}
+The dataset that will be used is called Arad 1K as it also contains the camera sf matrix
+
+\subsection{Proposed Algorithm/Model Architecture}
+
+
+\subsection{Evaluation Metrics}
+Accuracy, time taken 
+
+\section{Project Plan and Timeline}
+The project will be executed in four phases as detailed in Table~\ref{tab:Timeline}.
+
+\begin{table}[h]
+  \caption{Project Milestone Timeline}
+  \label{tab:Timeline}
+  \begin{tabular}{@{}lll@{}} \toprule
+  Phase & Task Description & Completion Date \\ \midrule
+  1     & Data Collection \& Cleaning & March 25      \\
+  2     & Initial Model Training      & April 10      \\
+  3     & Testing and Optimization    & April 25      \\
+  4     & Final Report \& Submission  & May 05        \\ \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Expected Outcomes and Impact}
+
+
+\printbibliography
+
+\appendix
+
+\section{Resource Requirements}
+\label{app:resources}
+% List hardware (GPUs), datasets, or software libraries needed.
+\begin{figure}[h]
+    \caption{Proposed System Architecture Flowchart.}
+    \figurenote{This diagram represents the data pipeline from input sensor to classification.}
+    \label{fig:Arch}
+\end{figure}
+
+\end{document}
