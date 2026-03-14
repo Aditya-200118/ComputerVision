@@ -30,6 +30,7 @@
 \usepackage{framed}
 \usepackage[most]{tcolorbox}
 \usepackage{xcolor}
+\usepackage[ruled,vlined]{algorithm2e}
 \colorlet{shadecolor}{orange!15}
 \parindent 0in
 \parskip 12pt
@@ -1603,4 +1604,27 @@ The weights should add up to 0 (gradient smoothing filter)
     \item Prewitt Operator
     \item Sobel Operator
 \end{enumerate}
+\begin{algorithm}[H]
+\DontPrintSemicolon
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output}
+
+\Input{Grayscale image $I$ of size $M \times N$}
+\Output{Histogram $H[0..255]$}
+
+Initialize $H[i] \leftarrow 0$ for $i = 0$ to $255$\;
+
+\For{$x \leftarrow 0$ \KwTo $M-1$}{
+    \For{$y \leftarrow 0$ \KwTo $N-1$}{
+        $g \leftarrow I[x,y]$\;
+        $H[g] \leftarrow H[g] + 1$\;
+    }
+}
+
+\Return $H$\;
+
+\caption{Computation of Grey-Level Histogram}
+\end{algorithm}
+
+
 \end{document}
