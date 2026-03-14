@@ -317,7 +317,7 @@ A pixel, $p \in S$ connected to pixel  $q\in S$  if there exists a path from p t
 
 A subset of pixels on S in which each pixel is connected to all other pixels in the subset.
 
-4 conncected component
+4 connected component
 
 8 connected component
 
@@ -815,8 +815,8 @@ coordinates {(4.7,0) (4.7,2.2)};
 \begin{enumerate}
     \item Select threshold $T_1$ and $T_2$
     \item Parititon the image into 3 pixel classes \\
-    $R_1 \longleftarrow$ graylevel $\le T_1$ - gaurantee  foreground pixel \\
-    $R_2 \longleftarrow$ graylevel $\ge T_2$ - gaurantee  background pixel \\
+    $R_1 \longleftarrow$ graylevel $\le T_1$ - guarantee  foreground pixel \\
+    $R_2 \longleftarrow$ graylevel $\ge T_2$ - guarantee  background pixel \\
     $R_3 \longleftarrow$ $T_1 < $\ graylevel $< T_2$ - could be either foreground or background
     \item Visit each pixel in class $R_3$. If the pixel has a neighbour  in class $R_1$ then reassign that pixel to $R_1$
     \item Repeat step 3 until no more $R_3$ pixels are reassigned.
@@ -862,7 +862,7 @@ Tries to reduce the \textbf{misclassification} by using spatial coherence
     
     \end{itemize}
 
-    \item \textbf{Heirarchical Representation} \\
+    \item \textbf{Hierarchical Representation} \\
     Represent image and regions at multiple levels of representations.
     \begin{itemize}
         \item Fine analysis at higher resolution (detached)
@@ -942,7 +942,7 @@ Scene Graph (RAG is more specialized variant)
 \end{itemize}
 
 \begin{unnote}
-    Nodes and Arc possess attribtues
+    Nodes and Arc possess attributes
 \end{unnote} 
 Node Attributes: Region Attributes
 \begin{itemize}
@@ -964,7 +964,7 @@ Given a label array $L(i,j)$ one can generate an RAG
     \item Consider pixel (i,j)
     \begin{itemize}
         \item If node with label L(i,j) exists then update the node in the RAG to include pixel(i, j)
-        \item else create a new node with label L(i, j) cosnsiting of pixel (i, j)
+        \item else create a new node with label L(i, j) consisting of pixel (i, j)
     \end{itemize}
     \item Examine the neighbour pixel (i,j)
     \begin{itemize}
@@ -1603,4 +1603,51 @@ The weights should add up to 0 (gradient smoothing filter)
     \item Prewitt Operator
     \item Sobel Operator
 \end{enumerate}
+
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 04 March, 2026, 14:50 PM}  
+
+
+\begin{equation}
+    \begin{aligned}
+    I \circledast S_x &= I_{sx}\\
+    I \circledast S_y &= I_{sy} \\
+    \text{ magnitude image} &= \sqrt{I_{sx}^2 + I_{sy}^2}
+\end{aligned}
+\end{equation}
+
+
+\section{Gradient Operators - 1st derivative operator}
+
+Technique A
+
+
+\begin{itemize}
+  \item Convolve image with the operator
+  \item Computer the gradient magnitude operator
+  \item Threshold the gradient magnitude image gmi
+  \item Output the resulting binary image
+\end{itemize}
+
+Resulting edge would be thicker (multi pixel edge contours)
+
+Thats the issue (simple thresholding)
+
+Ideally want one pixel wide (crisp contour)
+
+Loose localization precision
+
+need to do edge thinning or edge Skeletonization
+
+local maxima based approach
+
+noisy edges 
+
+local maxima
+
+
+For a step edge (for a first derivative)
+
+0 crossing to pixel with smaller abs value 
 \end{document}
