@@ -8,7 +8,7 @@
 \usepackage{csquotes}
 \usepackage{booktabs}
 \usepackage[style=apa,backend=biber]{biblatex}
-
+\usepackage{amssymb}
 \addbibresource{ppb.bib}
 % \bibliographystyle{unsrt} % Or use a specific apa-numeric style
 % \bibliography{ppb.bib}
@@ -36,45 +36,71 @@
 \section{Introduction and Problem Statement}
 
 % Describe the "Why". What is the gap in current computer vision research or applications?
-Hyperspectral imaging (HSI) is an advanced optical sensing technique that assembles spectroscopy and digital photography into a single system  \parencite{hong2026hyperspectralimaging}. The imaging collects and processes scene information by dividing the whole spectrum into tens of hundreds of bands, typically covering wavelengths from 380 nm to 2500 nm \parencite{Rybicki:847173}. The technique has been widely adopted in many fields, eg., medical diagnosis, healthcare, remote sensing and identifying foreign objects in food products \parencite{ghimpeteanu2025hyperspectralimagingidentifyingforeign}. The hyperspectral images possess a three-dimensional structure, comprising two dimensions of spatial information and one dimension of spectral information. However, conventional spectrometers often operate in 1D line or 2D plane scanning, which is time-consuming and not suitable for dynamic scenes. Also, the devices for acquring the HSIs are typically more complicated and expensive than common cameras. 
+Hyperspectral imaging (HSI) is an advanced optical sensing technique that assembles spectroscopy and digital photography into a single system  \parencite{hong2026hyperspectralimaging}. The imaging collects and processes scene information by dividing the whole spectrum into tens of hundreds of bands, typically covering wavelengths from 380 nm to 2500 nm \parencite{Rybicki:847173}. The technique has been widely adopted in many fields, e.g., medical diagnosis, healthcare, remote sensing and identifying foreign objects in food products \parencite{ghimpeteanu2025hyperspectralimagingidentifyingforeign}. The hyperspectral images possess a three-dimensional structure, comprising two dimensions of spatial information and one dimension of spectral information. However, conventional spectrometers often operate in 1D line or 2D plane scanning, which is time-consuming and not suitable for dynamic scenes. Also, the devices for acquiring the HSIs are typically more complicated and expensive than common cameras. 
 % In order to obtain the spectral information more effectively by extracting the required spectral information from the RGB images. 
 The need to reconstruct the spectral properties of scene reflectance (and illumination) from a three-channel device or standard color space was recognized as early as 1980s \parencite{Hall1988IlluminationAC,Jaaskelainen:90, Maloney:86, Maloney:86, Parkkinen:89}. But this is an extremely ill-posed problem since a large amount of information is lost during the process of spectral integration when RGB sensors capture the light.\\ Spectral reconstruction from RGB images often suffer from a \textit{metameric} dilemma, where distinct spectral distribution map to nearly identical RGB values, making them indistinguishable. Recent approaches involve deep learning methods to solve this by learning the mapping from RGB to HSI. While these models achieve reasonable quantitative metrics, they operate as black boxes that ignore the underlying mechanism behind the imaging process. To overcome these issues, the goal is to incorporate physics based formulations into the architecture itself. By explicitly embedding the camera's Spectral Response Function (SRF) as a mathematical forward-model constraint, the network is forced to output hyperspectral reconstructions that strictly adhere to the physical laws of image formation, achieving both higher accuracy and reliable material distinction.
 
 \section{Literature Review}
-A RGB image is usally generated in three wide spectral channels with Bayer Filters, which is essentially a color filter array (CFA) placed over digital image sensor to capture color information. While, an HSI is obtained by the interaction between the spectral reflectance and illumination. The relation between the RGB and HSI images can be represented by
+A RGB image is usually generated in three wide spectral channels with Bayer Filters, which is essentially a color filter array (CFA) placed over digital image sensor to capture color information. While, an HSI is obtained by the interaction between the spectral reflectance and illumination. The relation between the RGB and HSI images can be represented by
 
 \begin{equation}
     I_c(x, y) = \int_{w_1}^{w_2} R(x, y, w) L(w) S_c(w) \, dw
 \end{equation}
-where $I_c$ represents each channel of RGB image, $S_c()$ denotes the spectral response function and $R(x,y,z)$ is the spectral reflectance of the objects and $L(w)$ is the illumination spectrum. HSI is typically defined as
+where $I_c$ represents each channel of RGB image, $S_c(w)$ denotes the spectral response function and $R(x,y,z)$ is the spectral reflectance of the objects and $L(w)$ is the illumination spectrum. HSI is typically defined as
 \begin{equation}
     I_c(x, y) = \int_{w_1}^{w_2} H(x, y, w) S_c(w) \, dw
 \end{equation}
-where, $H(x,y,z)$ represents the Hyperspectral image. The challenge in spectral reconstruction is to invert the above forward image formation model in optimzation framework to find the $H(x, y, z)$. A wide variety of methods have been developed to achieve spectral reconstruction.
+where, $H(x,y,z)$ represents the Hyperspectral image. The challenge in spectral reconstruction is to invert the above forward image formation model in optimization framework to find the $H(x, y, z)$. A wide variety of methods have been developed to achieve spectral reconstruction.
 
 \subsection{Prior-Based Methods}
 These methods rely on mathematical assumptions around which the algorithms are designed. Broadly there are three categories of Prior-Based methods namely dictionary learning, manifold learning and gaussian process. \textcite{Arad2016SparseRO} introduced a method to reconstruct HSI directly from RGB leveraging hyperspectral priors in order to create a sparse dictionary of hyperspectral signatures and their corresponding RGB projections. The method works by collecting the hyperspectral prior, preferably from a set of domain specific scenes. This prior is then reduced computationally to an overcomplete dictionary $D_h$ of hyperspectral signatures. The dictionary is projected to the sensor space via the receptor spectral absorbance functions $R$, establishing a corresponding RGB dictionary, $D_{rgb}$. 
-This correspondance between each RGB vector and its hyperspectral signature originator $h_i$ is maintained for the later mapping from RGB to hyperspectral signatures. For a given image, a sparse weight vector $w$ is calculated, that reconstructs a given RGB pixel query from the RGB dictionary. Because both dictionaries share the exact same sparse coefficients, applying these weights back to the hyperspectral dictionary yields the estimated spectrum signature $h_q$. 
+This correspondence between each RGB vector and its hyperspectral signature originator $h_i$ is maintained for the later mapping from RGB to hyperspectral signatures. For a given image, a sparse weight vector $w$ is calculated, that reconstructs a given RGB pixel query from the RGB dictionary. Because both dictionaries share the exact same sparse coefficients, applying these weights back to the hyperspectral dictionary yields the estimated spectrum signature $h_q$. 
 
-While, manifold learning approach is aimed at finding a low-dimensional manifold that can uniquely represent the high dimensional data. \textcite{8237766} proposed a manifold apporach but simplifying the three to many mapping into a well conditioned three to three problem using a isometric mapping algorithm which is used to reduce dimensionality of the basis spectra to a three-dimensional subspace. After finding a low dimensional embedding of natural scene spectra, a non linear mapping is learned between the RGB vectors and their corresponding 3D embedded natural scene spectra using a radial basis function with 10 hidden neurons and leveraging Levenberg-Marquardt training algorithm \parencite{Levenberg1944AMF,Marquardt1963AnAF}. The reconstruction of high dimesnional spectrum from its 3D embedding employs a dictionary learning-based technique, essentially finding a common coding between the 3D embedding and high dimesnional space of the spectra.
+While, manifold learning approach is aimed at finding a low-dimensional manifold that can uniquely represent the high dimensional data. \textcite{8237766} proposed a manifold approach but simplifying the three to many mapping into a well conditioned three to three problem using a isometric mapping algorithm which is used to reduce dimensionality of the basis spectra to a three-dimensional subspace. After finding a low dimensional embedding of natural scene spectra, a non linear mapping is learned between the RGB vectors and their corresponding 3D embedded natural scene spectra using a radial basis function with 10 hidden neurons and leveraging Levenberg-Marquardt training algorithm \parencite{Levenberg1944AMF,Marquardt1963AnAF}. The reconstruction of high dimensional spectrum from its 3D embedding employs a dictionary learning-based technique, essentially finding a common coding between the 3D embedding and high dimensional space of the spectra.
 
-\textcite{akhtar2018hyperspectralrecoveryrgbimages} proposed a technique to estimate the HSI from RGB by modeling natural spectra with Gaussian processes. By exploiting the kernels of gaussian process to model the realtive smoothness of naturally occuring spectra and accounting for the non-negativity of reflectance values and the self-similarity of hyperspectral image patches for accurate spectral recovery.
+\textcite{akhtar2018hyperspectralrecoveryrgbimages} proposed a technique to estimate the HSI from RGB by modeling natural spectra with Gaussian processes. By exploiting the kernels of gaussian process to model the relative smoothness of naturally occurring spectra and accounting for the non-negativity of reflectance values and the self-similarity of hyperspectral image patches for accurate spectral recovery.
 % this formulation inherently guarantees that the reconstructed hyperspectral signal is physically consistent with the original RGB measurement (i.e., $c_q = R \cdot h_q$), though the overall reconstruction quality remains strictly bounded by the representational capacity of the initial hyperspectral prior.
 
 \subsection{Deep-Learning Methods}
-\cite{Xiong2017HSCNNCH} introduced a deep learning apporach to recover the hyperspectral image. The method first applies a umsampling matrix to interpolate the 3-channel input into a high-dimensional spectral volume. A convolutional network, inspired by the residual learning architectures like VSDR, is then applied to the the volume. The network learns a learns and end-end to mapping from a large number of upsampled/ground truth hyperspectral image pairs.
+\cite{Xiong2017HSCNNCH} introduced a deep learning approach to recover the hyperspectral image. The method first applies a upsampling matrix to interpolate the 3-channel input into a high-dimensional spectral volume. A convolutional network, inspired by the residual learning architectures like VSDR, is then applied to the the volume. The network learns a learns and end-end to mapping from a large number of upsampled/ground truth hyperspectral image pairs.
 
-Building upon the original HSCNN, the advanceed HSCNN+ \parencite{Shi2018HSCNNAC} models eliminate the need for hand-crafted umsampling and significantly improve feature extraction.
+Building upon the original HSCNN, the advanced HSCNN+ \parencite{Shi2018HSCNNAC} models eliminate the need for hand-crafted upsampling and significantly improve feature extraction.
 Instead of using a fixed interpolation matrix, HSCNN+ utilizes a pointwise convolutional layer to directly expand the 3-channel RGB input into the targeted spectral dimensions and replacing the plain convolution layers in HSCNN by modern residual blocks to boost its performance allowing the the network to learn the optimal spectral mapping.
 
-The \textcite{cai2022mstmultistagespectralwisetransformer} introduced Vision Transformer based architecture shifting from CNN-based methods. Excelling at capturing long-range dependencies in hyperspectral data, MST++ employs a novel spectral-wise multi head self-attention (S-MSA) that is based on the hyperspectral characteristics. Which allows the model to capture global spatial context and complex spectral correlations simultaneously, which traditional CNNs struggle to achieve due to their localized receptive fields
+\textcite{cai2022mstmultistagespectralwisetransformer} introduced Vision Transformer based architecture shifting from CNN-based methods. Excelling at capturing long-range dependencies in hyperspectral data, MST$++$ employs a novel spectral-wise multi head self-attention (S-MSA) that is based on the hyperspectral characteristics. Which allows the model to capture global spatial context and complex spectral correlations simultaneously, which traditional CNNs struggle to achieve due to their localized receptive fields
 \section{Proposed Methodology}
 % How are you going to build it?
 \subsection{Data Acquisition and Preprocessing}
 The dataset that will be used is called Arad 1K as it also contains the camera sf matrix
 
 \subsection{Proposed Algorithm/Model Architecture}
+% \subsection{Proposed Algorithm/Model Architecture}
 
+To bridge the gap between data-driven mapping and the physical reality of the imaging process, I propose a Physics-Informed Deep Learning architecture. The framework consists of a deep feature extraction backbone coupled with a differentiable forward-model constraint layer.
+
+\subsubsection{Base Reconstruction Network}
+The first stage of the pipeline involves a deep neural network ideally a transformer achitecture, acting as the inverse mapping function $f_\theta$, parameterized by $\theta$. Given an input RGB image $I_{rgb} \in \mathbb{R}^{H \times W \times 3}$, the network predicts an hyperspectral volume $\hat{H} \in \mathbb{R}^{H \times W \times C}$, where $C$ is the number of spectral bands (e.g., 31). I plan to evaluate both advanced CNN structures (such as HSCNN+) and Vision Transformer backbones (such as MST++) for this stage to capture both local and global spectral-spatial dependencies.
+
+\subsubsection{Differentiable Forward Model Layer}
+Most deep learning approaches stop at the prediction of $\hat{H}$ and compute the error against the ground truth. To eliminate the black-box nature of this process, a parameter-free, differentiable layer that mathematically simulates the camera's sensor integration. By discretizing the forward model defined in Equation 2, we can represent the camera's Spectral Response Function (SRF) as a known projection matrix $\Phi \in \mathbb{R}^{C \times 3}$. 
+
+Projecting the predicted hyperspectral image $\hat{H}$ back into the RGB domain to generate a reconstructed RGB image, $\hat{I}_{rgb}$:
+\begin{equation}
+    \hat{I}_{rgb} = \hat{H} \Phi
+\end{equation}
+This layer forces the network to explicitly acknowledge how the hyperspectral signal will be integrated by the specific camera sensor used to capture the input data.
+
+\subsubsection{Physics-Informed Loss Function}
+To train the network, we propose a joint optimization strategy that penalizes both spectral inaccuracies and physical inconsistencies. The total loss function $\mathcal{L}_{total}$ is defined as a weighted sum of a reconstruction loss and a physics-informed data fidelity loss:
+\begin{equation}
+    \mathcal{L}_{total} = \alpha \mathcal{L}_{recon}(\hat{H}, H_{gt}) + \beta \mathcal{L}_{physics}(\hat{I}_{rgb}, I_{rgb})
+\end{equation}
+where $H_{gt}$ is the ground-truth hyperspectral image, and $\alpha$ and $\beta$ are hyperparameters balancing the terms. 
+
+\begin{itemize}
+    \item \textbf{Reconstruction Loss ($\mathcal{L}_{recon}$):} We will utilize Mean Absolute Error (MAE) or a spectral-angle-aware loss to ensure the predicted spectrum closely matches the ground truth.
+    \item \textbf{Physics Constraint Loss ($\mathcal{L}_{physics}$):} We compute the error between the input RGB image $I_{rgb}$ and the simulated RGB image $\hat{I}_{rgb}$. Minimizing this term guarantees that the network's predicted hyperspectral signature is a mathematically valid metamer of the original RGB observation under the specific SRF constraint.
+\end{itemize}
 
 \subsection{Evaluation Metrics}
 Accuracy, time taken 
