@@ -3,25 +3,36 @@
 
 \raggedbottom
 
+%% --- Packages ---
 \usepackage[american]{babel}
 \usepackage{lipsum}
 \usepackage{csquotes}
 \usepackage{booktabs}
-\usepackage[style=apa,backend=biber]{biblatex}
 \usepackage{amssymb}
-\addbibresource{ppb.bib}
-% \bibliographystyle{unsrt} % Or use a specific apa-numeric style
-% \bibliography{ppb.bib}
+\usepackage[style=apa,backend=biber]{biblatex}
 
-%% --- Proposal Metadata ---
+%% --- Bibliography ---
+\addbibresource{ppb.bib}
+
+%% --- PDF Metadata ---
+% Put AFTER all packages; do NOT load hyperref manually (apa7 does it internally)
+\hypersetup{
+    pdfauthor={Aditya Bhargava},
+    pdftitle={Physics Informed Hyperspectral Image Reconstruction from RGB},
+    pdfsubject={CSCI 8820 Computer Vision and Pattern Recognition},
+    pdfkeywords={Hyperspectral imaging, RGB reconstruction, Computer vision, Aditya Bhargava}
+}
+
+%% --- Proposal / APA Metadata ---
 \title{Physics Informed Hyperspectral Image Reconstruction from RGB}
 \shorttitle{Project Proposal} % Required for APA headers
 
-\authorsnames{Aditya Bhargava}
+\author{Aditya Bhargava \\ UGA ID 811235738}       % Correct field for APA7 class
 \authorsaffiliations{University of Georgia}
 \course{CSCI 8820: Computer Vision and Pattern Recognition}
 \professor{Dr. Suchendra Bhandarkar}
-\duedate{March 18, 2026}
+\duedate{March 16, 2026}
+
 
 %% --- Abstract (Proposal Executive Summary) ---
 \abstract{Hyperspectral image (HSI) reconstruction from single-shot RGB measurements has predominantly relied on purely data-driven deep learning, often treating the complex physical imaging process as a black-box (three to many) mapping problem. Since this is an ill-posed problem it leads to difficulties, particularly in distinguishing similar materials due to the metamer problem—where distinct physical spectral signatures project to identical RGB values. To address this fundamental limitation, this proposal outlines a Physics-Informed architecture. Moving from direct RGB-to-HSI mapping, the proposed framework structurally embeds the camera's Spectral Response Function (SRF) to compute a mathematically guaranteed physical baseline. A deep neural network is then utilized to model the spectral discrepancy, explicitly tasked with learning the invisible metameric black component residing in the SRF null-space. To ensure physical validity and prevent shape overfitting, the system incorporates metameric data augmentation, a differentiable forward-model constraint layer, and an adaptively weighted multi-task loss function. The expected deliverable is a robust reconstruction pipeline capable of maintaining strict spectral reconstruction under metameric conditions, effectively bridging the gap between computational deep learning and the physical principles of hyperspectral data acquisition.}
@@ -36,9 +47,9 @@
 \section{Introduction and Problem Statement}
 
 % Describe the "Why". What is the gap in current computer vision research or applications?
-Hyperspectral imaging (HSI) is an advanced optical sensing technique that assembles spectroscopy and digital photography into a single system  \parencite{hong2026hyperspectralimaging}. The imaging collects and processes scene information by dividing the whole spectrum into tens of hundreds of bands, typically covering wavelengths from 380 nm to 2500 nm \parencite{Rybicki:847173}. The technique has been widely adopted in many fields, e.g., medical diagnosis, healthcare, remote sensing and identifying foreign objects in food products \parencite{ghimpeteanu2025hyperspectralimagingidentifyingforeign}. The hyperspectral images possess a three-dimensional structure, comprising two dimensions of spatial information and one dimension of spectral information. However, conventional spectrometers often operate in 1D line or 2D plane scanning, which is time-consuming and not suitable for dynamic scenes. Also, the devices for acquiring the HSIs are typically more complicated and expensive than common cameras. 
+Hyperspectral imaging (HSI) is an advanced optical sensing technique that assembles spectroscopy and digital photography into a single system  \parencite{hong2026hyperspectralimaging}. The imaging collects and processes scene information by dividing the whole spectrum into tens of hundreds of bands, typically covering wavelengths from 380 nm to 2500 nm \parencite{Rybicki:847173}. The technique has been widely adopted in many fields, e.g., medical diagnosis, healthcare, remote sensing and identifying foreign objects in food products \parencite{ghimpeteanu2025hyperspectralimagingidentifyingforeign}. The hyperspectral images possess a three-dimensional structure, comprising two dimensions of spatial information and one dimension of spectral information. However, conventional spectrometers often operate in 1D line or 2D plane scanning, which is time-consuming and not suitable for dynamic scenes. Also, the devices for acquiring the HSI's are typically more complicated and expensive than common cameras. 
 % In order to obtain the spectral information more effectively by extracting the required spectral information from the RGB images. 
-The need to reconstruct the spectral properties of scene reflectance (and illumination) from a three-channel device or standard color space was recognized as early as 1980s \parencite{Hall1988IlluminationAC,Jaaskelainen:90, Maloney:86, Maloney:86, Parkkinen:89}. But this is an extremely ill-posed problem since a large amount of information is lost during the process of spectral integration when RGB sensors capture the light.\\ Spectral reconstruction from RGB images often suffer from a \textit{metameric} dilemma, where distinct spectral distribution map to nearly identical RGB values, making them indistinguishable. Recent approaches involve deep learning methods to solve this by learning the mapping from RGB to HSI. While these models achieve reasonable quantitative metrics, they operate as black boxes that ignore the underlying mechanism behind the imaging process. To overcome these issues, the goal is to incorporate physics based formulations into the architecture itself. By explicitly embedding the camera's Spectral Response Function (SRF) as a mathematical forward-model constraint, the network is forced to output hyperspectral reconstructions that strictly adhere to the physical laws of image formation, achieving both higher accuracy and reliable material distinction.
+The need to reconstruct the spectral properties of scene reflectance (and illumination) from a three-channel device or standard color space was recognized as early as the 1980's \parencite{Hall1988IlluminationAC,Jaaskelainen:90, Maloney:86, Maloney:86, Parkkinen:89}. But this is an extremely ill-posed problem since a large amount of information is lost during the process of spectral integration when RGB sensors capture the light.\\ Spectral reconstruction from RGB images often suffer from a \textit{metameric} dilemma, where distinct spectral distribution map to nearly identical RGB values, making them indistinguishable. Recent approaches involve deep learning methods to solve this by learning the mapping from RGB to HSI. While these models achieve reasonable quantitative metrics, they operate as black boxes that ignore the underlying mechanism behind the imaging process. To overcome these issues, the goal is to incorporate physics based formulations into the architecture itself. By explicitly embedding the camera's Spectral Response Function (SRF) as a mathematical forward-model constraint, the network is forced to output hyperspectral reconstructions that strictly adhere to the physical laws of image formation, achieving both higher accuracy and reliable material distinction.
 
 \section{Literature Review}
 A RGB image is usually generated in three wide spectral channels with Bayer Filters, which is essentially a color filter array (CFA) placed over digital image sensor to capture color information. While, an HSI is obtained by the interaction between the spectral reflectance and illumination. The relation between the RGB and HSI images can be represented by
@@ -97,7 +108,7 @@ $$\mathcal{L}_{total} = \mathcal{L}_{recon}(\hat{H}, H'_{gt}) + \lambda \mathcal
 where $\lambda$ is an adaptively weighted hyperparameter. This is to prevent one task loss from dominating the other entirely.
 
 \begin{itemize}
-    \item \textbf{Data Prior Loss ($\mathcal{L}_{recon}$):} I will utilize the $L1$ Loss (Mean Absolute Error), as standard MSE struggles with metameric gradients, to ensure the predicted spectrum closely matches the augmented ground truth $H'_{gt}$.
+    \item \textbf{Reconstruction Loss ($\mathcal{L}_{recon}$):} I will utilize the $L1$ Loss (Mean Absolute Error), as standard MSE struggles with metameric gradients, to ensure the predicted spectrum closely matches the augmented ground truth $H'_{gt}$.
     \item \textbf{Physics Constraint Loss ($\mathcal{L}_{physics}$):} Computed between the input RGB image $I_{rgb}$ and the simulated RGB image $\hat{I}_{rgb}$. Minimizing this mathematically restricts the network's prediction to a valid metamer under the specific SRF constraint.
     \item \textbf{Adaptive Weighting:} To prevent dominant terms from overshadowing others, the optimizer will dynamically adjust the weight $\lambda$ based on the gradient statistics of the neural tangent kernel (NTK) or gradient path non-uniformity. This balances the convergence rates of the different losses without manual hyperparameter tuning.
 \end{itemize}
@@ -121,12 +132,12 @@ Prior to training the neural network, the raw hyperspectral data will undergo a 
 
 \begin{itemize}
     \item \textbf{Spatial Patching:} The high-resolution spatial dimensions of the hyperspectral cubes will be divided into overlapping spatial patches (e.g., $128 \times 128$ or $256 \times 256$ pixels). This operation significantly augments the total number of training samples and maintains a manageable memory footprint during the calculation of the pseudo-inverse baseline and backpropagation.
-    \item \textbf{Radiometric Normalization:} To ensure gradient stability across the multi-task loss function \parencite{chen2018gradnormgradientnormalizationadaptive}, both the hyperspectral volumes $H$ and the simulated RGB inputs $I_{rgb}$ will be strictly normalized to a continuous $[0, 1]$ floating-point range. 
+    \item \textbf{Normalization:} To ensure gradient stability across the multi-task loss function \parencite{chen2018gradnormgradientnormalizationadaptive}, both the hyperspectral volumes $H$ and the simulated RGB inputs $I_{rgb}$ will be strictly normalized to a continuous $[0, 1]$ floating-point range. 
     \item \textbf{Data Partitioning:} The patched dataset will be partitioned into strictly non-overlapping training, validation, and testing sets. Care will be taken to split the data at the scene level, rather than the patch level, to guarantee that no spatial or spectral data leakage occurs between the training and testing phases.
 \end{itemize}
 
 \section{Project Plan and Timeline}
-As this is an individual term project, the execution is divided into four phases. The timeline prioritizes the sequential implementation of the physics-informed architecture, starting with data pipeline construction, followed by model training and metameric evaluation. The milestones are detailed in Table~\ref{tab:Timeline}.
+As this is an \textbf{individual} term project, the execution is divided into four phases. The timeline prioritizes the sequential implementation of the physics-informed architecture, starting with data pipeline construction, followed by model training and metameric evaluation. The milestones are detailed in \textbf{Table~\ref{tab:Timeline}}.
 
 \begin{table}[h]
   \centering
@@ -135,7 +146,7 @@ As this is an individual term project, the execution is divided into four phases
   \begin{tabular}{@{}lp{8cm}l@{}} \toprule
   Phase & Task Description & Completion Date \\ \midrule
   1     & \textbf{Data Pipeline \& Augmentation Setup:} Download datasets (ICVL/CAVE), implement the SRF RGB projection ($I_{rgb} = H_{gt} \Phi$), and code the PyTorch 'DataLoader' with metameric augmentation ($H'_{gt} = S^* + \alpha B$). & March 24, 2026 \\ \addlinespace
-  2     & \textbf{Architecture Setup \& Initial Training:} Implement the physical baseline calculation ($H_{baseline} = I_{rgb} \Phi^{\dagger}$), build the discrepancy network backbone (ResNet/U-Net), and integrate the differentiable forward model layer. Run initial training loops. & April 7, 2026 \\ \addlinespace
+  2     & \textbf{Architecture Setup \& Initial Training:} Implement the physical baseline calculation ($H_{baseline} = I_{rgb} \Phi^{\dagger}$), build the network backbone (ResNet/U-Net), and integrate the differentiable forward model layer. Run initial training loops. & April 7, 2026 \\ \addlinespace
   3     & \textbf{Loss Optimization \& Evaluation:} Integrate the adaptive weighting algorithm for the dual-loss function. Conduct final testing and calculate quantitative metrics (MRAE, RMSE, SAM) to evaluate metameric robustness. & April 17, 2026 \\ \addlinespace
   4     & \textbf{Final Report Formulation:} Compile quantitative results, visual spectral curve comparisons, finalize the write-up, and format the final technical report for submission. & April 27, 2026 \\ \bottomrule
   \end{tabular}
@@ -143,11 +154,11 @@ As this is an individual term project, the execution is divided into four phases
 
 \section{Expected Outcomes and Impact}
 
-The proposed Physics-Informed framework aims to improve the reliability of hyperspectral image (HSI) reconstruction. By explicitly separating the known optical physics from the learned state-space residuals, this project targets the following practical outcomes:
+The proposed Physics-Informed framework aims to improve the reliability of hyperspectral image (HSI) reconstruction and better material distinction. By explicitly separating the known optical physics from the learned state-space residuals, this project targets the following practical outcomes:
 
 \subsection{Technical and Performance Outcomes}
 \begin{itemize}
-    \item \textbf{Improved Spectral Fidelity and Physical Consistency:} Standard data-driven models often struggle with metameric ambiguity, leading to spectral hallucinations. By structurally isolating the metameric black component ($B$) into the null-space residual learned by the network, the proposed model is expected to reduce Spectral Angle Mapper (SAM) errors and produce outputs that better adhere to the forward measurement constraint ($I_{rgb} = \hat{H} \Phi$).
+    \item \textbf{Improved Spectral Fidelity:} Standard data-driven models often struggle with metameric ambiguity, leading to spectral hallucinations. By structurally isolating the metameric black component ($B$) into the null-space residual learned by the network, the proposed model is expected to reduce Spectral Angle Mapper (SAM) errors and produce outputs that better adhere to the forward measurement constraint ($I_{rgb} = \hat{H} \Phi$).
     
     \item \textbf{Training Efficiency and Stability:} Since the deep neural network only needs to approximate the high-frequency ($\Delta H$), I anticipate that combining this with NTK-based adaptive loss weighting will result in a more stable training and potentially reduce the need of an over-parameterized model.
 \end{itemize}
