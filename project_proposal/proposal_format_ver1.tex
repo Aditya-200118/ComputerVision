@@ -91,7 +91,7 @@ Hyperspectral datasets lack sufficient metameric diversity and generally have fe
 $$H'_{gt} = S^* + \alpha B$$
 This step trains the network to explicitly recognize the underdetermined nature of the metamer problem.
 
-\subsubsection{Discrepancy Modeling Network}
+\subsubsection{Reconstruction Network}
 Instead of simply mapping from RGB to a full $C$-channel hyperspectral volume from scratch, the pipeline adapts the discrepancy modeling framework to resolve the model-measurement mismatch in the spectral domain. First, an approximate physical baseline $H_{baseline} \in \mathbb{R}^{H \times W \times C}$ is calculated using the pseudo-inverse of the camera's Spectral Response Function (SRF), denoted as $\Phi^{\dagger}$:
 $$H_{baseline} = I_{rgb} \Phi^{\dagger}$$
 Mathematically, this least-squares minimum-norm solution is equivalent to the fundamental metamer $S^*$ defined in the previous section. Because this linear approximation cannot capture complex physical textures, the deep neural network (acting as the discrepancy mapping function $f_\theta$) is utilized to identify the missing physics. Consequently, the network is tasked exclusively with learning the missing metameric black component (the null-space residual). The network takes $I_{rgb}$ and learns a model for the systematic state-space residual, predicting only the high-frequency residual details $\Delta H \in \mathbb{R}^{H \times W \times C}$. I plan to evaluate reliable backbones such as U-Net or ResNet (as well as lightweight Vision Transformers) for this stage. The final predicted hyperspectral volume is the sum of the physical baseline and the learned discrepancy:
