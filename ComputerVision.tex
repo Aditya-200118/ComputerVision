@@ -36,7 +36,6 @@
 \parskip 12pt
 \geometry{margin=1in, headsep=0.25in}
 \theoremstyle{definition}
-
 \newtheorem{defn}{Definition}
 \newtheorem{reg}{Rule}
 \newtheorem{exer}{Exercise}
@@ -1651,27 +1650,29 @@ local maxima
 For a step edge (for a first derivative)
 
 0 crossing to pixel with smaller abs value 
-\begin{algorithm}[H]
-\DontPrintSemicolon
-\SetKwInOut{Input}{Input}
-\SetKwInOut{Output}{Output}
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 08 March, 2026, 14:50 PM}  
 
-\Input{Grayscale image $I$ of size $M \times N$}
-\Output{Histogram $H[0..255]$}
+\newpage
+Second order derivatives is more noise sensitive than the laplacian
 
-Initialize $H[i] \leftarrow 0$ for $i = 0$ to $255$\;
+gradient (first order derivative) $\longleftarrow$ the signal/image needs to be smoothed (Gaussian Smoothing)
 
-\For{$x \leftarrow 0$ \KwTo $M-1$}{
-    \For{$y \leftarrow 0$ \KwTo $N-1$}{
-        $g \leftarrow I[x,y]$\;
-        $H[g] \leftarrow H[g] + 1$\;
-    }
-}
+Laplacian of Gaussian (LoG) edge operator $\equiv$ Gaussian Smoothing of the image + laplacian computation
 
-\Return $H$\;
+Two Techniques for implementing the LoG operator
+Technique 1:\\
+- Smooth the image I(i, j) with the Guassian Operator 
+\[
+    G(i, j, \sigma) = \frac{1}{2\pi\sigma^2} \epsilon^\frac{-(i^2+j^2)}{2\sigma^2} 
+\]
+to generate $I_s(i, j)$
 
-\caption{Computation of Grey-Level Histogram}
-\end{algorithm}
+Convolve $I_s(i,j)$ with the laplacian operator 
 
-
+\[
+\nabla^2(i, j) \text{ or } L(i, j)
+\]
+ 
 \end{document}
