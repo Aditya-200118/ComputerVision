@@ -55,17 +55,26 @@ def calculate_dynamic_stats(image):
     return mean_val, std_val, T_temp, dynamic_multiplier
 
 def generate_log_kernel(sigma):
-    """Generates a dynamic LoG kernel bounded by [-4\sigma, +4\sigma]."""
+    """
+    Generates a Scale-Normalized LoG kernel.
+    Multiplying by sigma^2 ensures consistent peak response across scales.
+    """
     radius = int(np.ceil(4 * sigma))
     
     x = np.arange(-radius, radius + 1)
     y = np.arange(-radius, radius + 1)
     X, Y = np.meshgrid(x, y)
     
-    term1 = (X**2 + Y**2) / (2 * sigma**2)
-    kernel = - (1.0 / (np.pi * sigma**4)) * (1.0 - term1) * np.exp(-term1)
+    # Gaussian exponent term
+    arg = -(X**2 + Y**2) / (2 * sigma**2)
     
-    kernel = kernel - np.mean(kernel) # Zero sum correction
+    # Scale-Normalized LoG Formula: 
+    # Normalizing by (1 / (pi * sigma^2)) instead of sigma^4 
+    # effectively applies the sigma^2 scaling factor.
+    kernel = -(1.0 / (np.pi * sigma**2)) * (1.0 + arg) * np.exp(arg)
+    
+    # Ensure the kernel sums to zero to ignore constant intensity regions
+    kernel -= np.mean(kernel) 
     return kernel
 
 def convolve2d_fft(image, kernel):
@@ -126,16 +135,16 @@ def run_edge_focusing(image):
     # 1. On-the-fly Image Profiling
     mean_val, std_val, T_iterative, dynamic_multiplier = calculate_dynamic_stats(image)
     
-    # 2. Contrast Normalization 
+    # 2. Contrast Normalization (Stabilizes math across all images)
     norm_image = (image - mean_val) / (std_val + 1e-5)
     
     # 3. Create Bimodal Spatial Threshold Map
-    # Slightly relaxed from 1.5 to 1.2 so we don't kill the dark edges of the monitor
+    # Background gets harsher threshold (1.5x) to kill noise. 
+    # Foreground gets relaxed threshold (0.8x) to preserve fine details.
     spatial_penalty = np.ones_like(image, dtype=float)
-    spatial_penalty[image <= T_iterative] = 1.2 
+    spatial_penalty[image <= T_iterative] = 1.5
     spatial_penalty[image > T_iterative] = 0.8
 
-    # Constraints Check: Start at 5.0, End at 1.0, Step 0.5
     sigmas_to_process = np.arange(5.0, 0.5, -0.5)
     sigmas_to_save = [5.0, 4.0, 3.0, 2.0, 1.0]
     
@@ -145,19 +154,21 @@ def run_edge_focusing(image):
     for sigma in sigmas_to_process:
         print(f"  -> Processing scale \u03C3 = {sigma:.1f}")
         
-        # Constraints Check: Kernel bounds are correctly [-4σ, +4σ]
         kernel = generate_log_kernel(sigma)
         log_img = convolve2d_fft(norm_image, kernel)
         
-        # 4. FIX: Statistical Normalization instead of Max Normalization
-        # By standardizing the LoG response, our base_thresh means "fractions of a standard deviation"
-        log_std = np.std(log_img)
-        if log_std > 0:
-            log_img = log_img / log_std
+        # 4. Apply Adaptive Thresholding
+        # Base threshold scales based on the image's skewness
+        # By normalizing the log_img to have a max absolute value of 1.0 at every scale,
+        # we ensure our threshold logic remains consistent and doesn't decay to zero.
+        max_log_val = np.max(np.abs(log_img))
+        if max_log_val > 0:
+            log_img = log_img / max_log_val
             
-        # A threshold of ~0.3 standard deviations produces solid, connected edges
-        base_thresh = 0.3 * dynamic_multiplier
+        # base_thresh = dynamic_multiplier * np.mean(np.abs(log_img))
+        base_thresh = 0.05 * dynamic_multiplier
         
+        # Multiply base by the 2D penalty map to get a pixel-perfect local threshold
         adaptive_thresh_map = base_thresh * spatial_penalty
         
         edges = find_zero_crossings(log_img, search_mask=current_search_mask, variance_thresh_map=adaptive_thresh_map)
@@ -165,8 +176,8 @@ def run_edge_focusing(image):
         if sigma in sigmas_to_save:
             saved_edge_maps[sigma] = edges
             
-        # 5. FIX: Increased dilation from 2 to 3 to prevent the mask from choking valid shifting edges
-        current_search_mask = dilate_mask(edges, iterations=3)
+        # 5. Dilate edges to create the search window for the next scale
+        current_search_mask = dilate_mask(edges, iterations=2)
         
     return saved_edge_maps
 
@@ -194,7 +205,7 @@ def plot_and_save_results(image, edge_maps, filename, output_dir):
 if __name__ == "__main__":
     output_dir = "assignment4_figures_ver4"
     os.makedirs(output_dir, exist_ok=True)
-    
+
     files = ["test1.img", "test2.img", "test3.img"]
 
     for file in files:
