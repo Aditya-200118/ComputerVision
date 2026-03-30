@@ -1,0 +1,322 @@
+\documentclass[11pt, letterpaper]{article}
+\usepackage[ruled,vlined]{algorithm2e}
+% --- Encoding & Margins ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{framed}
+\usepackage[backend=biber]{biblatex}
+\addbibresource{assignment4.bib}
+\geometry{margin=1in}
+
+% --- Fonts ---
+\usepackage{mathptmx} % Times New Roman
+\usepackage[scaled]{helvet} 
+\usepackage{courier}
+
+% --- Graphics & Tables ---
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{array}
+
+% --- Math ---
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+% --- Code Highlighting ---
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Professional ICLR-style Syntax Colors
+\definecolor{py_comment}{rgb}{0.4, 0.4, 0.4}
+\definecolor{py_keyword}{rgb}{0.0, 0.0, 0.7}
+\definecolor{py_string}{rgb}{0.0, 0.5, 0.0}
+\definecolor{py_num}{rgb}{0.6, 0.1, 0.1}
+\definecolor{backcolour}{rgb}{0.98, 0.98, 0.98}
+\colorlet{shadecolor}{orange!15}
+
+\lstset{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{py_comment}\itshape,
+    keywordstyle=\color{py_keyword}\bfseries,
+    numberstyle=\tiny\color{gray},
+    stringstyle=\color{py_string},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=8pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    language=Python,
+    frame=single,
+    rulecolor=\color{lightgray}
+}
+
+% --- Links & Headers ---
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\thepage}
+\lhead{CSCI 8820: Assignment 4}
+\renewcommand{\headrulewidth}{0.5pt}
+
+% ============================================================
+% DOCUMENT START
+% ============================================================
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{1.5in}
+    \rule{\linewidth}{0.5mm} \\[0.4cm]
+    {\huge \bfseries Assignment 4: Multiscale Edge Detection \par}
+    \rule{\linewidth}{0.5mm} \\[1.5cm]
+    
+    \vspace{0.3in}
+    {\Large \textbf{Aditya Bhargava} \par}
+    {\large UGA ID: 811235738 \par}
+    
+    \vfill
+    {\large CSCI 8820: Computer Vision and Pattern Recognition \par}
+    {\large School of Computing, University of Georgia \par}
+    {\large March 29, 2026 \par}
+\end{titlepage}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction}
+This report details the implementation of a multi-scale Laplacian-of-Gaussian (LoG) edge detection algorithm, commonly referred to as Edge Focusing. By tracking zero-crossings from a coarse scale ($\sigma = 5.0$) down to a fine scale ($\sigma = 1.0$), the pipeline mathematically combines the noise-immunity of large convolution kernels with the precise spatial localization of small kernels. The performance is objectively verified against a single-scale LoG approach using Pratt's Figure of Merit (PFOM).
+
+\section{Algorithm and Methodology}
+
+\subsection{Scale-Normalized LoG Kernel}
+To ensure the convolution response does not mathematically decay as the kernel size decreases, the pipeline implements Lindeberg's Scale-Space Amplitude Normalization. By altering the denominator from $\sigma^4$ to $\sigma^2$, the peak response remains consistent across all scales. The kernel is evaluated over the strict range $[-4\sigma, +4\sigma]$ to guarantee an odd-sized convolution mask:
+\begin{equation}
+    \text{LoG}(x, y) = -\frac{1}{\pi \sigma^2} \left[ 1 - \frac{x^2 + y^2}{2\sigma^2} \right] \exp\left(-\frac{x^2 + y^2}{2\sigma^2}\right)
+\end{equation}
+To ensure computational efficiency at large scales (e.g., $\sigma = 5.0$), the 2D convolution is performed in the frequency domain using the Fast Fourier Transform (FFT).
+
+\subsection{Multi-Scale Edge Focusing (Tracking)}
+The Edge Focusing algorithm dictates that true structural edges exist at coarse scales, while noise does not. A base threshold (anchored at 5\% of the maximum LoG response) is modulated by a spatial bimodal penalty map to isolate legitimate zero-crossings. 
+
+Once zero-crossings are detected at scale $\sigma_i$, morphological dilation (2 iterations) is applied to create a boolean tracking mask. When processing the next scale ($\sigma_{i-0.5}$), the algorithm is strictly constrained to search for zero-crossings only within this active mask.
+
+\begin{algorithm}[H]
+\DontPrintSemicolon
+\SetKwInOut{Input}{input}
+\SetKwInOut{Output}{output}
+
+\Input{Normalized Grayscale Image $I$, $\sigma_{start}=5.0$, $\sigma_{end}=1.0$, step $\Delta\sigma=0.5$}
+\Output{Final focused edge map $E$, intermediate maps for all $\sigma$}
+
+Initialize $SearchMask \leftarrow \text{None}$\;
+Initialize dictionary $SavedMaps$\;
+
+\For{$\sigma \leftarrow \sigma_{start}$ \KwTo $\sigma_{end}$ \textbf{step} $-\Delta\sigma$}{
+    $K \leftarrow \text{GenerateScaleNormalizedLoG}(\sigma, \text{range}=[-4\sigma, 4\sigma])$\;
+    $L \leftarrow \text{Convolve2D\_FFT}(I, K)$\;
+    
+    $L_{norm} \leftarrow L / \max(|L|)$\;
+    $T_{map} \leftarrow \text{CalculateAdaptiveThresholdMap}(I)$\;
+    
+    $E_{\sigma} \leftarrow \text{FindZeroCrossings}(L_{norm}, SearchMask, T_{map})$\;
+    
+    \If{$\sigma \in \{5.0, 4.0, 3.0, 2.0, 1.0\}$}{
+        $SavedMaps[\sigma] \leftarrow E_{\sigma}$\;
+    }
+    
+    $SearchMask \leftarrow \text{Dilate}(E_{\sigma}, \text{iterations}=2)$ \tcp*{Update tracking window}
+}
+
+\Return $SavedMaps$\;
+\caption{Multi-Scale Edge Focusing Pipeline}
+\end{algorithm}
+
+\section{Experimental Verification Framework}
+To mathematically verify that Edge Focusing is superior to a Single-Scale LoG operator, the final output must be evaluated against a proxy ground truth (OpenCV Canny optimized via Otsu thresholding). \textbf{Pratt's Figure of Merit (PFOM)} is calculated using Euclidean distance transforms. A PFOM score closer to $1.0$ indicates perfect overlap, while lower scores mathematically penalize excessive noise or edge drift. 
+
+\newpage
+\section{Experimental Results}
+
+% ---------------------------------------------------------
+% TEST 1 RESULTS
+% ---------------------------------------------------------
+\subsection{Results: test1.img}
+The Edge Focusing pipeline correctly identified the monitor and desk boundaries at $\sigma = 5.0$ and successfully tracked them down to precise pixel locations at $\sigma = 1.0$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assignment4_ver6/multi_scale/test1_edge_focusing_ver6.pdf}
+    \caption{Multi-Scale Edge Tracking Progression for \texttt{test1.img}}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.19\textwidth}
+        \includegraphics[width=\textwidth]{assignment4_ver6/single_scale/test1/test1_single_scale_5.png}
+        \caption*{$\sigma=5.0$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.19\textwidth}
+        \includegraphics[width=\textwidth]{assignment4_ver6/single_scale/test1/test1_single_scale_4.png}
+        \caption*{$\sigma=4.0$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.19\textwidth}
+        \includegraphics[width=\textwidth]{assignment4_ver6/single_scale/test1/test1_single_scale_3.png}
+        \caption*{$\sigma=3.0$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.19\textwidth}
+        \includegraphics[width=\textwidth]{assignment4_ver6/single_scale/test1/test1_single_scale_2.png}
+        \caption*{$\sigma=2.0$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.19\textwidth}
+        \includegraphics[width=\textwidth]{assignment4_ver6/single_scale/test1/test1_single_scale_1.png}
+        \caption*{$\sigma=1.0$}
+    \end{subfigure}
+    \caption{Single-Scale LoG Edge Maps progression for \texttt{test1.img}}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assignment4_ver6/pfom_opencv/test1_merged_verification.pdf}
+    \vspace{0.2cm}
+    \includegraphics[width=0.4\textwidth]{assignment4_ver6/pfom_opencv/test1_pfom_table.pdf}
+    \caption{PFOM Verification: Single-Scale vs. Multi-Scale for \texttt{test1.img}}
+\end{figure}
+
+\newpage
+% ---------------------------------------------------------
+% TEST 2 RESULTS
+% ---------------------------------------------------------
+\subsection{Results: test2.img}
+Despite heavy background shadows, the adaptive bimodal spatial penalty effectively suppressed false positives, allowing the morphological mask to track the primary structural outlines without choking.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assignment4_ver6/multi_scale/test2_edge_focusing_ver6.pdf}
+    \caption{Multi-Scale Edge Tracking Progression for \texttt{test2.img}}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.19\textwidth}
+        \includegraphics[width=\textwidth]{assignment4_ver6/single_scale/test2/test2_single_scale_5.png}
+        \caption*{$\sigma=5.0$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.19\textwidth}
+        \includegraphics[width=\textwidth]{assignment4_ver6/single_scale/test2/test2_single_scale_4.png}
+        \caption*{$\sigma=4.0$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.19\textwidth}
+        \includegraphics[width=\textwidth]{assignment4_ver6/single_scale/test2/test2_single_scale_3.png}
+        \caption*{$\sigma=3.0$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.19\textwidth}
+        \includegraphics[width=\textwidth]{assignment4_ver6/single_scale/test2/test2_single_scale_2.png}
+        \caption*{$\sigma=2.0$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.19\textwidth}
+        \includegraphics[width=\textwidth]{assignment4_ver6/single_scale/test2/test2_single_scale_1.png}
+        \caption*{$\sigma=1.0$}
+    \end{subfigure}
+    \caption{Single-Scale LoG Edge Maps progression for \texttt{test2.img}}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assignment4_ver6/pfom_opencv/test2_merged_verification.pdf}
+    \vspace{0.2cm}
+    \includegraphics[width=0.4\textwidth]{assignment4_ver6/pfom_opencv/test2_pfom_table.pdf}
+    \caption{PFOM Verification: Single-Scale vs. Multi-Scale for \texttt{test2.img}}
+\end{figure}
+
+\newpage
+% ---------------------------------------------------------
+% TEST 3 RESULTS
+% ---------------------------------------------------------
+\subsection{Results: test3.img}
+In this highly textured environment, the Edge Focusing algorithm demonstrates its primary advantage. While the single-scale $\sigma=1.0$ operator is overwhelmed by high-frequency noise, the multi-scale tracker ignores it completely, having been constrained by the clean $\sigma=5.0$ stencil.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assignment4_ver6/multi_scale/test3_edge_focusing_ver6.pdf}
+    \caption{Multi-Scale Edge Tracking Progression for \texttt{test3.img}}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.19\textwidth}
+        \includegraphics[width=\textwidth]{assignment4_ver6/single_scale/test3/test3_single_scale_5.png}
+        \caption*{$\sigma=5.0$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.19\textwidth}
+        \includegraphics[width=\textwidth]{assignment4_ver6/single_scale/test3/test3_single_scale_4.png}
+        \caption*{$\sigma=4.0$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.19\textwidth}
+        \includegraphics[width=\textwidth]{assignment4_ver6/single_scale/test3/test3_single_scale_3.png}
+        \caption*{$\sigma=3.0$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.19\textwidth}
+        \includegraphics[width=\textwidth]{assignment4_ver6/single_scale/test3/test3_single_scale_2.png}
+        \caption*{$\sigma=2.0$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.19\textwidth}
+        \includegraphics[width=\textwidth]{assignment4_ver6/single_scale/test3/test3_single_scale_1.png}
+        \caption*{$\sigma=1.0$}
+    \end{subfigure}
+    \caption{Single-Scale LoG Edge Maps progression for \texttt{test3.img}}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assignment4_ver6/pfom_opencv/test3_merged_verification.pdf}
+    \vspace{0.2cm}
+    \includegraphics[width=0.4\textwidth]{assignment4_ver6/pfom_opencv/test3_pfom_table.pdf}
+    \caption{PFOM Verification: Single-Scale vs. Multi-Scale for \texttt{test3.img}}
+\end{figure}
+
+\newpage
+\section{Conclusion and Analysis}
+Based on the experimental verification, the Multi-Scale LoG operator (Edge Focusing) is demonstrably superior to a Single-Scale LoG operator. 
+
+As evidenced by the visual outputs and mathematically proven by Pratt's Figure of Merit (PFOM), applying a single-scale LoG at $\sigma=1.0$ results in excellent spatial localization but extreme susceptibility to high-frequency noise. Conversely, applying a single-scale LoG at $\sigma=5.0$ eliminates noise but causes structural edges to drift significantly from their true locations. 
+
+The Edge Focusing pipeline successfully bridges this gap. By utilizing a coarse-to-fine morphological tracking mask, the algorithm inherits the noise-immunity of the $\sigma=5.0$ scale, while retaining the precise pixel localization of the $\sigma=1.0$ scale. Across all three test images, the multi-scale approach yielded the highest structural fidelity and PFOM scores when benchmarked against the proxy ground truth.
+
+\begin{shaded}
+\textbf{\textit{Note:}} For source code, kindly refer to the appendix on the next page.
+\end{shaded}
+
+\newpage
+\section{Appendix: Source Code}
+% Paste your final python code here using the lstlisting environment.
+% \begin{lstlisting}[language=Python]
+% # Code goes here
+% \end{lstlisting}
+
+\end{document}
