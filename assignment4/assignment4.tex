@@ -98,21 +98,27 @@
 \newpage
 
 \section{Introduction}
-This report details the implementation of a multi-scale Laplacian-of-Gaussian (LoG) edge detection algorithm, commonly referred to as Edge Focusing. By tracking zero-crossings from a coarse scale ($\sigma = 5.0$) down to a fine scale ($\sigma = 1.0$), the pipeline mathematically combines the noise-immunity of large convolution kernels with the precise spatial localization of small kernels. The performance is objectively verified against a single-scale LoG approach using Pratt's Figure of Merit (PFOM).
+This report details the implementation of a multi-scale Laplacian-of-Gaussian (LoG) edge detection algorithm, referred to as Edge Focusing. By tracking the zero-crossings from a coarse scale ($\sigma = 5.0$) down to a fine scale ($\sigma = 1.0$). The performance is objectively verified against a single-scale LoG approach using Pratt's Figure of Merit (PFOM).
+
+\begin{shaded}
+\textbf{\textit{Note:}} The code uses OpenCV for canny edge detection algorithm, which serves as baseline for comparing the single scale and multiscale edge detection using pratt figure of merit (PFOM).
+\end{shaded}
 
 \section{Algorithm and Methodology}
 
-\subsection{Scale-Normalized LoG Kernel}
-To ensure the convolution response does not mathematically decay as the kernel size decreases, the pipeline implements Lindeberg's Scale-Space Amplitude Normalization. By altering the denominator from $\sigma^4$ to $\sigma^2$, the peak response remains consistent across all scales. The kernel is evaluated over the strict range $[-4\sigma, +4\sigma]$ to guarantee an odd-sized convolution mask:
+\subsection{LoG Kernel}
+To ensure the magnitude of the convolution response is comparable across varying scales, the LoG kernel is normalized by a $\sigma^2$ factor. The kernel is evaluated over the strict range $[-4\sigma, +4\sigma]$ to guarantee an odd-sized convolution mask:
 \begin{equation}
     \text{LoG}(x, y) = -\frac{1}{\pi \sigma^2} \left[ 1 - \frac{x^2 + y^2}{2\sigma^2} \right] \exp\left(-\frac{x^2 + y^2}{2\sigma^2}\right)
 \end{equation}
-To ensure computational efficiency at large scales (e.g., $\sigma = 5.0$), the 2D convolution is performed in the frequency domain using the Fast Fourier Transform (FFT).
+To maintain computational efficiency at large scales (e.g., $\sigma = 5.0$), the 2D convolution is performed utilizing the Fast Fourier Transform (FFT).
 
-\subsection{Multi-Scale Edge Focusing (Tracking)}
-The Edge Focusing algorithm dictates that true structural edges exist at coarse scales, while noise does not. A base threshold (anchored at 5\% of the maximum LoG response) is modulated by a spatial bimodal penalty map to isolate legitimate zero-crossings. 
+\subsection{Multi-Scale Edge Focusing}
+The Edge Focusing algorithm operates on the assumption that significant structural edges exist at coarser scales, whereas high-frequency noise does not. 
+% A relative variance threshold (anchored at 5\% of the maximum LoG response) is applied to isolate legitimate zero-crossings. 
 
-Once zero-crossings are detected at scale $\sigma_i$, morphological dilation (2 iterations) is applied to create a boolean tracking mask. When processing the next scale ($\sigma_{i-0.5}$), the algorithm is strictly constrained to search for zero-crossings only within this active mask.
+Once zero-crossings are detected at scale $\sigma_i$, a boolean tracking mask is created. When processing the subsequent finer scale ($\sigma_{i-0.5}$), the algorithm strictly constraints the search for zero-crossings to this masked region.
+
 
 \begin{algorithm}[H]
 \DontPrintSemicolon
@@ -120,7 +126,7 @@ Once zero-crossings are detected at scale $\sigma_i$, morphological dilation (2 
 \SetKwInOut{Output}{output}
 
 \Input{Normalized Grayscale Image $I$, $\sigma_{start}=5.0$, $\sigma_{end}=1.0$, step $\Delta\sigma=0.5$}
-\Output{Final focused edge map $E$, intermediate maps for all $\sigma$}
+\Output{Final edge map $E$, intermediate maps for all $\sigma$}
 
 Initialize $SearchMask \leftarrow \text{None}$\;
 Initialize dictionary $SavedMaps$\;
@@ -130,38 +136,42 @@ Initialize dictionary $SavedMaps$\;
     $L \leftarrow \text{Convolve2D\_FFT}(I, K)$\;
     
     $L_{norm} \leftarrow L / \max(|L|)$\;
-    $T_{map} \leftarrow \text{CalculateAdaptiveThresholdMap}(I)$\;
+    $T \leftarrow \text{CalculateThreshold}(I)$\;
     
-    $E_{\sigma} \leftarrow \text{FindZeroCrossings}(L_{norm}, SearchMask, T_{map})$\;
+    $E_{\sigma} \leftarrow \text{FindZeroCrossings}(L_{norm}, T)$\;
+    
+    \If{$SearchMask \neq \text{None}$}{
+        $E_{\sigma} \leftarrow E_{\sigma} \cap SearchMask$
+    }
     
     \If{$\sigma \in \{5.0, 4.0, 3.0, 2.0, 1.0\}$}{
         $SavedMaps[\sigma] \leftarrow E_{\sigma}$\;
     }
     
-    $SearchMask \leftarrow \text{Dilate}(E_{\sigma}, \text{iterations}=2)$ \tcp*{Update tracking window}
+    $SearchMask \leftarrow \text{Dilate}(E_{\sigma}, \text{iterations}=2)$ \tcp*{Update window}
 }
 
 \Return $SavedMaps$\;
-\caption{Multi-Scale Edge Focusing Pipeline}
+\caption{Multi-Scale Edge Detection using Laplacian of Gaussian}
 \end{algorithm}
 
-\section{Experimental Verification Framework}
-To mathematically verify that Edge Focusing is superior to a Single-Scale LoG operator, the final output must be evaluated against a proxy ground truth (OpenCV Canny optimized via Otsu thresholding). \textbf{Pratt's Figure of Merit (PFOM)} is calculated using Euclidean distance transforms. A PFOM score closer to $1.0$ indicates perfect overlap, while lower scores mathematically penalize excessive noise or edge drift. 
+\section{Experimental Verification}
+To mathematically verify that Edge Focusing is superior to a Single-Scale LoG operator, the final output must be evaluated against a proxy ground truth (OpenCV Canny optimized via Otsu thresholding). \textbf{Pratt's Figure of Merit (PFOM)} is calculated using Euclidean distance transforms. A PFOM score closer to $1.0$ indicates perfect overlap, while lower scores mathematically penalize excessive noise or localization error. 
 
-\newpage
 \section{Experimental Results}
 
 % ---------------------------------------------------------
 % TEST 1 RESULTS
 % ---------------------------------------------------------
 \subsection{Results: test1.img}
-The Edge Focusing pipeline correctly identified the monitor and desk boundaries at $\sigma = 5.0$ and successfully tracked them down to precise pixel locations at $\sigma = 1.0$.
+The single-scale $\sigma=1.0$ operator captures the edges but remains susceptible to noise, resulting in a PFOM of 0.5905. Conversely, the $\sigma=5.0$ operator suppresses the noise but suffers from severe localization error (PFOM: 0.5507). The multi-scale edge focusing algorithm successfully tracks the edge down to precise locations and achieving a PFOM of 0.8484.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{assignment4_ver6/multi_scale/test1_edge_focusing_ver6.pdf}
-    \caption{Multi-Scale Edge Tracking Progression for \texttt{test1.img}}
+    \caption{Multi-Scale Edge Focussing Progression for \texttt{test1.img}}
 \end{figure}
+\newpage
 
 \begin{figure}[H]
     \centering
@@ -200,17 +210,19 @@ The Edge Focusing pipeline correctly identified the monitor and desk boundaries 
     \caption{PFOM Verification: Single-Scale vs. Multi-Scale for \texttt{test1.img}}
 \end{figure}
 
-\newpage
 % ---------------------------------------------------------
 % TEST 2 RESULTS
 % ---------------------------------------------------------
 \subsection{Results: test2.img}
-Despite heavy background shadows, the adaptive bimodal spatial penalty effectively suppressed false positives, allowing the morphological mask to track the primary structural outlines without choking.
+
+The second image suffers from heavy background shadows. The single-scale $\sigma=1.0$ operator is highly vulnerable to this, yielding the lowest relative PFOM of 0.4855. Meanwhile the multi-scale edge focusing initialized at $\sigma=5.0$ effectively suppresses background noise while accurately localizing the primary edge of the foreground objects, increasing the PFOM score to 0.7884.
+
+\newpage
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{assignment4_ver6/multi_scale/test2_edge_focusing_ver6.pdf}
-    \caption{Multi-Scale Edge Tracking Progression for \texttt{test2.img}}
+    \caption{Multi-Scale Edge Focussing Progression for \texttt{test2.img}}
 \end{figure}
 
 \begin{figure}[H]
@@ -250,19 +262,19 @@ Despite heavy background shadows, the adaptive bimodal spatial penalty effective
     \caption{PFOM Verification: Single-Scale vs. Multi-Scale for \texttt{test2.img}}
 \end{figure}
 
-\newpage
 % ---------------------------------------------------------
 % TEST 3 RESULTS
 % ---------------------------------------------------------
 \subsection{Results: test3.img}
-In this highly textured environment, the Edge Focusing algorithm demonstrates its primary advantage. While the single-scale $\sigma=1.0$ operator is overwhelmed by high-frequency noise, the multi-scale tracker ignores it completely, having been constrained by the clean $\sigma=5.0$ stencil.
+The single-scale $\sigma=1.0$ operator detects background texture (PFOM: 0.5198), whereas the single-scale $\sigma=5.0$ operator filters the texture but poorly localizes the sharp edges of the shelves (PFOM: 0.6724). The multi-scale edge focusing algorithm resolves this trade-off resulting in the highest recorded PFOM score of 0.8675.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{assignment4_ver6/multi_scale/test3_edge_focusing_ver6.pdf}
-    \caption{Multi-Scale Edge Tracking Progression for \texttt{test3.img}}
+    \includegraphics[width=0.9\textwidth]{assignment4_ver6/multi_scale/test3_edge_focusing_ver6.pdf}
+    \caption{Multi-Scale Edge Focussing Progression for \texttt{test3.img}}
 \end{figure}
 
+\newpage
 \begin{figure}[H]
     \centering
     \begin{subfigure}{0.19\textwidth}
@@ -300,13 +312,14 @@ In this highly textured environment, the Edge Focusing algorithm demonstrates it
     \caption{PFOM Verification: Single-Scale vs. Multi-Scale for \texttt{test3.img}}
 \end{figure}
 
-\newpage
 \section{Conclusion and Analysis}
-Based on the experimental verification, the Multi-Scale LoG operator (Edge Focusing) is demonstrably superior to a Single-Scale LoG operator. 
+Based on the experimental verification, the Multi-Scale LoG operator (Edge Focusing) is superior to a Single-Scale LoG operator. 
 
-As evidenced by the visual outputs and mathematically proven by Pratt's Figure of Merit (PFOM), applying a single-scale LoG at $\sigma=1.0$ results in excellent spatial localization but extreme susceptibility to high-frequency noise. Conversely, applying a single-scale LoG at $\sigma=5.0$ eliminates noise but causes structural edges to drift significantly from their true locations. 
+As mathematically proven by Pratt's Figure of Merit (PFOM), applying a single-scale LoG at $\sigma=1.0$ results in excellent spatial localization but is susceptible to noise. Conversely, applying a single-scale LoG at $\sigma=5.0$ eliminates noise but causes structural edges to drift apart significantly from their true locations (localization error). 
 
-The Edge Focusing pipeline successfully bridges this gap. By utilizing a coarse-to-fine morphological tracking mask, the algorithm inherits the noise-immunity of the $\sigma=5.0$ scale, while retaining the precise pixel localization of the $\sigma=1.0$ scale. Across all three test images, the multi-scale approach yielded the highest structural fidelity and PFOM scores when benchmarked against the proxy ground truth.
+% By utilizing a coarse-to-fine tracking mask, the edge detection algorithm inherits the noise-immunity of the $\sigma=5.0$ scale, while retaining the precise pixel localization of the $\sigma=1.0$ scale. 
+
+Across all three test images, the multi-scale approach yielded the highest PFOM scores when benchmarked against the proxy ground truth (Canny edge detector).
 
 \begin{shaded}
 \textbf{\textit{Note:}} For source code, kindly refer to the appendix on the next page.
