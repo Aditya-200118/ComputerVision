@@ -129,6 +129,57 @@ def find_zero_crossings(log_img, search_mask=None, variance_thresh_map=0.0):
     
     return crossings
 
+def generate_opencv_benchmark(image):
+    img_uint8 = np.clip(image, 0, 255).astype(np.uint8)
+    blurred = cv2.GaussianBlur(img_uint8, (5, 5), 1.0)
+    high_thresh, _ = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    low_thresh = 0.5 * high_thresh
+    canny_edges = cv2.Canny(blurred, low_thresh, high_thresh)
+    return canny_edges > 0
+
+def run_single_scale_log(norm_image, image, sigma, T_iterative, dynamic_multiplier):
+    """Applies LoG without any edge tracking/focusing."""
+    spatial_penalty = np.ones_like(image, dtype=float)
+    spatial_penalty[image <= T_iterative] = 1.5
+    spatial_penalty[image > T_iterative] = 0.8
+    
+    kernel = generate_log_kernel(sigma)
+    log_img = convolve2d_fft(norm_image, kernel)
+    
+    max_log_val = np.max(np.abs(log_img))
+    if max_log_val > 0:
+        log_img = log_img / max_log_val
+        
+    base_thresh = 0.05 * dynamic_multiplier
+    adaptive_thresh_map = base_thresh * spatial_penalty
+    
+    # NO SEARCH MASK PASSED HERE
+    return find_zero_crossings(log_img, search_mask=None, variance_thresh_map=adaptive_thresh_map)
+
+def pratt_figure_of_merit(detected_edges, true_edges, alpha=1.0/9.0):
+    """
+    Calculates Pratt's Figure of Merit (PFOM).
+    1.0 is perfect overlap. Closer to 0 means excessive noise or edge drift.
+    """
+    N_I = np.sum(true_edges)
+    N_A = np.sum(detected_edges)
+    
+    if N_A == 0 or N_I == 0:
+        return 0.0
+        
+    # Get euclidean distances from every pixel to the nearest TRUE edge
+    inverse_true = np.logical_not(true_edges)
+    distances = distance_transform_edt(inverse_true)
+    
+    # We only care about the penalties where we DETECTED an edge
+    d_i = distances[detected_edges > 0]
+    
+    # Calculate PFOM Formula
+    pfom = np.sum(1.0 / (1.0 + alpha * (d_i ** 2)))
+    pfom /= max(N_I, N_A)
+    
+    return pfom
+
 def run_edge_focusing(image):
     """Executes multi-scale edge focusing with adaptive statistics."""
     
@@ -203,17 +254,62 @@ def plot_and_save_results(image, edge_maps, filename, output_dir):
     print(f"  [+] Saved {out_path}\n")
 
 if __name__ == "__main__":
-    output_dir = "assignment4_figures_ver4"
-    os.makedirs(output_dir, exist_ok=True)
-
     files = ["test1.img", "test2.img", "test3.img"]
 
     for file in files:
         if not os.path.exists(file):
             continue
-
-        print(f"Starting Adaptive Edge Focusing on: {file}")
-        img = load_and_preprocess(file) 
-        edge_maps = run_edge_focusing(img)
-        plot_and_save_results(img, edge_maps, file, output_dir)
-        print("-" * 40)
+            
+        print(f"\nEvaluating: {file}")
+        img = load_and_preprocess(file)
+        base_name = file.split(".")[0]
+        
+        # Create unique subfolder for this image
+        out_dir = f"single_scale_log_{base_name}"
+        os.makedirs(out_dir, exist_ok=True)
+        
+        mean_val, std_val, T_iterative, dyn_mult = calculate_dynamic_stats(img)
+        norm_image = (img - mean_val) / (std_val + 1e-5)
+        
+        # 1. Generate Proxy Ground Truth
+        proxy_gt = generate_opencv_benchmark(img)
+        
+        # 2. Generate and save Single-Scale maps for 1.0 to 5.0
+        single_scale_maps = {}
+        for s in [5.0, 4.0, 3.0, 2.0, 1.0]:
+            ss_edges = run_single_scale_log(norm_image, img, s, T_iterative, dyn_mult)
+            single_scale_maps[s] = ss_edges
+            
+            # Save individual image to the subfolder
+            out_path = os.path.join(out_dir, f"{base_name}_sigma_{int(s)}.png")
+            plt.imsave(out_path, ss_edges, cmap='gray')
+            
+        # 3. Get Multi-Scale target map
+        multi_scale_edges = run_edge_focusing(norm_image, img, T_iterative, dyn_mult)
+        
+        # 4. Calculate PFOM
+        pfom_single = pratt_figure_of_merit(single_scale_maps[1.0], proxy_gt)
+        pfom_multi = pratt_figure_of_merit(multi_scale_edges, proxy_gt)
+        
+        print(f"  -> PFOM Single-Scale (Sigma=1.0): {pfom_single:.4f}")
+        print(f"  -> PFOM Multi-Scale  (Sigma=1.0): {pfom_multi:.4f}")
+        
+        # 5. Create the Comparative Hardcopy for Requirement #3
+        fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+        
+        axes[0].imshow(single_scale_maps[1.0], cmap='gray')
+        axes[0].set_title(f"Single-Scale (\u03C3=1.0)\nPFOM: {pfom_single:.4f}")
+        axes[0].axis('off')
+        
+        axes[1].imshow(multi_scale_edges, cmap='gray')
+        axes[1].set_title(f"Multi-Scale Focusing (\u03C3=1.0)\nPFOM: {pfom_multi:.4f}")
+        axes[1].axis('off')
+        
+        axes[2].imshow(proxy_gt, cmap='gray')
+        axes[2].set_title("Proxy Ground Truth (OpenCV)")
+        axes[2].axis('off')
+        
+        plt.tight_layout()
+        plt.savefig(os.path.join(out_dir, f"{base_name}_verification_comparison.pdf"), format='pdf', bbox_inches='tight')
+        plt.close()
+        print(f"  [+] Saved verification PDF to {out_dir}")

@@ -232,15 +232,16 @@ def plot_and_save_results(image, edge_maps, filename, output_dir):
 
 if __name__ == "__main__":
     base_dir = "assignment4_ver6"
+    os.makedirs(base_dir, exist_ok=True)
     dir_multi = os.path.join(base_dir, "multi_scale")
     dir_single = os.path.join(base_dir, "single_scale")
     dir_pfom = os.path.join(base_dir, "pfom_opencv")
-    dir_qual = os.path.join(base_dir, "qualitative_visual_proof")
+    # dir_qual = os.path.join(base_dir, "qualitative_visual_proof")
     
     os.makedirs(dir_multi, exist_ok=True)
     os.makedirs(dir_single, exist_ok=True)
     os.makedirs(dir_pfom, exist_ok=True)
-    os.makedirs(dir_qual, exist_ok=True)
+    # os.makedirs(dir_qual, exist_ok=True)
 
     files = ["test1.img", "test2.img", "test3.img"]
 
@@ -296,7 +297,7 @@ if __name__ == "__main__":
         axes[2].axis('off')
         
         axes[3].imshow(proxy_gt, cmap='gray')
-        axes[3].set_title("Proxy Ground Truth (OpenCV)")
+        axes[3].set_title("Ground Truth (OpenCV)")
         axes[3].axis('off')
         
         plt.tight_layout()
