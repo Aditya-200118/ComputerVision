@@ -29,6 +29,7 @@
 \setlength{\parindent}{0.0in}
 \setlength{\parskip}{0.05in}
 \usepackage{empheq}
+
 \usepackage{framed}
 \usepackage[most]{tcolorbox}
 \usepackage{xcolor}
@@ -39,6 +40,7 @@
 \geometry{margin=1in, headsep=0.25in}
 \theoremstyle{definition}
 \newtheorem{defn}{Definition}
+\newtheorem{definition}{Definition}
 \newtheorem{reg}{Rule}
 \newtheorem{exer}{Exercise}
 \newtheorem{note}{Note}  % Numbered Note
@@ -1772,47 +1774,393 @@ Non maximum supression Deblurring along the gradient direciton
 edge following with dual thresholdong edge Linking
 
 \newpage
-\pagestyle{fancy}  % Re-enable fancy headers/footers
-\fancyhead[L]{\textbf{Date:} 25 March, 2026, 15:00 PM}  
+\pagestyle{fancy} % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 25 March, 2026, 15:00 PM}
 
-Performance Evaluation
+\section*{Performance Evaluation}
 
-Performance Criteria
+\subsection*{Performance Criteria}
 \begin{itemize}
     \item Probability of false edge detection
     \item Probability of missing true edges
-    \item Localization error - mean squared error
-    \item Orientation error 
-    \item Robustness to noise or other artifacts
+    \item Localization error (mean squared error)
+    \item Orientation error
+    \item Robustness to noise and other artifacts
 \end{itemize}
 
-Access to ground truth data
-
-- reliability generated in restricted domains
-- in unrestricted or loosely restricted domains - crowdsourcing (with compensation)
--- annotation bias
--- demographics of annotators
--- screening for wrong/malacious annotation
--- consensus annotation
-
-
-Synethetic Data
+\subsection*{Access to Ground Truth Data}
 \begin{itemize}
-    \item Controlled
+    \item Reliability in restricted domains (synthetically or carefully generated datasets)
+    \item In unrestricted or loosely restricted domains:
+    \begin{itemize}
+        \item Crowdsourcing (with compensation)
+        \item Annotation bias
+        \item Demographics of annotators
+        \item Screening for incorrect or malicious annotations
+        \item Consensus-based annotation
+    \end{itemize}
 \end{itemize}
 
+\subsection*{Synthetic Data}
+\begin{itemize}
+    \item Controlled generation environment
+\end{itemize}
 
-Figure of merit (Pratt Figure of merit)
+\subsection*{Figure of Merit (Pratt Figure of Merit)}
 
 \begin{equation}
-    PFM = \frac{1}{max(I_A, I_I)} \sum_{i=1}^{I_A}\frac{1}{\alpha d_i^2+ 1}
+    \text{PFM} = \frac{1}{\max(I_A, I_I)} \sum_{i=1}^{I_A} \frac{1}{\alpha d_i^2 + 1}
 \end{equation}
 
-$I_a$; a detected edge II 
+\noindent
+$ I_A $: Number of detected edge points \\
+$ I_I $: Number of ideal (ground truth) edge points \\
+$ d_i $: Distance between detected edge and corresponding ground truth edge \\
+$ \alpha $: Scaling constant
+
 
 \newpage
 \pagestyle{fancy}  % Re-enable fancy headers/footers
 \fancyhead[L]{\textbf{Date:} 26 March, 2026, 14:55 PM}  
+
+Contour Analysis
+
+Edge pixels are linked to generate continous contours object boundaries (shape features)
+
+Contour Representation Criteria 
+
+Simplicity 
+
+\begin{definition}
+\textbf{Edge List:} An ordered set of edge pixels or fragments.
+
+\textbf{Boundary:} A closed contour that surrounds a region.
+
+\textbf{Contour:} An edge list representation that can be used for:
+\begin{itemize}
+    \item \textit{Enumerative representation} (rendering)
+    \item \textit{Analytical representation} (analysis, capturing geometry)
+\end{itemize}
+\end{definition}
+
+
+\begin{equation}
+    (x-a)^2 + (y-b)^2 = r^2 \\ \text{draw a doorted circle with centre as a,b and length r}
+\end{equation}
+
+
+\newpage
+
+\section{Curve Geometry}
+
+\newpage
+
+Let $\bar p_1 = (x(u_1) y(u1))$ $\bar p_2 = (x(u_2) y(u_e))$
+
+\begin{equation}
+    \bar n(u) = \frac{\frac{d}{du}t(u)}{\vert \frac{d}{du}t(u)\vert}
+\end{equation}
+
+\subsection{Local Curvature}
+
+\begin{equation}
+    \kappa(u) = \text{local curvature of the curve at p(x)}
+\end{equation}
+
+Consider 3 non colinear points
+
+\begin{equation}
+    \begin{aligned}
+        p(u-\delta u)\\
+        p(u)\\
+        p(u+\delta u)
+    \end{aligned}
+\end{equation}
+
+construct a circle passing through 3 points and curve passing through 3 points
+
+$R(\bar P)$ be the radiuys of the the circle 
+
+
+\begin{equation}
+    \kappa(p(u)) = \lim_{\delta u \rightarrow 0}\frac{1}{R(\bar P)}
+\end{equation}
+
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[scale=1.5, >=stealth]
+        \draw[thick, blue] plot [smooth, tension=1] coordinates {(-1,0) (1,0.5) (3,0)};
+        \node[blue] at (4.2, 0) {Curve};
+
+        \coordinate (P1) at (0.2, 0.28);
+        \coordinate (P2) at (1, 0.5);
+        \coordinate (P3) at (1.8, 0.35);
+
+        \draw[dashed, red] (1, -1.2) circle (1.7);
+        \node[red] at (2.5, -0.5) {Circle $R(\bar{P})$};
+
+        \filldraw (P1) circle (1.5pt) node[above left] {$p(u-\delta u)$};
+        \filldraw (P2) circle (1.5pt) node[above] {$p(u)$};
+        \filldraw (P3) circle (1.5pt) node[above right] {$p(u+\delta u)$};
+
+        \draw[->] (1, -1.2) -- (P2) node[midway, right] {$R$};
+        \filldraw (1, -1.2) circle (1pt) node[below] {Center};
+
+    \end{tikzpicture}
+    \caption{Geometric interpretation of local curvature via the osculating circle.}
+\end{figure}
+
+Discrete Curves 
+Ordered set of edge pixels $(x_1, y_1), (x_2, y_2) \ldots $
+
+Arc Length
+
+\begin{equation}
+    \begin{aligned}
+        \text{Arc Length } \bar S &= \sum_{min}^{max}
+    \end{aligned}
+\end{equation}
+
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 31 March, 2026, 14:55 PM}  
+
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 31 March, 2026, 14:55 PM}
+
+\section{Chain Code}
+
+\begin{equation}
+\{(x_0, y_0), \ldots, (x_n, y_n)\} \quad \text{M-pixel contour}
+\end{equation}
+
+% 3x3 neighborhood example:
+\[
+\begin{bmatrix}
+1 & 2 & 3 \\
+0 & P & 4 \\
+7 & 6 & 5
+\end{bmatrix}
+\]
+
+\[
+(x_0, y_0),\ 4,\ 3,\ 3,\ 5,\ 5,\ 6,\ \ldots
+\]
+
+Set of direction codes linking successive pixels along the contour.
+
+\subsection*{Bit Representation}
+
+For an $N \times N$ image:
+\[
+N = 2^n
+\]
+
+\[
+x, y \in \{0, \ldots, 2^n - 1\} \quad \Rightarrow \quad x, y \text{ require } n \text{ bits each}
+\]
+
+For an $M$-pixel contour:
+\[
+\text{Total bits} = 2n + 3(M - 1)
+\]
+
+\[
+\text{Raw representation} = 2 n M
+\]
+
+\[
+\Rightarrow \quad 2n + 3(M - 1) \ll 2 n M \text{ Also a lossless scheme for compression}
+\]
+
+\subsection*{Example}
+
+If $n = 10$ and $M = 1000$:
+\[
+2nM = 2 \cdot 10 \cdot 1000 = 2 \times 10^4
+\]
+
+\[
+2n + 3(M - 1) = 20 + 3(999) = 3017 \approx 3020 \text{ bits}
+\]
+
+\subsection*{Compression factor}
+
+\[
+\frac{2\cdot n\cdot m}{2n + 3(M-1)}
+\]
+
+As $M \to \infty$:
+\[
+\text{Compression factor} \approx \frac{3}{2n}
+\]
+
+Rotation of a closed contour about the centroid by $45 \cdot n^\circ$ (a multiple of $45^\circ$) is equivalent to:
+\[
+(\text{original chain code label} + n) \bmod 8 = \text{rotated chain code}.
+\]
+
+\subsection{First Difference Chain Code}
+
+The first difference chain code is obtained by computing the difference between successive elements of the chain code modulo 8.
+
+For example, if the chain code is:
+\[
+C_1, C_2, C_3, \ldots
+\]
+
+Then the first difference chain code is:
+\[
+(C_2 - C_1) \bmod 8,\quad (C_3 - C_2) \bmod 8,\ \ldots
+\]
+
+In general, the formula is:
+\[
+(C_i - C_{i-1}) \bmod 8.
+\]
+
+% 
+% Representation of closed contour in rotation invariant manner 
+
+% the first difference chain code would essentialy remain invariant since roation is just adding a constant.
+
+% Essentailly the FD chain rule is roation invariant contour signature.
+
+% Sample Implementation
+% Target Template
+% FD chain codes of model target
+
+% Query target shape - CCL - Boundary - extraction - chain code - fd chain code (fdcc)
+% How does starting point matter?
+
+% FDCC1 and FDCC2 (same shape just rotated and different starting location)
+
+% Cyclic permutation of a sequence
+
+
+% Loop through all the FD chain codes of model targets
+% Loop through all cyclic permutation of the query fd chain code
+
+
+% Compute the difference $Diff(FDCC_m-FDCC_q)$
+% FDCC_m C1m C2m C3m ... Cnm
+% FDCCq C1q C2q ... Cnq
+% | C1m - C1q| + |C2m -C2q| + ...
+% \underbrace above line and type Manhattan distance
+
+String Edit Distance - Insert Delete and Substitution
+%  older
+
+
+\section{Rotation-Invariant Representation of Closed Contours}
+
+A closed contour can be represented in a rotation-invariant manner using the \textbf{first difference chain code (FDCC)}.
+
+The first difference chain code remains invariant under rotation because rotation of the contour corresponds to adding a constant value to all elements of the chain code. When differences are computed modulo 8, this constant cancels out.
+
+Thus, the FDCC serves as a \textbf{rotation-invariant contour signature}.
+
+\subsection{Sample Implementation}
+
+\textbf{Target (Model):}  
+Compute and store the FD chain codes of model targets.
+
+\textbf{Query Shape Processing Pipeline:}
+\begin{itemize}
+    \item Connected Component Labeling (CCL)
+    \item Boundary extraction
+    \item Chain code generation
+    \item First difference chain code (FDCC) computation
+\end{itemize}
+
+\subsection{Effect of Starting Point}
+
+The starting point of the contour traversal affects the chain code representation.
+
+Even for the same shape (possibly rotated), two FDCCs:
+\[
+\text{FDCC}_1 \quad \text{and} \quad \text{FDCC}_2
+\]
+may differ due to different starting points.
+
+This results in a \textbf{cyclic permutation} of the sequence.
+
+\subsection{Matching Strategy}
+
+\begin{itemize}
+    \item Loop through all FD chain codes of model targets.
+    \item For the query FDCC, generate all cyclic permutations.
+    \item Compare each permutation with model FDCCs.
+\end{itemize}
+
+\subsection{Distance Measure}
+
+Let:
+\[
+\text{FDCC}_m = (C_1^m, C_2^m, C_3^m, \ldots, C_n^m)
+\]
+\[
+\text{FDCC}_q = (C_1^q, C_2^q, C_3^q, \ldots, C_n^q)
+\]
+
+The difference is computed using the \textbf{Manhattan distance}:
+
+\[
+\underbrace{
+|C_1^m - C_1^q| + |C_2^m - C_2^q| + \cdots + |C_n^m - C_n^q|
+}_{\text{Manhattan distance}}
+\]
+
+\subsection{Alternative}
+
+Another approach is to use \textbf{String Edit Distance}, which allows:
+\begin{itemize}
+    \item Insertions
+    \item Deletions
+    \item Substitutions
+\end{itemize}
+
+\section{Slope Based Representation for Contours $\psi$--$s$ Plot}
+
+$\psi$ - tangent angle\\
+$s$ - arc length
+
+Straight line segment: $\psi$--$s$ plot is a horizontal line \\
+Circular segment: $\psi$--$s$ plot is an inclined line
+
+\subsection{Slope Density Function}
+
+Histogram/distribution of Slope angles along the contours
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+
+% Circle
+\draw (0,0) circle (2);
+
+% Tangent lines at different points
+\draw (-2,0) -- (-2,1.5);     % left tangent
+\draw (2,0) -- (2,1.5);       % right tangent
+\draw (0,2) -- (1.5,2);       % top tangent
+\draw (0,-2) -- (1.5,-2);     % bottom tangent
+
+% Diagonal tangents
+% \draw (1.414,1.414) -- (2.2,2.2);
+% \draw (-1.414,1.414) -- (-2.2,2.2);
+% \draw (1.414,-1.414) -- (2.2,-2.2);
+% \draw (-1.414,-1.414) -- (-2.2,-2.2);
+
+\end{tikzpicture}
+\end{figure}
+
+Contour roation $\iff$ cyclic shift of the histogram
+
+(Scale Invariance, roational invaraince would be dependent on cyclic shift)
+
+
 
 
 \end{document}
