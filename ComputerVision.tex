@@ -2161,6 +2161,55 @@ Contour roation $\iff$ cyclic shift of the histogram
 (Scale Invariance, roational invaraince would be dependent on cyclic shift)
 
 
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 1 April, 2026, 14:55 PM}  
+
+\section{Contour Curve Fitting}
+
+Fit an analytical (parameteric) curve to the contour of the list of edge pixels/edge fragment.
+
+Analytical Curves
+
+\begin{itemize}
+    \item Line Segment (Linear Models) - Poly Line Representation
+    \item $2^{nd} order curves (quadratic)$
+    \begin{itemize}
+        \item[-] Circle
+        \item[-] Parabolas 
+        \item[-] Ellipse 
+    \end{itemize}
+    \item Cubic Spline
+\end{itemize}
+
+\section{Curve Fitting}
+
+\begin{itemize}
+    \item Curve Fitting Method
+    \begin{itemize}
+        \item[-] Regression
+        \item[-] Optimization
+    \end{itemize}
+    \item Fitting Metric (goodness of fit)
+    \begin{itemize}
+        \item error-based
+        \item physics-based
+    \end{itemize}
+\end{itemize}
+
+Let $d_i$ be the distance of an edge pixel $i$ from the fitted curve.
+
+Maximum Absolute Error (MAE) = $\max_i|d_i|$
+Mean Squared Error (MSE) = $\frac{1}{n}\sum_{i=1}^{n}d_i^2$
+Normalized MAE = $\frac{\max_i\left|d_i\right|}{S}$ where S is wavelngth
+
+Curve Complex
+
+Error Distribution Biased Fit (Need to check later)
+
+Greed = \# Positive error $\equiv$ \# negative error
+
+Biased Fit $\iff$ One of error signs is extremely dominant
 
 
 \end{document}
