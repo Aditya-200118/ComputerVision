@@ -1,0 +1,14 @@
+\begin{table*}[hbt]
+\ifnextchar[{\eatarg}{}
+[h]
+  \centering
+  \caption{Project Milestone Timeline}
+  \label{tab:Timeline}
+  \begin{tabular}{@{}lp{8cm}l@{}} \toprule
+  Phase & Task Description & Completion Date \\ \midrule
+  1     & \textbf{Data Pipeline \& Augmentation Setup:} Download datasets (ICVL/CAVE), implement the SRF RGB projection ($I_{rgb} = H_{gt} \Phi$), and code the PyTorch 'DataLoader' with metameric augmentation ($H'_{gt} = S^* + \alpha B$). & March 24, 2026 \\ \addlinespace
+  2     & \textbf{Architecture Setup \& Initial Training:} Implement the physical baseline calculation ($H_{baseline} = I_{rgb} \Phi^{\dagger}$), build the network backbone (ResNet/U-Net), and integrate the differentiable forward model layer. Run initial training loops. & April 7, 2026 \\ \addlinespace
+  3     & \textbf{Loss Optimization \& Evaluation:} Integrate the adaptive weighting algorithm for the dual-loss function. Conduct final testing and calculate quantitative metrics (MRAE, RMSE, SAM) to evaluate metameric robustness. & April 17, 2026 \\ \addlinespace
+  4     & \textbf{Final Report Formulation:} Compile quantitative results, visual spectral curve comparisons, finalize the write-up, and format the final technical report for submission. & April 27, 2026 \\ \bottomrule
+  \end{tabular}
+\end{table*}
