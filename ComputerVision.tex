@@ -29,7 +29,7 @@
 \setlength{\parindent}{0.0in}
 \setlength{\parskip}{0.05in}
 \usepackage{empheq}
-
+\usetikzlibrary{intersections}
 \usepackage{framed}
 \usepackage[most]{tcolorbox}
 \usepackage{xcolor}
@@ -2211,5 +2211,128 @@ Greed = \# Positive error $\equiv$ \# negative error
 
 Biased Fit $\iff$ One of error signs is extremely dominant
 
+\newpage
+\pagestyle{plain}  % Re-enable plain headers/footers
+\fancyhead[L]{\textbf{Date:} 2 April, 2026, 14:55 PM}  
+
+\section*{Polyline Fitting}
+\begin{itemize}
+    \item Input is essentially an ordered set
+    \item Input: Ordered list of edge pixels/fragments
+    \item Output: Sequence of vertices (end points) of the polyline segments
+\end{itemize}
+
+A, B, C, D --- vertices of the polyline  
+AB, BC, CD --- polyline segments
+
+Line segment joining points $(x_1, y_1)$ and $(x_2, y_2)$:
+
+\[
+\frac{y - y_1}{x - x_1} = \frac{y_2 - y_1}{x_2 - x_1}
+\]
+
+\[
+\underbrace{(y_1 - y_2)x}_{A} + \underbrace{(x_2 - x_1)y}_{B} + \underbrace{(x_1y_2 - x_2y_1)}_{C} = 0
+\]
+
+\[
+Ax + By + C = 0
+\]
+
+Distance from point $(u, v)$ to the line:
+
+\[
+d = \frac{|Au + Bv + C|}{\sqrt{A^2 + B^2}}
+\]
+
+The sign of $\left(Ax + By + C\right)$ indicates the direction of the error or deviation.
+
+
+\subsection{Steps}
+1. Fit a line segement tot endpoints of the contour edge list 
+
+Recursively do the following:
+
+a. Determine a point on the controur edge list that has maximum deviation from the current polyone representation 
+
+b. if the maximum deviation exceeds a threshold T
+
+then add the point to the current polyline 
+
+Halt when no more points can be added to ther current polyline representaiton
+
+\begin{tikzpicture}[scale=1.5, >=stealth, font=\small]
+
+    % --- SECTION 1: LEGEND ---
+    \node[anchor=north west, draw, fill=gray!5, rounded corners] at (0.5,-0.8) {
+        \begin{tabular}{l l}
+            \tikz[baseline=-0.5ex]\draw[dashed, black!50] (0,0) -- (0.5,0); & Contour (Edge List) \\
+            \tikz[baseline=-0.5ex]\draw[black, ultra thick] (0,0) -- (0.5,0); & Final Polyline \\
+            \tikz[baseline=-0.5ex]\draw[red, thin, <->] (0,0) -- (0.5,0); & Max Deviation $d > T$ \\
+        \end{tabular}
+    };
+
+    % --- SECTION 2: COORDINATES ---
+    \coordinate (P1) at (0,1);      % Start (x1, y1)
+    \coordinate (P2) at (6,1);      % End   (x2, y2)
+    
+    % S-shape peaks (calculated as points of max deviation)
+    \coordinate (M1) at (1.5, 2.1); % Peak 1
+    \coordinate (Mid) at (3, 1);    % Inflection point
+    \coordinate (M2) at (4.5, -0.1); % Peak 2
+
+    % --- SECTION 3: DRAW THE SPLINE ---
+    % Drawing the S-curve using the control points logic
+    \draw[dashed, black!40, thick] (P1) .. controls (1, 3) and (2, 3) .. (Mid)
+                                       .. controls (4, -1) and (5, -1) .. (P2);
+    
+    % --- SECTION 4: DYNAMIC DEVIATION VISUALS ---
+
+    % Initial segment P1 to P2
+    \draw[lightgray, dashed] (P1) -- (P2);
+
+    % Deviation d1: M1 relative to segment P1-Mid
+    % Using a perpendicular drop to the y=1 line
+    \draw[red, <->] (M1) -- (1.5, 1) node[midway, left] {$d_1$};
+    \draw (1.5, 1) ++(0, 0.1) -- ++(0.1, 0) -- ++(0, -0.1); % Right angle symbol
+    
+    % Deviation d2: M2 relative to segment Mid-P2
+    \draw[red, <->] (M2) -- (4.5, 1) node[midway, right] {$d_2$};
+    \draw (4.5, 1) ++(0, -0.1) -- ++(-0.1, 0) -- ++(0, 0.1); % Right angle symbol
+
+    % --- SECTION 5: FINAL POLYLINE ---
+    % This is the "Halt" state where the S is represented by 4 segments
+    \draw[ultra thick, black] (P1) -- (M1) -- (Mid) -- (M2) -- (P2);
+    
+    % Vertex Markers
+    \foreach \p in {P1, M1, Mid, M2, P2}
+        \filldraw[black] (\p) circle (1.5pt);
+
+    % Labels
+    \node[left] at (P1) {$(x_1, y_1)$};
+    \node[right] at (P2) {$(x_2, y_2)$};
+    \node[above] at (M1) {$(u, v)_{max1}$};
+    \node[below] at (M2) {$(u, v)_{max2}$};
+
+\end{tikzpicture}
+
+
+\section{Bottom Up Merging}
+
+Start with tthe first point on the edge list and expand the polyline segemnt 
+
+
+\section{Split and Merge Polyline Fitting}
+
+Alternate between split and merge phases
+
+After every split check if two successive polyline segments can be merged
+
+two successive polyline segement can be mergeed if doing so does not increase the maximum deviation by a certain perceantige.
+
+halt when no more splits or merge are possible 
+
+
+Fitting a parametric line to a set of point in a image space $\equiv$ determining the point of intersection of the 
 
 \end{document}
