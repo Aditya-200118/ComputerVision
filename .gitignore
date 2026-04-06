@@ -33,4 +33,4 @@
 **/*.pdf
 **/*.png
 **/.python-version
-**/.vscode/
+**/.vscode/*.ttt
