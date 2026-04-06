@@ -1,0 +1,939 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{apa/apasortcite//global/global/global}
+    \entry{ghimpeteanu2025hyperspectralimagingidentifyingforeign}{misc}{}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=0a359872ba13c5be3034b2c122162af3}{%
+           family={Ghimpeteanu},
+           familyi={G\bibinitperiod},
+           given={Gabriela},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=d5800a53cab79e0860b427eef95472a7}{%
+           family={Rajani},
+           familyi={R\bibinitperiod},
+           given={Hayat},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=492f592ee7595f03b8f9e3096e8fd2cd}{%
+           family={Quintana},
+           familyi={Q\bibinitperiod},
+           given={Josep},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=a0f78a3a52ae9100045456d415eaa324}{%
+           family={Garcia},
+           familyi={G\bibinitperiod},
+           given={Rafael},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{c6a6f488f1190b397a65437ac07e47d7}
+      \strng{fullhash}{9c8481a114f182350c993d0897e725fc}
+      \strng{fullhashraw}{9c8481a114f182350c993d0897e725fc}
+      \strng{bibnamehash}{9c8481a114f182350c993d0897e725fc}
+      \strng{authorbibnamehash}{9c8481a114f182350c993d0897e725fc}
+      \strng{authornamehash}{c6a6f488f1190b397a65437ac07e47d7}
+      \strng{authorfullhash}{9c8481a114f182350c993d0897e725fc}
+      \strng{authorfullhashraw}{9c8481a114f182350c993d0897e725fc}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CV}
+      \field{eprinttype}{arXiv}
+      \field{title}{Hyperspectral Imaging for Identifying Foreign Objects on Pork Belly}
+      \field{year}{2025}
+      \verb{eprint}
+      \verb 2503.16086
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2503.16086
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2503.16086
+      \endverb
+    \endentry
+    \entry{Hall1988IlluminationAC}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=4a8f48b7f45f72fa0ae371c0d86928c7}{%
+           family={Hall},
+           familyi={H\bibinitperiod},
+           given={Roy},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \strng{fullhash}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \strng{fullhashraw}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \strng{bibnamehash}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \strng{authorbibnamehash}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \strng{authornamehash}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \strng{authorfullhash}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \strng{authorfullhashraw}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Monographs in Visual Communication}
+      \field{title}{Illumination and Color in Computer Generated Imagery}
+      \field{year}{1988}
+      \verb{urlraw}
+      \verb https://api.semanticscholar.org/CorpusID:6919758
+      \endverb
+      \verb{url}
+      \verb https://api.semanticscholar.org/CorpusID:6919758
+      \endverb
+    \endentry
+    \entry{hong2026hyperspectralimaging}{misc}{}{}
+      \name{author}{9}{}{%
+        {{un=0,uniquepart=base,hash=f2cb6caf5572328fc37ef1849ac97bef}{%
+           family={Hong},
+           familyi={H\bibinitperiod},
+           given={Danfeng},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=38982a068d993b656747eda3c1d05082}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Chenyu},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3a4d56ca67ef7eca1353e7f289b0afa5}{%
+           family={Yokoya},
+           familyi={Y\bibinitperiod},
+           given={Naoto},
+           giveni={N\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=44d73e639c535123777db68e270b754e}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Bing},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=5531a991949ba468ecbe556c88603d3f}{%
+           family={Jia},
+           familyi={J\bibinitperiod},
+           given={Xiuping},
+           giveni={X\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=9b3ce6468cd35a018e12616afcd1f795}{%
+           family={Plaza},
+           familyi={P\bibinitperiod},
+           given={Antonio},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e1ce17add886783dfd763c7953e2eb58}{%
+           family={Gamba},
+           familyi={G\bibinitperiod},
+           given={Paolo},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=239dd28035475bdb5b6deaf343cefbcb}{%
+           family={Benediktsson},
+           familyi={B\bibinitperiod},
+           given={Jon\bibnamedelima Atli},
+           giveni={J\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=19a50089cae8f67ab374e30b054493ad}{%
+           family={Chanussot},
+           familyi={C\bibinitperiod},
+           given={Jocelyn},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{d150928b75a52d6934cbe61798927da4}
+      \strng{fullhash}{0cda41c0023c3d4287afe311b6525a56}
+      \strng{fullhashraw}{0cda41c0023c3d4287afe311b6525a56}
+      \strng{bibnamehash}{0cda41c0023c3d4287afe311b6525a56}
+      \strng{authorbibnamehash}{0cda41c0023c3d4287afe311b6525a56}
+      \strng{authornamehash}{d150928b75a52d6934cbe61798927da4}
+      \strng{authorfullhash}{0cda41c0023c3d4287afe311b6525a56}
+      \strng{authorfullhashraw}{0cda41c0023c3d4287afe311b6525a56}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CV}
+      \field{eprinttype}{arXiv}
+      \field{title}{Hyperspectral Imaging}
+      \field{year}{2026}
+      \verb{eprint}
+      \verb 2508.08107
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2508.08107
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2508.08107
+      \endverb
+    \endentry
+    \entry{Jaaskelainen:90}{article}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=e6979cc54cab5b760a95e9ad6275178e}{%
+           family={Jaaskelainen},
+           familyi={J\bibinitperiod},
+           given={T.},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=f8ca30edbe3b07c965b396e5c8ce75b7}{%
+           family={Parkkinen},
+           familyi={P\bibinitperiod},
+           given={J.},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=6c0b5670c6c9db0b2161efa979a86925}{%
+           family={Toyooka},
+           familyi={T\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Optica Publishing Group}%
+      }
+      \strng{namehash}{cacaa8272db384e68785e99c783a9b9f}
+      \strng{fullhash}{e9b92d1b4204184af73a4337494753f2}
+      \strng{fullhashraw}{e9b92d1b4204184af73a4337494753f2}
+      \strng{bibnamehash}{e9b92d1b4204184af73a4337494753f2}
+      \strng{authorbibnamehash}{e9b92d1b4204184af73a4337494753f2}
+      \strng{authornamehash}{cacaa8272db384e68785e99c783a9b9f}
+      \strng{authorfullhash}{e9b92d1b4204184af73a4337494753f2}
+      \strng{authorfullhashraw}{e9b92d1b4204184af73a4337494753f2}
+      \field{sortinit}{J}
+      \field{sortinithash}{b2f54a9081ace9966a7cb9413811edb4}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{In multispectral imaging it is advantageous to compress spectral information with a minimum loss of information in a way that permits accurate recovery of the spectrum. By use of the simple vector-subspace model that we propose, spectral information can be stored and recovered by the use of a few inner products, which are easy to measure optically. Two large data sets, the first consisting of 1257 Munsell colors and the other of 218 naturally occurring spectral reflectances, were analyzed to form two bases for the model. The Munsell basis can be used to represent the natural colors, and the basis derived from the natural data can be used to represent the Munsell data. The proposed vector-subspace model includes a simple relation between the inner products and conventional color coordinates. It also provides a way to estimate the spectrum of an object that has known chromaticity coordinates.}
+      \field{journaltitle}{J. Opt. Soc. Am. A}
+      \field{number}{4}
+      \field{title}{Vector-subspace model for color representation}
+      \field{volume}{7}
+      \field{year}{1990}
+      \field{pages}{725\bibrangedash 730}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1364/JOSAA.7.000725
+      \endverb
+      \verb{urlraw}
+      \verb https://opg.optica.org/josaa/abstract.cfm?URI=josaa-7-4-725
+      \endverb
+      \verb{url}
+      \verb https://opg.optica.org/josaa/abstract.cfm?URI=josaa-7-4-725
+      \endverb
+      \keyw{Absorption spectroscopy; CIE color spaces; Illuminants; Multispectral imaging; Statistics; Surfaces}
+    \endentry
+    \entry{8237766}{article}{}{}
+      \name{author}{7}{}{%
+        {{un=0,uniquepart=base,hash=dac09067e89440490763a92ac983db62}{%
+           family={Jia},
+           familyi={J\bibinitperiod},
+           given={Yan},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=5bd64e0d5231c6f7a972360273e7b57d}{%
+           family={Zheng},
+           familyi={Z\bibinitperiod},
+           given={Yinqiang},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=8ff40edf8c7dbccf70712f8d0b666c6c}{%
+           family={Gu},
+           familyi={G\bibinitperiod},
+           given={Lin},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=525f27623dcd48c9ff771221c4e77d8f}{%
+           family={Subpa-Asa},
+           familyi={S\bibinithyphendelim A\bibinitperiod},
+           given={Art},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=444c97ffeb6379ae1e2c4c491207ac6d}{%
+           family={Lam},
+           familyi={L\bibinitperiod},
+           given={Antony},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e292ab2afea048f7ad6399d6b3301f67}{%
+           family={Sato},
+           familyi={S\bibinitperiod},
+           given={Yoichi},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=f482f7bebd4c6f8f91cac4aecb1802b6}{%
+           family={Sato},
+           familyi={S\bibinitperiod},
+           given={Imari},
+           giveni={I\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{d3263145ec1d6983ba942128dd6c5a8e}
+      \strng{fullhash}{1e61600cab00c1c28887209fc9606515}
+      \strng{fullhashraw}{1e61600cab00c1c28887209fc9606515}
+      \strng{bibnamehash}{1e61600cab00c1c28887209fc9606515}
+      \strng{authorbibnamehash}{1e61600cab00c1c28887209fc9606515}
+      \strng{authornamehash}{d3263145ec1d6983ba942128dd6c5a8e}
+      \strng{authorfullhash}{1e61600cab00c1c28887209fc9606515}
+      \strng{authorfullhashraw}{1e61600cab00c1c28887209fc9606515}
+      \field{sortinit}{J}
+      \field{sortinithash}{b2f54a9081ace9966a7cb9413811edb4}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{2017 IEEE International Conference on Computer Vision (ICCV)}
+      \field{title}{From RGB to Spectrum for Natural Scenes via Manifold-Based Mapping}
+      \field{year}{2017}
+      \field{pages}{4715\bibrangedash 4723}
+      \range{pages}{9}
+      \verb{doi}
+      \verb 10.1109/ICCV.2017.504
+      \endverb
+      \keyw{Cameras;Hyperspectral imaging;Three-dimensional displays;Image reconstruction;Manifolds;Lighting}
+    \endentry
+    \entry{Maloney:86}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=862284eca1a33643f39e987689c50c5b}{%
+           family={Maloney},
+           familyi={M\bibinitperiod},
+           given={Laurence\bibnamedelima T.},
+           giveni={L\bibinitperiod\bibinitdelim T\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Optica Publishing Group}%
+      }
+      \strng{namehash}{862284eca1a33643f39e987689c50c5b}
+      \strng{fullhash}{862284eca1a33643f39e987689c50c5b}
+      \strng{fullhashraw}{862284eca1a33643f39e987689c50c5b}
+      \strng{bibnamehash}{862284eca1a33643f39e987689c50c5b}
+      \strng{authorbibnamehash}{862284eca1a33643f39e987689c50c5b}
+      \strng{authornamehash}{862284eca1a33643f39e987689c50c5b}
+      \strng{authorfullhash}{862284eca1a33643f39e987689c50c5b}
+      \strng{authorfullhashraw}{862284eca1a33643f39e987689c50c5b}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Recent computational models of color vision demonstrate that it is possible to achieve exact color constancy over a limited range of lights and surfaces described by linear models. The success of these computational models hinges on whether any sizable range of surface spectral reflectances can be described by a linear model with about three parameters. In the first part of this paper, I analyze two large sets of empirical surface spectral reflectances and examine three conjectures concerning constraints on surface reflectance: (1) that empirical surface reflectances fall within a linear model with a small number of parameters, (2) that empirical surface reflectances fall within a linear model composed of band-limited functions with a small number of parameters, and (3) that the shape of the spectral-sensitivity curves of human vision enhance the fit between empirical surface reflectances and a linear model. I conclude that the first and second conjectures hold for the two sets of spectral reflectances analyzed but that the number of parameters required to model the spectral reflectances is five to seven, not three. A reanalysis of the empirical data that takes human visual sensitivity into account gives more promising results. The linear models derived provide excellent fits to the data with as few as three or four parameters, confirming the third conjecture. The results suggest that constraints on possible surface-reflectance functions and the ``filtering'' properties of the shapes of the spectral-sensitivity curves of photoreceptors can both contribute to color constancy. In the last part of the paper I derive the relation between the number of photoreceptor classes present in vision and the ``filtering'' properties of each class. The results of this analysis reverse a conclusion reached by Barlow: the ``filtering'' properties of human photoreceptors are consistent with a trichromatic visual system that is color constant.}
+      \field{journaltitle}{J. Opt. Soc. Am. A}
+      \field{number}{10}
+      \field{title}{Evaluation of linear models of surface spectral reflectance with small numbers of parameters}
+      \field{volume}{3}
+      \field{year}{1986}
+      \field{pages}{1673\bibrangedash 1683}
+      \range{pages}{11}
+      \verb{doi}
+      \verb 10.1364/JOSAA.3.001673
+      \endverb
+      \verb{urlraw}
+      \verb https://opg.optica.org/josaa/abstract.cfm?URI=josaa-3-10-1673
+      \endverb
+      \verb{url}
+      \verb https://opg.optica.org/josaa/abstract.cfm?URI=josaa-3-10-1673
+      \endverb
+      \keyw{Color vision; Computer simulation; Fourier transforms; Near infrared; Physiology; Vision modeling}
+    \endentry
+    \entry{Parkkinen:89}{article}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=a92613d31e58f7c23818f030bbb3bcbc}{%
+           family={Parkkinen},
+           familyi={P\bibinitperiod},
+           given={J.\bibnamedelimi P.\bibnamedelimi S.},
+           giveni={J\bibinitperiod\bibinitdelim P\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=aa0c51be544d7f3b6fd95033a1a2e4e5}{%
+           family={Hallikainen},
+           familyi={H\bibinitperiod},
+           given={J.},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e6979cc54cab5b760a95e9ad6275178e}{%
+           family={Jaaskelainen},
+           familyi={J\bibinitperiod},
+           given={T.},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Optica Publishing Group}%
+      }
+      \strng{namehash}{5e41607518f6eef0d387102b0e8279ab}
+      \strng{fullhash}{8c9cbb580bcd9bdf4d7853c25d1a36c3}
+      \strng{fullhashraw}{8c9cbb580bcd9bdf4d7853c25d1a36c3}
+      \strng{bibnamehash}{8c9cbb580bcd9bdf4d7853c25d1a36c3}
+      \strng{authorbibnamehash}{8c9cbb580bcd9bdf4d7853c25d1a36c3}
+      \strng{authornamehash}{5e41607518f6eef0d387102b0e8279ab}
+      \strng{authorfullhash}{8c9cbb580bcd9bdf4d7853c25d1a36c3}
+      \strng{authorfullhashraw}{8c9cbb580bcd9bdf4d7853c25d1a36c3}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The 1257 reflectance spectra of the chips in the Munsell Book of Color---Matte Finish Collection (Munsell Color, Baltimore, Md., 1976) were measured with a rapid acousto-optic spectrophotometer. Measured spectra were sampled from 400 to 700 nm at 5-nm intervals. The correlation matrix of this sample set was formed, and the characteristic vectors of this matrix were computed. It is shown, contradictory to earlier recommendations \[ Psychon. Sci.1, 369 ( 1964)\], that as many as eight characteristic spectra are needed to achieve good representation for all spectra.}
+      \field{journaltitle}{J. Opt. Soc. Am. A}
+      \field{number}{2}
+      \field{title}{Characteristic spectra of Munsell colors}
+      \field{volume}{6}
+      \field{year}{1989}
+      \field{pages}{318\bibrangedash 322}
+      \range{pages}{5}
+      \verb{doi}
+      \verb 10.1364/JOSAA.6.000318
+      \endverb
+      \verb{urlraw}
+      \verb https://opg.optica.org/josaa/abstract.cfm?URI=josaa-6-2-318
+      \endverb
+      \verb{url}
+      \verb https://opg.optica.org/josaa/abstract.cfm?URI=josaa-6-2-318
+      \endverb
+      \keyw{Color spaces; Image analysis; Imaging systems; Optical fibers; Pattern recognition; Stochastic processes}
+    \endentry
+    \entry{Rybicki:847173}{book}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=a8b83f4134b8420d321b4347ac783e11}{%
+           family={Rybicki},
+           familyi={R\bibinitperiod},
+           given={George\bibnamedelima B},
+           giveni={G\bibinitperiod\bibinitdelim B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=6f630e08309226fb2a0dbdf8e0a6fdf7}{%
+           family={Lightman},
+           familyi={L\bibinitperiod},
+           given={Alan\bibnamedelima P},
+           giveni={A\bibinitperiod\bibinitdelim P\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {New York, NY}%
+      }
+      \list{publisher}{1}{%
+        {Wiley}%
+      }
+      \strng{namehash}{5adc88be60a94c7021deb49fbe035855}
+      \strng{fullhash}{5adc88be60a94c7021deb49fbe035855}
+      \strng{fullhashraw}{5adc88be60a94c7021deb49fbe035855}
+      \strng{bibnamehash}{5adc88be60a94c7021deb49fbe035855}
+      \strng{authorbibnamehash}{5adc88be60a94c7021deb49fbe035855}
+      \strng{authornamehash}{5adc88be60a94c7021deb49fbe035855}
+      \strng{authorfullhash}{5adc88be60a94c7021deb49fbe035855}
+      \strng{authorfullhashraw}{5adc88be60a94c7021deb49fbe035855}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{{Radiative Processes in Astrophysics}}
+      \field{year}{1985}
+      \verb{doi}
+      \verb 10.1002/9783527618170
+      \endverb
+      \verb{urlraw}
+      \verb https://cds.cern.ch/record/847173
+      \endverb
+      \verb{url}
+      \verb https://cds.cern.ch/record/847173
+      \endverb
+    \endentry
+  \enddatalist
+  \datalist[entry]{apa/global//global/global/global}
+    \entry{ghimpeteanu2025hyperspectralimagingidentifyingforeign}{misc}{}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=0a359872ba13c5be3034b2c122162af3}{%
+           family={Ghimpeteanu},
+           familyi={G\bibinitperiod},
+           given={Gabriela},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=d5800a53cab79e0860b427eef95472a7}{%
+           family={Rajani},
+           familyi={R\bibinitperiod},
+           given={Hayat},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=492f592ee7595f03b8f9e3096e8fd2cd}{%
+           family={Quintana},
+           familyi={Q\bibinitperiod},
+           given={Josep},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=a0f78a3a52ae9100045456d415eaa324}{%
+           family={Garcia},
+           familyi={G\bibinitperiod},
+           given={Rafael},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{c6a6f488f1190b397a65437ac07e47d7}
+      \strng{fullhash}{9c8481a114f182350c993d0897e725fc}
+      \strng{fullhashraw}{9c8481a114f182350c993d0897e725fc}
+      \strng{bibnamehash}{9c8481a114f182350c993d0897e725fc}
+      \strng{authorbibnamehash}{9c8481a114f182350c993d0897e725fc}
+      \strng{authornamehash}{c6a6f488f1190b397a65437ac07e47d7}
+      \strng{authorfullhash}{9c8481a114f182350c993d0897e725fc}
+      \strng{authorfullhashraw}{9c8481a114f182350c993d0897e725fc}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CV}
+      \field{eprinttype}{arXiv}
+      \field{title}{Hyperspectral Imaging for Identifying Foreign Objects on Pork Belly}
+      \field{year}{2025}
+      \verb{eprint}
+      \verb 2503.16086
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2503.16086
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2503.16086
+      \endverb
+    \endentry
+    \entry{Hall1988IlluminationAC}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=4a8f48b7f45f72fa0ae371c0d86928c7}{%
+           family={Hall},
+           familyi={H\bibinitperiod},
+           given={Roy},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \strng{fullhash}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \strng{fullhashraw}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \strng{bibnamehash}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \strng{authorbibnamehash}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \strng{authornamehash}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \strng{authorfullhash}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \strng{authorfullhashraw}{4a8f48b7f45f72fa0ae371c0d86928c7}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Monographs in Visual Communication}
+      \field{title}{Illumination and Color in Computer Generated Imagery}
+      \field{year}{1988}
+      \verb{urlraw}
+      \verb https://api.semanticscholar.org/CorpusID:6919758
+      \endverb
+      \verb{url}
+      \verb https://api.semanticscholar.org/CorpusID:6919758
+      \endverb
+    \endentry
+    \entry{hong2026hyperspectralimaging}{misc}{}{}
+      \name{author}{9}{}{%
+        {{un=0,uniquepart=base,hash=f2cb6caf5572328fc37ef1849ac97bef}{%
+           family={Hong},
+           familyi={H\bibinitperiod},
+           given={Danfeng},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=38982a068d993b656747eda3c1d05082}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Chenyu},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3a4d56ca67ef7eca1353e7f289b0afa5}{%
+           family={Yokoya},
+           familyi={Y\bibinitperiod},
+           given={Naoto},
+           giveni={N\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=44d73e639c535123777db68e270b754e}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Bing},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=5531a991949ba468ecbe556c88603d3f}{%
+           family={Jia},
+           familyi={J\bibinitperiod},
+           given={Xiuping},
+           giveni={X\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=9b3ce6468cd35a018e12616afcd1f795}{%
+           family={Plaza},
+           familyi={P\bibinitperiod},
+           given={Antonio},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e1ce17add886783dfd763c7953e2eb58}{%
+           family={Gamba},
+           familyi={G\bibinitperiod},
+           given={Paolo},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=239dd28035475bdb5b6deaf343cefbcb}{%
+           family={Benediktsson},
+           familyi={B\bibinitperiod},
+           given={Jon\bibnamedelima Atli},
+           giveni={J\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=19a50089cae8f67ab374e30b054493ad}{%
+           family={Chanussot},
+           familyi={C\bibinitperiod},
+           given={Jocelyn},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{d150928b75a52d6934cbe61798927da4}
+      \strng{fullhash}{0cda41c0023c3d4287afe311b6525a56}
+      \strng{fullhashraw}{0cda41c0023c3d4287afe311b6525a56}
+      \strng{bibnamehash}{0cda41c0023c3d4287afe311b6525a56}
+      \strng{authorbibnamehash}{0cda41c0023c3d4287afe311b6525a56}
+      \strng{authornamehash}{d150928b75a52d6934cbe61798927da4}
+      \strng{authorfullhash}{0cda41c0023c3d4287afe311b6525a56}
+      \strng{authorfullhashraw}{0cda41c0023c3d4287afe311b6525a56}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CV}
+      \field{eprinttype}{arXiv}
+      \field{title}{Hyperspectral Imaging}
+      \field{year}{2026}
+      \verb{eprint}
+      \verb 2508.08107
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2508.08107
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2508.08107
+      \endverb
+    \endentry
+    \entry{Jaaskelainen:90}{article}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=e6979cc54cab5b760a95e9ad6275178e}{%
+           family={Jaaskelainen},
+           familyi={J\bibinitperiod},
+           given={T.},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=f8ca30edbe3b07c965b396e5c8ce75b7}{%
+           family={Parkkinen},
+           familyi={P\bibinitperiod},
+           given={J.},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=6c0b5670c6c9db0b2161efa979a86925}{%
+           family={Toyooka},
+           familyi={T\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Optica Publishing Group}%
+      }
+      \strng{namehash}{cacaa8272db384e68785e99c783a9b9f}
+      \strng{fullhash}{e9b92d1b4204184af73a4337494753f2}
+      \strng{fullhashraw}{e9b92d1b4204184af73a4337494753f2}
+      \strng{bibnamehash}{e9b92d1b4204184af73a4337494753f2}
+      \strng{authorbibnamehash}{e9b92d1b4204184af73a4337494753f2}
+      \strng{authornamehash}{cacaa8272db384e68785e99c783a9b9f}
+      \strng{authorfullhash}{e9b92d1b4204184af73a4337494753f2}
+      \strng{authorfullhashraw}{e9b92d1b4204184af73a4337494753f2}
+      \field{sortinit}{J}
+      \field{sortinithash}{b2f54a9081ace9966a7cb9413811edb4}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{In multispectral imaging it is advantageous to compress spectral information with a minimum loss of information in a way that permits accurate recovery of the spectrum. By use of the simple vector-subspace model that we propose, spectral information can be stored and recovered by the use of a few inner products, which are easy to measure optically. Two large data sets, the first consisting of 1257 Munsell colors and the other of 218 naturally occurring spectral reflectances, were analyzed to form two bases for the model. The Munsell basis can be used to represent the natural colors, and the basis derived from the natural data can be used to represent the Munsell data. The proposed vector-subspace model includes a simple relation between the inner products and conventional color coordinates. It also provides a way to estimate the spectrum of an object that has known chromaticity coordinates.}
+      \field{journaltitle}{J. Opt. Soc. Am. A}
+      \field{number}{4}
+      \field{title}{Vector-subspace model for color representation}
+      \field{volume}{7}
+      \field{year}{1990}
+      \field{pages}{725\bibrangedash 730}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1364/JOSAA.7.000725
+      \endverb
+      \verb{urlraw}
+      \verb https://opg.optica.org/josaa/abstract.cfm?URI=josaa-7-4-725
+      \endverb
+      \verb{url}
+      \verb https://opg.optica.org/josaa/abstract.cfm?URI=josaa-7-4-725
+      \endverb
+      \keyw{Absorption spectroscopy; CIE color spaces; Illuminants; Multispectral imaging; Statistics; Surfaces}
+    \endentry
+    \entry{8237766}{article}{}{}
+      \name{author}{7}{}{%
+        {{un=0,uniquepart=base,hash=dac09067e89440490763a92ac983db62}{%
+           family={Jia},
+           familyi={J\bibinitperiod},
+           given={Yan},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=5bd64e0d5231c6f7a972360273e7b57d}{%
+           family={Zheng},
+           familyi={Z\bibinitperiod},
+           given={Yinqiang},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=8ff40edf8c7dbccf70712f8d0b666c6c}{%
+           family={Gu},
+           familyi={G\bibinitperiod},
+           given={Lin},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=525f27623dcd48c9ff771221c4e77d8f}{%
+           family={Subpa-Asa},
+           familyi={S\bibinithyphendelim A\bibinitperiod},
+           given={Art},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=444c97ffeb6379ae1e2c4c491207ac6d}{%
+           family={Lam},
+           familyi={L\bibinitperiod},
+           given={Antony},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e292ab2afea048f7ad6399d6b3301f67}{%
+           family={Sato},
+           familyi={S\bibinitperiod},
+           given={Yoichi},
+           giveni={Y\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=f482f7bebd4c6f8f91cac4aecb1802b6}{%
+           family={Sato},
+           familyi={S\bibinitperiod},
+           given={Imari},
+           giveni={I\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{d3263145ec1d6983ba942128dd6c5a8e}
+      \strng{fullhash}{1e61600cab00c1c28887209fc9606515}
+      \strng{fullhashraw}{1e61600cab00c1c28887209fc9606515}
+      \strng{bibnamehash}{1e61600cab00c1c28887209fc9606515}
+      \strng{authorbibnamehash}{1e61600cab00c1c28887209fc9606515}
+      \strng{authornamehash}{d3263145ec1d6983ba942128dd6c5a8e}
+      \strng{authorfullhash}{1e61600cab00c1c28887209fc9606515}
+      \strng{authorfullhashraw}{1e61600cab00c1c28887209fc9606515}
+      \field{sortinit}{J}
+      \field{sortinithash}{b2f54a9081ace9966a7cb9413811edb4}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{2017 IEEE International Conference on Computer Vision (ICCV)}
+      \field{title}{From RGB to Spectrum for Natural Scenes via Manifold-Based Mapping}
+      \field{year}{2017}
+      \field{pages}{4715\bibrangedash 4723}
+      \range{pages}{9}
+      \verb{doi}
+      \verb 10.1109/ICCV.2017.504
+      \endverb
+      \keyw{Cameras;Hyperspectral imaging;Three-dimensional displays;Image reconstruction;Manifolds;Lighting}
+    \endentry
+    \entry{Maloney:86}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=862284eca1a33643f39e987689c50c5b}{%
+           family={Maloney},
+           familyi={M\bibinitperiod},
+           given={Laurence\bibnamedelima T.},
+           giveni={L\bibinitperiod\bibinitdelim T\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Optica Publishing Group}%
+      }
+      \strng{namehash}{862284eca1a33643f39e987689c50c5b}
+      \strng{fullhash}{862284eca1a33643f39e987689c50c5b}
+      \strng{fullhashraw}{862284eca1a33643f39e987689c50c5b}
+      \strng{bibnamehash}{862284eca1a33643f39e987689c50c5b}
+      \strng{authorbibnamehash}{862284eca1a33643f39e987689c50c5b}
+      \strng{authornamehash}{862284eca1a33643f39e987689c50c5b}
+      \strng{authorfullhash}{862284eca1a33643f39e987689c50c5b}
+      \strng{authorfullhashraw}{862284eca1a33643f39e987689c50c5b}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Recent computational models of color vision demonstrate that it is possible to achieve exact color constancy over a limited range of lights and surfaces described by linear models. The success of these computational models hinges on whether any sizable range of surface spectral reflectances can be described by a linear model with about three parameters. In the first part of this paper, I analyze two large sets of empirical surface spectral reflectances and examine three conjectures concerning constraints on surface reflectance: (1) that empirical surface reflectances fall within a linear model with a small number of parameters, (2) that empirical surface reflectances fall within a linear model composed of band-limited functions with a small number of parameters, and (3) that the shape of the spectral-sensitivity curves of human vision enhance the fit between empirical surface reflectances and a linear model. I conclude that the first and second conjectures hold for the two sets of spectral reflectances analyzed but that the number of parameters required to model the spectral reflectances is five to seven, not three. A reanalysis of the empirical data that takes human visual sensitivity into account gives more promising results. The linear models derived provide excellent fits to the data with as few as three or four parameters, confirming the third conjecture. The results suggest that constraints on possible surface-reflectance functions and the ``filtering'' properties of the shapes of the spectral-sensitivity curves of photoreceptors can both contribute to color constancy. In the last part of the paper I derive the relation between the number of photoreceptor classes present in vision and the ``filtering'' properties of each class. The results of this analysis reverse a conclusion reached by Barlow: the ``filtering'' properties of human photoreceptors are consistent with a trichromatic visual system that is color constant.}
+      \field{journaltitle}{J. Opt. Soc. Am. A}
+      \field{number}{10}
+      \field{title}{Evaluation of linear models of surface spectral reflectance with small numbers of parameters}
+      \field{volume}{3}
+      \field{year}{1986}
+      \field{pages}{1673\bibrangedash 1683}
+      \range{pages}{11}
+      \verb{doi}
+      \verb 10.1364/JOSAA.3.001673
+      \endverb
+      \verb{urlraw}
+      \verb https://opg.optica.org/josaa/abstract.cfm?URI=josaa-3-10-1673
+      \endverb
+      \verb{url}
+      \verb https://opg.optica.org/josaa/abstract.cfm?URI=josaa-3-10-1673
+      \endverb
+      \keyw{Color vision; Computer simulation; Fourier transforms; Near infrared; Physiology; Vision modeling}
+    \endentry
+    \entry{Parkkinen:89}{article}{}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=a92613d31e58f7c23818f030bbb3bcbc}{%
+           family={Parkkinen},
+           familyi={P\bibinitperiod},
+           given={J.\bibnamedelimi P.\bibnamedelimi S.},
+           giveni={J\bibinitperiod\bibinitdelim P\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=aa0c51be544d7f3b6fd95033a1a2e4e5}{%
+           family={Hallikainen},
+           familyi={H\bibinitperiod},
+           given={J.},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e6979cc54cab5b760a95e9ad6275178e}{%
+           family={Jaaskelainen},
+           familyi={J\bibinitperiod},
+           given={T.},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Optica Publishing Group}%
+      }
+      \strng{namehash}{5e41607518f6eef0d387102b0e8279ab}
+      \strng{fullhash}{8c9cbb580bcd9bdf4d7853c25d1a36c3}
+      \strng{fullhashraw}{8c9cbb580bcd9bdf4d7853c25d1a36c3}
+      \strng{bibnamehash}{8c9cbb580bcd9bdf4d7853c25d1a36c3}
+      \strng{authorbibnamehash}{8c9cbb580bcd9bdf4d7853c25d1a36c3}
+      \strng{authornamehash}{5e41607518f6eef0d387102b0e8279ab}
+      \strng{authorfullhash}{8c9cbb580bcd9bdf4d7853c25d1a36c3}
+      \strng{authorfullhashraw}{8c9cbb580bcd9bdf4d7853c25d1a36c3}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The 1257 reflectance spectra of the chips in the Munsell Book of Color---Matte Finish Collection (Munsell Color, Baltimore, Md., 1976) were measured with a rapid acousto-optic spectrophotometer. Measured spectra were sampled from 400 to 700 nm at 5-nm intervals. The correlation matrix of this sample set was formed, and the characteristic vectors of this matrix were computed. It is shown, contradictory to earlier recommendations \[ Psychon. Sci.1, 369 ( 1964)\], that as many as eight characteristic spectra are needed to achieve good representation for all spectra.}
+      \field{journaltitle}{J. Opt. Soc. Am. A}
+      \field{number}{2}
+      \field{title}{Characteristic spectra of Munsell colors}
+      \field{volume}{6}
+      \field{year}{1989}
+      \field{pages}{318\bibrangedash 322}
+      \range{pages}{5}
+      \verb{doi}
+      \verb 10.1364/JOSAA.6.000318
+      \endverb
+      \verb{urlraw}
+      \verb https://opg.optica.org/josaa/abstract.cfm?URI=josaa-6-2-318
+      \endverb
+      \verb{url}
+      \verb https://opg.optica.org/josaa/abstract.cfm?URI=josaa-6-2-318
+      \endverb
+      \keyw{Color spaces; Image analysis; Imaging systems; Optical fibers; Pattern recognition; Stochastic processes}
+    \endentry
+    \entry{Rybicki:847173}{book}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=a8b83f4134b8420d321b4347ac783e11}{%
+           family={Rybicki},
+           familyi={R\bibinitperiod},
+           given={George\bibnamedelima B},
+           giveni={G\bibinitperiod\bibinitdelim B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=6f630e08309226fb2a0dbdf8e0a6fdf7}{%
+           family={Lightman},
+           familyi={L\bibinitperiod},
+           given={Alan\bibnamedelima P},
+           giveni={A\bibinitperiod\bibinitdelim P\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {New York, NY}%
+      }
+      \list{publisher}{1}{%
+        {Wiley}%
+      }
+      \strng{namehash}{5adc88be60a94c7021deb49fbe035855}
+      \strng{fullhash}{5adc88be60a94c7021deb49fbe035855}
+      \strng{fullhashraw}{5adc88be60a94c7021deb49fbe035855}
+      \strng{bibnamehash}{5adc88be60a94c7021deb49fbe035855}
+      \strng{authorbibnamehash}{5adc88be60a94c7021deb49fbe035855}
+      \strng{authornamehash}{5adc88be60a94c7021deb49fbe035855}
+      \strng{authorfullhash}{5adc88be60a94c7021deb49fbe035855}
+      \strng{authorfullhashraw}{5adc88be60a94c7021deb49fbe035855}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{{Radiative Processes in Astrophysics}}
+      \field{year}{1985}
+      \verb{doi}
+      \verb 10.1002/9783527618170
+      \endverb
+      \verb{urlraw}
+      \verb https://cds.cern.ch/record/847173
+      \endverb
+      \verb{url}
+      \verb https://cds.cern.ch/record/847173
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
