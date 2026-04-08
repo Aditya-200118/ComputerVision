@@ -2337,4 +2337,98 @@ halt when no more splits or merge are possible
 
 Fitting a parametric line to a set of point in a image space $\equiv$ determining the point of intersection of the 
 
+
+\newpage
+\pagestyle{plain}  % Re-enable plain headers/footers
+\fancyhead[L]{\textbf{Date:} 7 April, 2026, 14:55 PM}  
+
+The common line passing through x0y0, x1y1 ... is represented by the point of intersection of all possible lines throughe ach of (x0, y0)...(xn, yn).
+
+Collect votes from all the line the other cells will not.
+
+The cell (c, m) which represent the common point of intersection in parameter space will collect the required number of votes.
+
+Evidential Reasoning
+
+Hough Space (discretized parameter space) hough array hough accumualtor array
+
+
+
+vertical lines are an issue since m tends to infinity and hence accumulator will tend to infinity and hence not possible
+
+solution polar line representation
+
+
+\[
+\rho = x\cos\theta + y\sin\theta \\
+\theta \left[0\dots2\pi\right] \text{ or } \left[0\deg\dots360\deg\right] \\
+\rho \left[0, \sqrt{2}n\right]  \text{ for N*N image }
+\]
+
+for each edge pixel (x,y)
+{for theta = 0 to theta = 360 instep size of theta
+    {rho = xcostheta + ysintheta 
+    if rho >= 0 then increment HA[rho, theta] by 1
+}}
+% Determine the maximum in HA and the corresponding value rho_m and theta_n
+
+Check the degenerate case why rho = 0 later
+
+\newpage
+\section*{Hough Transform for Line Detection}
+
+The common line passing through points $(x_0, y_0), (x_1, y_1), \dots, (x_n, y_n)$ 
+is represented by the point of intersection of all possible lines passing through each of these points.
+
+Each point votes for all possible lines passing through it. Cells in the parameter space that do not correspond to a common intersection receive fewer votes.
+
+The cell $(c, m)$ that represents the common point of intersection in parameter space accumulates the maximum number of votes.
+
+\subsection*{Evidential Reasoning}
+
+The Hough space (discretized parameter space) is represented using a Hough array, also called the Hough accumulator.
+
+\subsection*{Issue with Vertical Lines}
+
+Vertical lines pose a problem in slope-intercept form since $m \to \infty$, making the accumulator impractical.
+
+\subsection*{Solution: Polar Representation}
+
+To overcome this, we use the polar form of a line:
+
+\[
+\rho = x \cos \theta + y \sin \theta
+\]
+
+\[
+\theta \in [0, 2\pi] \quad \text{or} \quad [0^\circ, 360^\circ]
+\]
+
+\[
+\rho \in \left[0, \sqrt{2}N\right] \quad \text{for an } N \times N \text{ image}
+\]
+
+\begin{algorithm}[H]
+\caption{Hough Transform Algorithm}
+\KwIn{Edge image}
+\KwOut{Detected lines $(\rho, \theta)$}
+
+Initialize Hough accumulator array $HA[\rho, \theta]$ to zero\;
+
+\ForEach{edge pixel $(x, y)$}{
+    \For{$\theta = 0$ to $360^\circ$ with step size $\Delta \theta$}{
+        $\rho = x \cos \theta + y \sin \theta$\;
+        \If{$\rho \geq 0$}{
+            Increment $HA[\rho, \theta]$ by 1\;
+        }
+    }
+}
+
+Find the maximum value in $HA$\;
+Determine corresponding $(\rho_m, \theta_n)$\;
+
+\end{algorithm}
+
+
+quanitze and break down to limit the search space (parallize at upper level)
 \end{document}
