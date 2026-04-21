@@ -1631,8 +1631,8 @@ Technique A
 
 \begin{itemize}
   \item Convolve image with the operator
-  \item Computer the gradient magnitude operator
-  \item Threshold the gradient magnitude image gmi
+  \item Compute the gradient magnitude operator
+  \item Threshold the gradient magnitude image (GMI)
   \item Output the resulting binary image
 \end{itemize}
 
@@ -1661,9 +1661,9 @@ For a step edge (for a first derivative)
 \fancyhead[L]{\textbf{Date:} 17 March, 2026, 14:50 PM}  
 
 \newpage
-Second order derivatives is more noise sensitive than the laplacian
+Second order derivatives is more noise sensitive than the (laplacian)
 
-gradient (first order derivative) $\longleftarrow$ the signal/image needs to be smoothed (Gaussian Smoothing)
+gradient (first order derivative) $\iff$ the signal/image needs to be smoothed (Gaussian Smoothing)
 
 Laplacian of Gaussian (LoG) edge operator $\equiv$ Gaussian Smoothing of the image + laplacian computation
 
@@ -1675,12 +1675,28 @@ Technique 1:\\
 \]
 to generate $I_s(i, j)$
 
-Convolve $I_s(i,j)$ with the laplacian operator 
+Convolve $I_s(i,j)$ with the laplacian operator $\nabla^2(i, j) \text{ or } L(i, j)$ to generate $I_{LS}(i, j)$
+
+ 
+Detect zero crossings in $I_{LS} (i, j)$ int the x and y directions.
+
+$\begin{bmatrix}
+0 & 1 & 0 \\
+1 & -4 & 1 \\
+0 & 1 & 0
+\end{bmatrix}$
+
+Technique 2:
 
 \[
-\nabla^2(i, j) \text{ or } L(i, j)
+\nabla^2(G(x,y;\sigma)\circledast I(x,y)) = \underbrace{\nabla^2G(x,y;\sigma)}_{LOG Operator} \circledast I(x, y)
 \]
- 
+
+\begin{itemize}
+    \item formulate the $\nabla^2G(x,y;\sigma)$ operator.
+    \item Convolve the $I(x,y)$ with $\nabla^2G(x,y;\sigma)$ to generate $I_{LS}(x,y).$
+    \item Detect zero crossings in $I_{LS}$ in $x$ and $y$ directions.
+\end{itemize}
 \newpage
 \pagestyle{fancy}  % Re-enable fancy headers/footers
 \fancyhead[L]{\textbf{Date:} 18 March, 2026, 14:50 PM}  
@@ -1693,10 +1709,21 @@ Range of persistance
 Properties of scale space
 \begin{itemize}
     \item  An edge detected for $\sigma = \sigma_i$ will also be detected for all values of $\sigma\ge\sigma_i$.
-    \item  An edge detected at coarse scale (large sigma value) cannot disappear at a finer scale - principle of causiality in scale space.
-    \item  
-    \item 
+    \item  An edge detected at coarse scale (large sigma value) cannot disappear at a finer scale - principle of causality in scale space.
 \end{itemize}
+Significance of the edge is directly proportional to the zero crossing slope.
+
+\[
+ZCS \propto \frac{h}{\sigma} \text{ where h is step edge height and sigma is smoothing parameter.}
+\]
+
+If $\frac{h}{\sigma} < \tau$ then the edge is no longer percieved.
+$\sigma_c = \frac{h}{\tau}$ is the critical $\sigma$ value for an step edge of height $h$.
+
+\section{Multiedge detection using the LoG}
+
+Choose A large value $\sigma$ To detect significant edges and suppress noisy edges.
+Focus the significant edges to the true (precise) location by reducing the value of Sigma Progressively (focussing) Without introducing noisy edges.
 
 \newpage
 \pagestyle{fancy}  % Re-enable fancy headers/footers
