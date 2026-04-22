@@ -1,0 +1,2340 @@
+% !BIB program = biber
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}	% Para caracteres en español
+\usepackage{caption}
+\usepackage[backend=biber]{biblatex}
+\usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
+\usepackage{multirow,booktabs}
+\usepackage[table]{xcolor}
+\usepackage{graphicx}
+\usepackage{fullpage}
+% \usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{fancyhdr}
+\usepackage{mathrsfs}
+\usepackage{fancyhdr}
+\setlength{\headheight}{14pt}
+\usepackage{wrapfig}
+\usepackage{setspace}
+\usepackage{calc}
+\usepackage{multicol}
+\usepackage{cancel}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usepackage[retainorgcmds]{IEEEtrantools}
+\usepackage[margin=3cm]{geometry}
+\usepackage{amsmath}
+\newlength{\tabcont}
+\setlength{\parindent}{0.0in}
+\setlength{\parskip}{0.05in}
+\usepackage{empheq}
+\usetikzlibrary{intersections}
+\usepackage{framed}
+\usepackage[most]{tcolorbox}
+\usepackage{xcolor}
+\usepackage[ruled,vlined]{algorithm2e}
+\colorlet{shadecolor}{orange!15}
+\parindent 0in
+\parskip 12pt
+\geometry{margin=1in, headsep=0.25in}
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}
+\newtheorem{definition}{Definition}
+\newtheorem{reg}{Rule}
+\newtheorem{exer}{Exercise}
+\newtheorem{note}{Note}  % Numbered Note
+\newtheorem*{unnote}{Note}  % Unnumbered Note
+\newtheorem{mynote}{Note:}  % Numbered Note:
+\newtheorem*{myunnote}{Note:} % Unnumbered Note:
+\thispagestyle{empty}
+\pagestyle{fancy}
+\fancyhf{}
+\addbibresource{ComputerVision.bib}
+\begin{document}
+\setcounter{section}{0}
+\title{Computer Vision Notes}
+
+
+% \thispagestyle{empty}
+
+\begin{center}
+    {\LARGE \bf Lecture Notes}\\
+    {\large Computer Vision and Pattern Recognition 8820}\\
+    Spring 2026
+\end{center}
+\section{Background}
+\subsection{Pinhole Camera and Perspective Foreshortening}
+Pin hole camera → approximation (formed at the focal plane of the camera) this doesnt hold true always.
+
+Perspective Projection → used by humans (the model for approximation)
+\begin{shaded}
+    
+\begin{equation}
+\sqrt{
+\left(\frac{f x_1}{z} - \frac{f x_2}{z}\right)^2
++
+\left(\frac{f y_1}{z} - \frac{f y_2}{z}\right)^2
+}
+=
+\frac{f}{z}
+\sqrt{(x_1 - x_2)^2 + (y_1 - y_2)^2}
+\end{equation}
+\end{shaded}
+% \begin{center}
+% \parbox{0.9\linewidth}{
+% \centering\textit{Perspective foreshortening under a pinhole camera model}
+% }
+% \end{center}
+
+\noindent
+Where, \(f\) is the camera focal length,
+\(z\) is the depth of the points from the camera,
+and \((x_1,y_1)\), \((x_2,y_2)\) are their coordinates in the camera frame.
+
+
+% \begin{note}
+% \textbf{Capital Letters refer to the accelerating reference frame \textit{S} while lowercase letters refer to the inertial reference frame S$_0$}
+% \end{note}
+\subsection{Digital Image and Discretisation}
+In a 2D sensor (CCD Camera), the image intensity is sampled at discrete points in image plane.
+Image plane is discretised into cells and pixels (picture element)
+
+An Image is essentially a 2D array (matrix) of cells and pixels
+The pixel coordinates \((i, j)\) refer to center of the cell.
+The pixel size essnetialy the image resolution can be measured in terms of pixel per unit area.
+
+Discretisation of the image plane is equivalent to spatial sampling. 
+
+Sampling Density/Resolution Pixels/Unit area
+
+Higher Sampling Density leads to higher image resolution
+
+For a image plane of a given area → smaller pixel size implies higher resolution 
+Digital Image → Discretisation of spatial coordinates ( sampling)
+\newpage
+\textbf{Discretization of intensity values (Quantization)}
+
+Quantization is the discretization of intensity values.
+
+If each pixel is represented using $n$ bits, then the intensity values range from
+$0$ to $2^{n} - 1$.
+\begin{shaded}
+For $n = 8$,
+\[
+\therefore \text{gray-level intensity values} \in \{0, 1, \ldots, 255\}.
+\]
+\end{shaded}
+
+% \vspace{0px}
+
+\subsection{Levels of Computation}
+
+\begin{enumerate}
+\item \textbf{Pixel Level Computation (contrast enhancement)}
+  \begin{itemize}
+    \item Output pixel (assume gray scale) Location of pixel or intensity of the pixel (understood in context)
+          (spatial and gray scale intensity can mean both)
+    \item Each pixel is processed independently
+          (parallelism can be applied)
+          (massively data parallel operations)
+  \end{itemize}
+
+\item \textbf{Local Level Computation (Parallelizable but not easy) (edge)}
+  \begin{itemize}
+    \item Output Pixel Value is equal to\\
+    $f(\text{input pixel value, }\allowbreak
+    \text{values of pixels in the neighborhood of the input pixel})$
+    (overlapping neighbourhood)
+  \end{itemize}
+
+\item \textbf{Global Level Computation (distance of gray levels within image)}
+  \begin{itemize}
+    \item Performed on all pixels in image
+    \item Histogram computation
+  \end{itemize}
+
+\item \textbf{Object Level Computation}
+  \begin{itemize}
+    \item This is performed after a semantic entity is extracted from the image (image region)
+    \begin{itemize}
+      \item Region Size
+      \item Region Shape
+      \item Region Intensity / Texture
+    \end{itemize}
+  \end{itemize}
+\end{enumerate}
+
+\newpage
+\section{Binary Images}
+\subsection{Background}
+1 pixel → Object Pixel
+
+0 pixel → non object pixel (background pixel)
+
+Shape or Geometry Conveyed (Eg: Silhouette of the person)
+
+Operations on bits (very efficient) (robotic sorting)
+
+How would you create a binary image?
+
+Binary Image (Created by thresholding a gray scale image)
+
+\subsection{Binary Image Formation (Image Taken)}
+
+\[
+B(i,j) = \text{threshold}\big(F(i,j)\big)
+\]
+
+\[
+\text{threshold}\big(F(i,j)\big) =
+\begin{cases} 
+1, & \text{if } F(i,j) > T \\[2mm]
+0, & \text{otherwise}
+\end{cases}
+\]
+
+\text{\textbf{white objects} against dark background}
+\begin{unnote}
+\text{Selection of \textbf{T} is based on \textbf{domain knowledge}}
+\end{unnote}
+
+\newpage
+\section{Geometric Properties of Interests}
+\subsection{Object Size}
+\begin{unnote}
+    Assumption: image contains one object.
+\end{unnote}
+\begin{enumerate}
+    \item Object Size.
+    \begin{itemize}
+        \item 
+        \begin{equation}
+        A = \sum_{i=1}^{n} \sum_{j=1}^{m} B(i, j)
+        \end{equation}
+    \end{itemize}
+    \item Centroid
+    \begin{itemize}
+    \item 
+    \begin{equation}
+    X_C = \frac{1}{A}\sum_{i=1}^n\sum_{j=1}^m j \cdot B(i,j)
+    \end{equation}
+    \item 
+    \begin{equation}
+    Y_C = \frac{1}{A}\sum_{i=1}^n\sum_{j=1}^m i \cdot B(i,j)
+    \end{equation}
+    \end{itemize}
+\item Orientation of Object
+\begin{itemize}
+    \item Normalising the coordinates based on the centroid
+    \[x' =  j -x_c\] 
+    \[y' =i-y_c\]
+    \item Centralised coordinates wrt to centroid 
+    \begin{equation}
+    a = \sum_{i=1}^{n} \sum_{j=1}^{m} [x' (i, j)]^2 B(i, j) 
+    \end{equation}
+\end{itemize}
+\end{enumerate}
+
+\section{Moments}
+\subsection{Object Orientation}
+
+To compute the second-order moments \( a \), \( b \), and \( c \), we start with the equation:
+
+\[
+\tan(2\theta) = \frac{b}{a-c}
+\]
+\newpage
+
+\begin{shaded}
+    \begin{equation}
+        a = \sum_{i=1}^{n}\sum_{j=1}^{m}[X^\prime(i,j)]^2 \cdot B(i,j)
+    \end{equation}
+    \begin{equation}
+        b = 2\sum_{i=1}^{n}\sum_{j=1}^{m}[X^\prime(i,j)][Y^\prime(i,j)] \cdot B(i,j)
+    \end{equation}
+    \begin{equation}
+        c = \sum_{i=1}^{n}\sum_{j=1}^{m}[Y^\prime(i,j)]^2 \cdot B(i,j)
+    \end{equation}
+\end{shaded}
+Consider the following expression for \( X^2 \):
+
+\begin{equation}X^2 = \frac{1}{2}(a+c) + \frac{1}{2}(a-c) \cos(2\theta) + \frac{1\cdot b}{2} \sin(2\theta)\end{equation}
+
+Here, \( X^2 \) represents the moment of inertia.
+
+Substitution Step:
+Now, we substitute \( 2\theta_1 \) and \( 2\theta_2 \) into the expression for \( X^2 \). The value of \( X^2 \) is minimized for one of them (let's call it \( 2\theta_1 \)) and maximized for the other (denoted as \( 2\theta_2 \)).
+
+Thus, the axis of orientation is the one that minimizes \( X^2 \).
+
+Elongation:
+The elongation ratio is given by:
+
+\[
+E = \frac{X_{\text{max}}}{X_{\text{min}}}
+\]
+
+where \( X_{\text{max}} \) and \( X_{\text{min}} \) are the maximum and minimum moments of inertia.
+
+For a \textbf{sphere} the elongation is:
+
+\[
+E = 1
+\]
+
+\subsection{Projections}
+\begin{equation}
+    H[i]  = \sum_{j=1}^{m} B(i, j) 
+\end{equation}
+\begin{equation}
+    V[j]  = \sum_{i=1}^{m} B(i, j)
+\end{equation}
+Where, H and V are compact representations of $B(i,j)$.
+
+
+
+\newpage
+\section{Topological Definitions}
+\subsection{Path}
+A sequence of pixels where successive pixels are neighbours
+
+4 path $\rightarrow$ successive pixels are 4 neighbours 
+
+8 path $\rightarrow$ successive pixels are 8 neighbours
+
+\subsection{Foreground}
+The set of pixels with value $1$ denoted by $S$.
+
+\subsection{Connectivity}
+A pixel, $p \in S$ connected to pixel  $q\in S$  if there exists a path from p to q consisting entirely of pixels in S (foreground pixels) 
+
+4 connectivity 4 path
+
+8 connectivity 8 path
+
+\subsection{Relations}
+\begin{itemize}
+    \item p is trivially connected to p (reflexive)
+    \item p is connected to q $\Longleftrightarrow$  q is connected to p (symmetric)
+    \item if p is connected to q and q is connected to r then p is connected to r (transitive)
+\end{itemize}
+
+A subset of pixels on S in which each pixel is connected to all other pixels in the subset.
+
+4 connected component
+
+8 connected component
+
+The connectivity relation partitions S into connected components
+
+Definition of a partition of a set S into components S1, S2 and S3
+
+\begin{itemize}
+\item $S_i = S$
+\item $S_i \cap S_j = \phi \forall \text{ i and j}$
+\end{itemize}
+
+\newpage
+\section{Image Segmentation}
+Let $\bar S$  = complement of S
+
+$\bar S =$ set of 0 - pixels $\because S$ is foreground
+
+The set of of all pixels connected components of $\bar S$ that gave some pixels on the image border are referred to as the background.
+
+The other components of $\bar S$  are referred as holes.
+
+Holes are semantically tied to the geometry of the object.
+
+(related to the object)
+
+Background is semantically not related to the object
+
+\subsection{Criteria/Caveat}
+\text{Different criteria need to be used for S and $\bar S$ in terms of connectivity}
+
+0 1 0 
+
+1 0 1
+
+0 1 0 
+
+4 4 connected comp in S
+
+
+$S\prime_{int}$ = $S' - S'_{boundary}$
+
+Surrounded / Contains Relation 
+
+A set of pixels T is  said to be surrounded a set of pixels S if a 4 path from any pixel of S to the image border must intersect T
+
+If T surrounds S then, S is contained in T
+
+
+\newpage
+\section{Connected Component Labelling}
+The process by which one assigns a unique label to to each of the connected components 
+
+Components in S
+
+Components in S 
+
+All the pixels within the same component will be assigned the same label
+\subsection{Recursive}
+\textbf{Recursive CCL Algorithm}
+\begin{itemize}
+\item Scan the image until an unlabelled 1 pixel is found and assign it a new label L.
+\item Assign recursively the label L to all of its neighbouring one pixels…
+\item Halt the recursion when no unlabelled 1 pixels are found .
+\item Repeat 1 to 3 until no more unlabelled one pixel are found 
+\end{itemize}
+
+
+\begin{unnote}
+    Check relation of CCL with flood fill
+\end{unnote} 
+\subsection{Iterative}
+
+Sequential
+
+\textbf{Iterative CCL Algorithm}
+
+Image Scan
+
+1. Raster Scan (left to right, top to bottom array scan)
+2. Serpentine Scan ( lawn mover scan)
+
+*4CC*
+
+1. *Raster scan the image*
+2. *If the given pixel p is a 1 pixel*
+    1. *if only of u or l has a label then assign that assign label to p*
+    2. *Both u and l have the same label then assign that label to p*
+    3. *pixel u and l have different labels then assign p the label of u and enter the two labels in an equivalence table*
+    4. *Create a new label and assign it to pixel p*
+    5. *Continue with the raster scan until no more un-labeled 1 pixel exist.* 
+3. *Raster scan the image and for each 1 pixel assign it a single unique label from its equivalence class.*
+
+\newpage
+\section{Boundary Extraction}
+Binary Image → CCL → Size Filtering
+
+Size Filtering
+
+Replace all components when area < t  with all other 0’ s 
+
+(below the size of smallest object or interests)
+
+ Euler Number
+
+Computed for various objects
+
+E = n.components - n.holes
+
+Boundary Extraction for a Component
+
+1. Perform a raster scan to find the starting pixel of that component 
+
+1. Current pixel $\leftarrow$ starting pixel
+
+b $\longleftarrow$ 4 neighbour to the west of current pixel
+
+1. Enumerate the 8 neighbour of current pixel starting with b in clockwise order. Let these be n1, n2 $\ldots$ n8 (where $n_1$ = b)
+
+
+1. Determine the smallest i such that $n_i$ belongs to the component
+
+1. Append the current pixel to the contour list (also called a boundary list)
+2. Update current $pixel = n_i b \leftarrow n_i-1$
+3. Repeat Step 3 to 6 until current pixel comes back to starting pixel 
+
+Boundary Properties
+
+1. Perimeter ( 8 connected )
+    1. Trace the boundary list
+    2. if the sucessive pixels are 4 neighbours add 1
+    3. if the successive pixels are diagonal neighbour add $\sqrt{2}$
+2. Compactness of the component
+    
+    $Compactness = Perimeter^2/Area$
+    
+    The smaller the compactness the more compact the object
+    
+    of all 2d shapes the circle has the smallest compactness → 
+    
+    $$
+    Circle = 4\pi^2 r^2 / \pi r^2
+    $$
+    
+
+\section{Skeletonization of a 2D Shape}
+
+\textbf{Activity Analysis} $\leftrightarrow$ \textbf{Animation}
+
+A 2D shape in the current case is represented as a \emph{binary component}.
+
+\subsection{Distance Measure Properties}
+
+A distance function $d(p,q)$ satisfies the following properties:
+
+\begin{itemize}
+\item \textbf{Non-negativity}
+\[
+d(p,q) \ge 0
+\]
+
+\item \textbf{Identity of indiscernibles}
+\[
+d(p,q) = 0 \iff p = q
+\]
+
+\item \textbf{Symmetry}
+\[
+d(p,q) = d(q,p)
+\]
+
+\item \textbf{Triangle inequality}
+\[
+d(p,r) \le d(p,q) + d(q,r)
+\]
+\end{itemize}
+
+\subsection{Distance Measures in a 2D Digital Image}
+
+Let
+\[
+p = (i_1, j_1), \quad q = (i_2, j_2)
+\]
+
+\subsubsection{Euclidean Distance}
+
+\[
+d_E(p,q) = \sqrt{(i_1 - i_2)^2 + (j_1 - j_2)^2}
+\]
+
+\subsubsection{Chessboard Distance}
+
+\[
+d_C(p,q) = \max \left( |i_1 - i_2|,\ |j_1 - j_2| \right)
+\]
+
+
+\subsection{Isodistance Contours}
+
+The geometric locust of all points (pixels) that are at a fixed distance from a given point (pixel)
+
+Euclidean distance contour is a circle 
+
+% Manhattan Distance 
+
+% Circle with a square in vertice at top  $D_e = $
+\newpage
+\section*{Skeletonization Cont.}
+The distance transform (DT) of all pixels in component S is the minimum values from the background $\bar S$ for each pixel in S. The distance transform DT image DT(i, j) gives the minimum distance of each pixel (i, j) from $\bar S$.
+\subsection{Distance Parallel Algorithm}
+\[DT^\circ (i, j) = B(i, j)\]
+\[DT^n (i, j) = DT^\circ + min (DT^{n-1}(u,v)\]
+
+(u,v) = set of pixels that $d((i,j), (u, v)) = 1$ unit neighbourhood of (i, j)
+
+d = euclidean, manhattan (u, v) = 4 neighbour of (i, j)
+
+d = chessboard 
+
+(u,v) = 8 neighbours of (i, j)
+
+Check for convergence at end $DT^n (i, j) \neq DT^{n-1}(i, j)$ (hence not converged)
+\subsection{Skeleton or the medial axis transform \textit{MAT(i, j)}}
+\begin{shaded}
+    \begin{equation}
+        \text{MAT}(i, j) = \begin{cases}   1, & \text{if } DT(i, j) \geq DT(u, v) \text{ for all } (u, v) \in N(i, j) \\   0, & \text{otherwise} \end{cases}
+    \end{equation}
+\end{shaded}
+
+\text{MAT}$(i, j) \longleftarrow$ \text{represents the skeleton of the original compound}.\\
+Given $MAT (i, j)$ and the $DT$ value for each non zero pixel in $MAT (i, j)$ then one reconstruct the original component (using reverse distance propagation).
+\\ \textbf{Halt} when, 
+\begin{shaded}
+    \begin{equation}
+        DT (i, j) = DT(i, j) ^{n-1} \ \forall \text{ i, j}
+    \end{equation}
+\end{shaded}
+\newpage
+
+\section{Region Analysis in Grayscale Images}
+
+\subsection{Formal Definition of image segmentation }
+Given an image I, compute a partition $R_1, R_2,...,R_n $ such that,
+
+\begin{shaded}
+    \begin{equation}
+        \bigcup_{i=1}^{n} R_i - \text{exhaustive}
+    \end{equation}
+    \begin{equation}
+        R_i \cap R_j = \phi \text{ if i and j } -\text{ mutually exclusive/nonoverlapping}
+    \end{equation}
+\end{shaded}
+    
+Let $P$ be a predicate that incorporates some homogeneity notion
+
+\begin{shaded}
+    \begin{equation}
+        P(R_i) = 1 
+    \end{equation}
+    \begin{equation}
+        P(R_i \cup R_j) = 0 \text{ for i } \neq \text{ j}  
+    \end{equation}
+\end{shaded}
+
+\begin{itemize}
+    \item The optimum partition is one for which n is the minimum. (partition into fewest regions) 
+    \item Homogeneity criteria needs to be quantified
+\end{itemize}
+
+
+    
+\subsection{Image Segmentation (Semantic Image Segmentation)}
+Partition the image into regions that correspond to distinct objects
+
+Assign semantic label to each region - semantic segmentation
+
+Two Approaches
+\begin{enumerate}
+    \item Region based segmentation ( similarity)
+    \begin{itemize}
+        \item Group together or cluster all pixels that belong to a single object - clustering
+    \end{itemize}
+    \item Edge Based Segmentation (dissimilarity)
+    \begin{itemize}
+        \item Detect edge pixels and construct region boundaries or region contours and identify regions - edge detector
+    \end{itemize}
+\end{enumerate}
+
+% -------------------------------------------------------------------
+
+\newpage
+\section{Modal Analysis}
+
+% -------------------------------------------------------------------
+
+\subsection{Iterative Threshold Selection}
+
+\begin{enumerate}
+    \item Determine an initial estimate for $T$ = avg of intensity values of the pixels in the image.
+    
+    \item Partition the image into two classes $R_1 \text{ and } R_2$ using $T$.
+    
+    \item Compute the mean gray levels $\mu_1 \text{ and } \mu_2$ of the pixels in 
+    $R_1 \text{ and } R_2$ respectively.
+\end{enumerate}
+
+\begin{shaded}
+\[
+T_{new} = \frac{\mu_1 + \mu_2}{2}
+\]
+\end{shaded}
+
+\begin{enumerate}
+    \setcounter{enumi}{3}
+    \item If $T_{new} = T$ halt else update $T \longleftarrow T_{new}$ and repeat step 2 to 4
+\end{enumerate}
+
+\begin{unnote}
+    For \textbf{step 4} we can also do
+\end{unnote}
+
+\[
+\alpha \cdot \mu_1 + \beta \cdot \mu_2
+\]
+\text{ where } $\alpha$ \text{ and } $\beta$ are the fraction of pixels in  
+$R_1 \text{ and } R_2$ $(\alpha + \beta) = 1$
+
+% -------------------------------------------------------------------
+
+\subsection{Non-Uniform Background (variable thresholding)}
+
+\begin{itemize}
+    \item Capture the variation in background intensity
+    \item Eliminate the variation in background intensity from the pixel values $\longrightarrow$ normalization
+    \item Threshold based on normalized pixel values
+\end{itemize}
+
+\textbf{Assumptions}
+
+\begin{enumerate}
+    \item Variation in background intensity values is systematic.
+    
+    \item Systematic Variation in background intensity values can be captured by a simple function. bilinear and biquadratic
+    
+    \item Assume that background pixels dominates the foreground pixels. Number of background pixels exceed the number of foreground pixels which essential employs that variation in image intensity values can be attributed to the variation in background intensity values
+\end{enumerate}
+
+% -------------------------------------------------------------------
+
+\subsection{Bilinear Regression}
+
+\begin{equation}
+\frac{1}{N^2}
+\sum_{x_i}
+\sum_{y_i}
+\vert F(x_i, y_i) - F'(x_i, y_i) \vert
+\end{equation}
+
+\newpage
+
+Compute the normalized pixel values
+
+\[
+F_n = F(x, y) - F'(x, y)
+\]
+
+Map $(F_n)_{min} \ldots (F_n)_{max} \implies (0, \text{max gray level})$
+
+use iterative thresholding to threshold the normalized image
+
+% -------------------------------------------------------------------
+
+\subsection{Model Fitting}
+
+\begin{equation}
+F_L(x,y) = Ax + By
+\end{equation}
+\begin{center}
+linear
+\end{center}
+
+\begin{equation}
+Q(x, y) = Ax^2 + Bxy + Cy^2 + Dx + Ey + F
+\end{equation}
+\begin{center}
+biquadratic
+\end{center}
+
+\begin{equation}
+R(x,y) = Ax^3 + Bx^2 + Cxy^2 + Dy^3 + Ex^2 + Fxy + Gy^2 + Hx + Iy + J
+\end{equation}
+\begin{center}
+bicubic
+\end{center}
+
+As the number of coeff increases so does the computational complexity increases.
+
+\begin{enumerate}
+    \item Pro's
+    \begin{itemize}
+        \item Less fitting error (higher fitting accuracy)
+    \end{itemize}
+    
+    \item Con's
+    \begin{itemize}
+        \item Computational complexity
+        \item overfitting
+    \end{itemize}
+\end{enumerate}
+
+
+\newpage
+\section{Adaptive thresholding}
+\begin{enumerate}
+    \item Divivde the image into sub images
+    \item Perform thresholding independently in each of subimage (eg iterative thresholding)
+    \item Combine the threshold results.
+\end{enumerate}
+
+Resulting mosiac image will have inconsistency (artifacts).
+
+\pgfplotsset{compat=1.18}
+\begin{tikzpicture}
+\begin{axis}[
+    width=15cm,
+    height=7cm,
+    xmin=0, xmax=10,
+    ymin=0,
+    axis lines=left,
+    xtick=\empty,
+    ytick=\empty,
+    samples=300,
+    domain=0:10,
+]
+
+% --- Red distribution (left, higher)
+\addplot[
+    red,
+    very thick
+]
+{
+    0.12
+    + 1.6*exp(-((x-3.0)^2)/1.2)
+};
+
+% --- Blue distribution (right, slightly lower)
+\addplot[
+    blue,
+    very thick
+]
+{
+    0.12
+    + 1.2*exp(-((x-6.2)^2)/1.4)
+};
+
+% --- Decision boundary
+\addplot[
+    red,
+    thick
+]
+coordinates {(4.7,0) (4.7,2.2)};
+
+% --- Misclassified region (red side)
+\addplot[
+    red,
+    opacity=0.25,
+    fill=red,
+    draw=none,
+    domain=4.7:6.0
+]
+{
+    0.12
+    + 1.6*exp(-((x-3.0)^2)/1.2)
+} \closedcycle;
+
+% --- Misclassified region (blue side)
+\addplot[
+    blue,
+    opacity=0.25,
+    fill=blue,
+    draw=none,
+    domain=3.5:4.7
+]
+{
+    0.12
+    + 1.2*exp(-((x-6.2)^2)/1.4)
+} \closedcycle;
+
+\end{axis}
+\end{tikzpicture}
+
+\section{Combine histogram with partial information}
+\subsection{Dual threhsolding with region growing}
+\section*{Algorithm}
+\begin{enumerate}
+    \item Select threshold $T_1$ and $T_2$
+    \item Parititon the image into 3 pixel classes \\
+    $R_1 \longleftarrow$ graylevel $\le T_1$ - guarantee  foreground pixel \\
+    $R_2 \longleftarrow$ graylevel $\ge T_2$ - guarantee  background pixel \\
+    $R_3 \longleftarrow$ $T_1 < $\ graylevel $< T_2$ - could be either foreground or background
+    \item Visit each pixel in class $R_3$. If the pixel has a neighbour  in class $R_1$ then reassign that pixel to $R_1$
+    \item Repeat step 3 until no more $R_3$ pixels are reassigned.
+\end{enumerate}
+
+Tries to reduce the \textbf{misclassification} by using spatial coherence
+
+\newpage
+\section{Region Representation Schemes}
+\begin{unnote}
+    Not an Exhuastive List 
+\end{unnote}
+
+\begin{enumerate}
+
+    \item \textbf{Array representations}
+    
+    \begin{itemize}
+    
+        \item \textbf{Label Array Representation}
+        
+        \begin{equation}
+        L(i, j) = \alpha 
+        \text{ if pixel } (i, j) \text{ in image } I(i, j) 
+        \text{ has the label } \alpha 
+        \text{ belongs to region with label } \alpha
+        \end{equation}
+        
+        
+        \item \textbf{Bitmap Representation}
+        
+        Each label $\alpha$ has an associated bitmap $\beta^{\alpha}$ defined as
+        
+        \begin{equation}
+        \beta^{\alpha}(i,j) =
+        \begin{cases}
+        1 & \text{if pixel } (i,j) \text{ in image } I \text{ belongs to class } \alpha, \\
+        0 & \text{otherwise.}
+        \end{cases}
+        \end{equation}
+        
+        The bitmap $\beta^{\alpha}$ is referred to as the \textit{mask} for class $\alpha$.
+    
+    \end{itemize}
+
+    \item \textbf{Hierarchical Representation} \\
+    Represent image and regions at multiple levels of representations.
+    \begin{itemize}
+        \item Fine analysis at higher resolution (detached)
+        \item Coarse Analysis at lower resolution
+    \end{itemize}
+    
+    Only a subset of the image is analyzed at higher resolution - \textbf{Focus of Attention} (FOA) \\
+    FOA is Dynamic 
+    \begin{itemize}
+        \item \textbf{Image Pyramid}
+        % \item 
+    \end{itemize}
+\end{enumerate}
+
+\begin{center}
+\begin{tikzpicture}[
+    level/.style={draw, minimum width=3cm, minimum height=3cm},
+    smalllevel/.style={draw, minimum width=2cm, minimum height=2cm},
+    tiny/.style={draw, minimum width=1.4cm, minimum height=1.4cm}
+]
+
+% Base
+\node[level] (base) at (0,0) {};
+\node at (0,-2) {$N = 2^n$};
+\node[right=1.2cm of base] {$N$ -- Pyramid base};
+
+% Middle level
+\node[smalllevel] (mid) at (0,5) {};
+\node[right=1.2cm of mid] {$2^{n-1}$};
+
+% Top level
+\node[tiny] (top) at (0,8) {};
+\node[right=1.2cm of top] {$2^{n-2} = \dfrac{N}{4}$};
+
+% Vertical arrows
+\draw[->, thick] (base.north) -- (mid.south);
+\draw[->, thick] (mid.north) -- (top.south);
+% \draw[->, thin] (mid.east) -- (mid.west);
+% Averaging function
+\node at (5,4) (avg) {Averaging function};
+
+\draw[->] (mid.east) -- (avg.west);
+
+% Branch
+\node at (9,5) (simple) {simple average};
+\node at (9,3) (weighted) {weighted average};
+
+\draw[->] (avg.east) -- (simple.west);
+\draw[->] (avg.east) -- (weighted.west);
+
+\end{tikzpicture}
+\end{center}
+
+
+\newpage
+\section{QuadTree}
+Each node has 4 children or no children (leafnode)
+
+Roof node represents the entire image\\
+A leaf node in the quad tree represents homogenous region otherwise the node is split into 4 child nodes
+\section*{OctTree}
+3-Dimensional representations
+
+\section{Picture tree}
+\begin{itemize}
+    \item leaf node represent a homogenous region
+    \item a non leaf node is split into child nodes based on containment
+    \item not a regular structure unlike quad and oct tree
+\end{itemize}
+
+\section{Region Adjacency Graph (RAG)}
+Scene Graph (RAG is more specialized variant)
+
+\begin{itemize}
+    \item Nodes: Represent Regions
+    \item Arcs: Represent Common Boundary between two regions
+\end{itemize}
+
+\begin{unnote}
+    Nodes and Arc possess attributes
+\end{unnote} 
+Node Attributes: Region Attributes
+\begin{itemize}
+    \item Geometric Attributes/Features
+    \item Spectral Attributes (avg gray level, texture, color etc \ldots)
+\end{itemize}
+
+ARC Attributes: Contour Attributes
+\begin{itemize}
+    \item 
+    \item 
+\end{itemize}
+
+\newpage
+\section*{RAG Generation}
+Given a label array $L(i,j)$ one can generate an RAG
+\begin{enumerate}
+    \item Raster Scan the L(i,j)
+    \item Consider pixel (i,j)
+    \begin{itemize}
+        \item If node with label L(i,j) exists then update the node in the RAG to include pixel(i, j)
+        \item else create a new node with label L(i, j) consisting of pixel (i, j)
+    \end{itemize}
+    \item Examine the neighbour pixel (i,j)
+    \begin{itemize}
+        \item if an arc exists between (i, j) and its neighbours region then update it
+        \item else create a new arc
+    \end{itemize}
+    \item Continue with raster scan until all pixels are exhausted
+\end{enumerate}
+
+
+Given the bitmaps $B^\alpha$ (i, j)
+\begin{enumerate}
+    \item Determine the connected components of $B^\alpha(i,j)$ for each $\alpha$
+    \item Create a node for each connected component for all $\alpha$
+    \item Trace the boundary of each cc to generate the arcs between the nodes
+\end{enumerate}
+
+\section{Over Segmentated Image}
+Need to start with a over segmented image because otherwise you will end up improper merge
+\ldots
+
+\section{Merge based segmentation}
+
+Over segment the image\\
+Create initial RAG for the over segmented image\\
+visit each node in the RAG\\
+a. conside the adjacent nodes\\
+b. if the current node and its adjacent node satisfies the merge criteria then merge the nodes and update RAG\\
+4. Repeat Step 4 unitl no more merges are possible
+
+\section{Node Selection}
+- Random selection of the node\\
+- Order the nodes based on same criterion and select the best node
+"best" node - longest region (smallest region) \\ 
+- list of all pairs of adjacent nodes and select the best pair for merging
+
+\section{Mean Based}
+Boundary Contrast Based, Variance Based or Mean Based \\
+$\vert \mu_i - \mu_j \vert$
+
+% -------------------------------------------------------------------
+
+\newpage
+\section{Split and Merge Segmentation using RAG}
+
+% -------------------------------------------------------------------
+
+\subsection*{Merge Algorithm Parameters}
+
+\begin{itemize}
+    \item Selection of nodes for merging
+    \item Merge Criterion
+    \item Stating point over segmented image
+    \item An improper merge cannot be undone
+\end{itemize}
+
+% -------------------------------------------------------------------
+
+\subsection*{Split Based Algorithm}
+
+\begin{enumerate}
+    \item Start with an initial RAG
+    \item Consider a node for splitting
+    \item If the node satisfies the split criterion then split it and update RAG
+    \item Perform steps 2 and 3 until no more splits are possible
+\end{enumerate}
+
+\begin{itemize}
+    \item Initial RAG - Undersegmented Image
+    \item Undersegmented Image - Binary Thresholding + CCL
+\end{itemize}
+
+% -------------------------------------------------------------------
+
+\subsection*{Splitting Criteria for a node}
+
+\begin{itemize}
+    \item Variance test performed in the pixels within the region/component/node
+    
+    \item how to split a node
+    \begin{itemize}
+        \item edge detection within region
+        \item contour following
+        \item split the region along the contours
+        \item split the region along predefined boundary (quad tree)
+    \end{itemize}
+\end{itemize}
+
+approxmiate the region by fitting to a func \\
+(homogeneity test) low mean square error then good fit
+
+% -------------------------------------------------------------------
+
+\section*{Parameters}
+
+\begin{itemize}
+    \item splitting criterion
+    \begin{itemize}
+        \item[-] Variance test
+        \item[-] Function Fitting test (bi linear and quadratic)
+    \end{itemize}
+    
+    \item Avg Fitting error
+    \item Pixels where fitting error $\gg$ avg fitting error
+    \item[-] Candidate along which to split the region
+    \item[-] Where to split the region
+    \item[-] Node Selection
+\end{itemize}
+
+Split where the fit error is higher (not only tells when not to split but also where to split)
+
+% -------------------------------------------------------------------
+
+\subsection*{Combined Split and Merge Algorithm}
+
+\begin{enumerate}
+    \item Start with an initial RAG
+    \item Go through a split phase
+    \item[-] Select a node that satisfies the split criterion and split it and update RAG.
+    \item Merge Phase
+    \item[-] Select a pair of adjacent node
+    \item[-] If they satisfy the merge criteria, then merge them and update the RAG
+    \item Perform the split and merge phase alternatively
+    \item Halt when no more splits or merge are possible
+\end{enumerate}
+
+Maintain a list of previously visited $k$ solution states
+
+if the current split/merge results in a previously visited state then reject it and select another node
+
+% tabu list
+
+% \newpage
+% \begin{equation}
+%     \hat \nabla \mathcal{L} = \frac{\mathcal{L}(\theta + \epsilon\cdot z)-\mathcal{L}(\theta - \epsilon\cdot z)}{\epsilon}
+% \end{equation}
+
+\newpage
+\section{Iterative Model Fitting (segmentation Technique) with Region Growing}
+
+% Basic Premise 
+
+\subsection*{Basic Premise}
+
+\begin{enumerate}
+    \item Segmented image can be modeled as a partition of regions approximated by a parametric function 
+    (constant, bilinear, biquadratic, bicubic).
+
+    \item Fitting a function:
+    \[
+    f = f(x, y, a, m) = \sum_{i+j \le m} a_{ij} x^i y^j
+    \]
+
+    \item[] where $x, y$ are variables and $a, m$ are parameters.
+
+    \item For a bilinear fit:
+    \[
+    f(x, y) = a_{00} + a_{10}x + a_{01}y + a_{20}x^2 + a_{02}y^2 + a_{11}xy
+    \]
+\end{enumerate}
+
+\subsection*{Fitting Error}
+
+The fitting error over a region $R$ is defined as:
+\begin{shaded}
+\begin{equation}
+X^2(R, a, m) 
+= \sum_{(x,y)\in R} 
+\left[ F(x, y) - f(x, y, a, m) \right]^2
+\end{equation}
+\noindent
+where $F(x, y)$ is the image intensity function.
+\vspace{0.3cm}
+
+For a given region $R$, determine the coefficients $a$ and model order $m$ that minimize the error $X^2$.
+
+\end{shaded}
+
+
+% -------------------------------------------------------------------
+
+\section*{Algorithm}
+
+\begin{enumerate}
+    \item Determine seed regions in the image — the most homogeneous core of each region.
+    
+    \begin{itemize}
+        \item Use a $5 \times 5$ or $7 \times 7$ window.
+        \item Perform a bilinear fit and compute the fitting error.
+        \item Select the center of the window where the error is $< T_1$.
+    \end{itemize}
+
+    \item For each seed region, perform the following:
+
+    \begin{enumerate}
+        \item[(a)] For a given model order, expand the current window (region growing) 
+        while keeping the same \underline{\textbf{$a$}} and \underline{\textbf{$m$}}. 
+        Compute the fitting error (model extrapolation).
+        
+        \begin{itemize}
+            \item Repeat step (a) until the fitting error $> T_2$.
+        \end{itemize}
+
+        \item[(b)] Refit using the same $m$ to obtain a new $a$, then repeat step (a). 
+        
+        If the refitting error $> T_3$, increase the model order and repeat.
+
+        \item[(c)] Repeat steps (a) and (b) until the maximum model order is reached.
+    \end{enumerate}
+\end{enumerate}
+
+
+\newpage
+\section{Edge Detection}
+
+\textbf{Edge} \\
+Location of \textbf{significant change} (rate of change) in a local image property.
+
+\medskip
+\noindent \textbf{Local Image Properties}
+\begin{itemize}
+    \item Gray level
+    \item Color
+    \item Texture
+    \item Motion
+\end{itemize}
+
+\subsection*{Basic Concept}
+
+Edges correspond to large derivatives (rates of change).
+
+\[
+f(t) - \frac{df(t)}{dt}
+\]
+
+\subsection*{Signal and Noise Model}
+
+\[
+f_{\circ}(t) = f(t) + n(t)
+\]
+
+\[
+\frac{df_{\circ}(t)}{dt} = \frac{df(t)}{dt} + \frac{dn(t)}{dt}
+\]
+
+\subsection*{Sinusoidal Example}
+
+\[
+f(t) = A_s \sin(2\pi f_s t)
+\]
+
+\[
+n(t) = A_n \sin(2\pi f_n t)
+\]
+
+\[
+f_{\circ}(t) = A_s \sin(2\pi f_s t) + A_n \sin(2\pi f_n t)
+\]
+
+where 
+\[
+f_n \gg f_s
+\]
+
+\subsection*{Signal-to-Noise Ratio}
+
+\[
+SNR = \frac{A_s^2}{A_n^2}
+\]
+
+\subsection*{Noise and Smoothing}
+
+Change detection is inherently noisy. Edge detectors are usually preceded by smoothing.
+
+\subsection*{Noise Averaging}
+
+Noise samples: 
+\[
+n_1, n_2, \ldots, n_k
+\]
+
+Noise power: 
+\[
+\sigma^2
+\]
+
+Variance of each sample: 
+\[
+Var(n_i) = \sigma^2
+\]
+
+Average noise: 
+\[
+n_s = \frac{n_1 + n_2 + \ldots + n_k}{k}
+\]
+
+Variance after averaging:
+\[
+Var(n_s) = \frac{\sigma^2}{k}
+\]
+
+\subsection*{Key Insight}
+
+Smoothing (averaging) reduces noise variance and improves edge detection.
+
+
+\section{Averaging Filter}
+\[
+I_{s} (i, j) = \sum_{l = -\frac{\mathcal{M} - 1}{1}}^{\frac{\mathcal{M} - 1}{1}}
+\]
+
+For a smoothing filter
+
+\begin{itemize}
+    \item [A.] $W(k,l) = 0$
+    \item [B.] $\sum \sum w(k, l) = 1$
+\end{itemize}
+
+
+
+Given Images $I_1, I_2$ and filter $W$ of size $M\times M$ where $M$ is odd.
+
+\[
+I_{1S} (i, j) = \sum_{k,l=+}^{k,l=-}\sum_{\frac{\mathcal{M} - 1}{2}}^{\frac{\mathcal{M} - 1}{2}}W(k,l) I_1 (i+k, j+k)
+\]
+
+corrected:
+
+\[
+I_{1S}(i,j) = \sum_{k=-\frac{M-1}{2}}^{\frac{M-1}{2}}
+\sum_{l=-\frac{M-1}{2}}^{\frac{M-1}{2}}
+W(k,l)\, I_1(i+k, j+l)
+\]
+
+\[
+= W \circledast I_1
+\]
+
+
+
+
+
+
+Given Images $I_1, I_2$ and filter $W$ of size $M\times M$ where $M$ is odd.
+
+\[
+I_{1S} (i, j) = \sum_{k,l=+}^{k,l=-}\sum_{\frac{\mathcal{M} - 1}{2}}^{\frac{\mathcal{M} - 1}{2}}W(k,l) I_1 (i+k, j+k)
+\]
+
+corrected:
+
+\[
+I_{1S}(i,j) = \sum_{k=-\frac{M-1}{2}}^{\frac{M-1}{2}}
+\sum_{l=-\frac{M-1}{2}}^{\frac{M-1}{2}}
+W(k,l)\, I_1(i+k, j+l)
+\]
+
+\[
+= W \circledast I_1
+\]
+
+
+
+
+
+Key Insight:
+Smoothing Filter is a linear operator.
+
+\section{Noise}
+Guassian Noise can be smoothed out by convolution filter
+
+Blurring is essentially uncertainty localization.
+
+\subsection{Salt and Pepper Noise (outlines noise)}
+
+Noise takes 2 values
+
+\begin{itemize}
+    \item[-] Min 0 (pepper)
+    \item[-] Max 1 (salt)
+\end{itemize}
+
+
+
+\begin{align}
+I(i,j) &= \min && \text{with probability } p, \\
+I(i,j) &= \max && \text{with probability } g, \\
+I(i,j) &= I(i,j) && \text{with probability (unchanged)} 1-p-g
+\end{align}
+
+\begin{myunnote}
+Look into rank order filter and median filter for salt and pepper
+\end{myunnote}
+
+\section{Guassian Smoothing Filters}
+Looking at 1 D Filters
+\[
+G(\sigma, x) = \frac{1}{\sigma\sqrt{2\pi}} \cdot e^{\frac{-x^2}{2\sigma^2}}
+\]
+
+\section*{Normalization Property}
+
+\[
+\int_{-\infty}^{+\infty} G(x; \sigma)\, dx = 1
+\]
+
+\section*{Probability Mass Condition}
+
+\[
+\int_{-\infty}^{+\infty} G(x; \sigma)\, dx \ge 0.99
+\]
+
+Sample $G(x; \sigma)$ within $[-3\sigma, +3\sigma]$
+
+Compute the values in the range $[0, +3\sigma]$ and determine the values $[-3\sigma, 0]$ by Symmetry.
+
+
+\begin{myunnote}
+    How to resolve 
+
+\end{myunnote}
+
+\subsection*{How to deal with discretization errors and truncation?}
+
+Normalize the weights and (1, dividing by the sum of the raw weights)
+
+\[(-3\sigma, +3 \sigma) \longrightarrow \text{Mass size of }(6\sigma+1)\]
+
+% \begin{figure}[htbp]
+%     \centering
+%     % First Image
+%     \begin{minipage}{0.31\textwidth}
+%         \centering
+%         \includegraphics[width=\textwidth]{figures/IMG_6511.png}
+%         \caption{Gaussian Kernels}
+%     \end{minipage}
+%     \hfill
+%     % Second Image
+%     \begin{minipage}{0.31\textwidth}
+%         \centering
+%         \includegraphics[width=\textwidth]{figures/IMG_6512_top.png}
+%         \caption{Step Edge $I(x)$}
+%     \end{minipage}
+%     \hfill
+%     % Third Image
+%     \begin{minipage}{0.31\textwidth}
+%         \centering
+%         \includegraphics[width=\textwidth]{figures/IMG_6512_bottom.png}
+%         \caption{Convolved Signal}
+%     \end{minipage}
+% \end{figure}
+
+
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 26 Feb, 2026, 14:50 PM}  
+\begin{equation}
+\begin{aligned}
+G(x, y, \sigma) &= \frac{1}{2\pi\sigma^2}\mathrm{e}^{\frac{-(x^2+y^2)}{2\sigma^2}} \\
+G(\delta, \theta, \sigma) &= \frac{1}{2\pi\sigma^2}\mathrm{e}^{\frac{-(\delta^2)}{2\sigma^2}}
+\quad \longleftarrow \textbf{Independent of }\theta
+\end{aligned}
+\end{equation}
+
+\textbf{Gaussian Filtering in 2D:}  
+
+- Truncate \\
+- Normalize  
+
+\[
+\int_{-\infty}^{\infty} G(x, y, \sigma)\, dx\, dy
+\]
+
+\textbf{Computational complexity:}  
+
+- $O(M^2)$ operations at each pixel location $(i, j)$  \\
+- $O(M^2 N^2)$ overall complexity for the entire image
+
+Sequential application of 1D convolve operations (essentialy a 2d convolution operation)
+\begin{equation}
+\begin{aligned}
+I(x,y) \circledast G(x, y) &= I(x,y) \circledast \underbrace{(G(x,\sigma) G(y,\sigma))} \\
+&= (I(x,y) \circledast G(x,\sigma))\circledast G(y, \sigma)
+\end{aligned}
+\end{equation}
+
+\[
+G(x, \sigma) = G^{\mathit{T}}(y, \sigma)
+\]
+
+
+Conisder a linear smoothing filter of a given size $(M\times M)$
+
+\begin{itemize}
+    \item[-] High SNR
+    \item[-] Low Edge Dislocation error $\in$ proportional to the edge localization confidence interval
+    \[
+    \textbf{Figure of merit} = \frac{SNR}{\in}
+    \]
+\end{itemize}
+
+Gaussian Filter maximizes the figure of merit
+best noise reduction with the least Dislocation error
+$7*7$
+
+Gaussian smoothing filter of Size M*M optimizers the figure of merit compared to all other smoothing filters of size M*M
+
+\newpage
+\pagestyle{plain}
+
+
+Edge - Significant local change in an image property
+
+Image property - gray level, color, texture, Motion
+
+Significant Local Changes - Noise
+
+3D Scene -> Object Boundaries -> 3D surface discontinuity 
+
+2D Image -> local change in image property (gray level)
+
+Shadowing is an illuminating artifacts
+
+\[
+\text{Operating Hypothesis} = \begin{cases}
+    \text{3D surface discontinuity} \\
+    \text{local change in image property (gray level)}
+\end{cases}
+\]
+
+Definition
+
+\begin{itemize}
+    \item Edge Point - Pixel/point in the image that signifies significant local change in the image
+    \item  Edge Fragment - Edge pixel/point + the local orientation/direction of the significant change
+\end{itemize}
+
+Edge -> Edge Pixels and Edge Fragment
+
+Edge Detector 
+Algorithm that produces a set of edge given an input image
+
+Involves convolution with a edge detector mask.
+
+Edge Contour 
+
+(ordered) list of edge pixel/edge fragments - enumeration 
+mathematical expresion describing the contour - analytical
+
+fitting and endering 
+
+Edge Linking -> To generate an ordered list of Edges from an unordered list
+
+
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 03 March, 2026, 14:50 PM}  
+
+Gradient of $F(x,y) = \hat{i} + \frac{\delta F(x,y)}{\delta x} + \hat{j} + \frac{\delta F(x,y)}{\delta y}$
+
+$\hat{i}$ and $\hat{j}$ are unit vectors along the x and y axis.
+
+\begin{equation}
+    \vert F(x,y)\vert = \sqrt{[\frac{\delta F(x,y)^2}{\delta x}]+[\frac{\delta F(x,y)^2}{\delta y}]}
+    \tan \theta = [\frac{\frac{\delta F(x,y)}{\delta y}}{\frac{\delta F(x,y)}{\delta x}}]
+\end{equation}
+
+Manhattan Approximation to the gradient magnitude
+
+\[
+\left| F(x, y) \right|_{M}
+=
+\left| \frac{\delta F(x,y)}{\delta x} \right|
++
+\left| \frac{\delta F(x,y)}{\delta y} \right|
+\]
+
+\[
+\text{Discrete Approximation}
+\]
+
+\[
+\theta = \tan^{-1}\!\left(\frac{V_y}{V_x}\right)
+\]
+
+\[
+\frac{\delta F(x,y)}{\delta x} \approx F(i, j+1) - F(i, j) \longrightarrow \text{ j - x direction}
+\]
+\[
+\frac{\delta F(x,y)}{\delta y} \approx F(i, j) - F(i+1, j) \longrightarrow \text{ i - y direction}
+\]
+
+Gradeint Orientation Image
+
+\[
+I(i,j) \circledast G_x = I_{gx}(i,j)
+\]
+
+\[
+I(i,j) \circledast G_y  = I_{gy}(i,j)
+\]
+
+\begin{equation}
+    \begin{aligned}
+        G_{\theta}(i, j) &= \tan^{-1} \left[I_{gy}(i,j)/I_{gx}(i,j)\right]\\
+        G_x &= \underbrace{F(i, j+1) - F(i, j)}_{i, \frac{j+1}{2}}\\
+        G_y &= \underbrace{F(i, j) - F(i+1, j)}_{\frac{i+1}{2}, j}
+    \end{aligned} 
+\end{equation}
+
+Gradient Magnitude Image
+\[
+G_{mag} (i,j) = \sqrt{I_{gx}^{2}(i,j) + I_{gy}^{2}(i,j)}  \approx \left|I_{gx}(i,j)\right| + \left|I_{gy}(i,j)\right|
+\]
+
+The weights should add up to 0 (gradient smoothing filter)
+\newpage
+\section{Steps in Edge Detection}
+
+\begin{enumerate}
+    \item Filtering/smoothing for noise removal
+    \item[-] Median Filtering followed by Gaussian Smoothing
+    \item Enhancement
+    \item[-] emphasize pixels that characterize significant local change in image intensity (or any image property)
+    \item[-] Image Gradient computation is one way of enhancement
+    \item Detection
+    \item[-] Select the enhanced pixels that represent edge pixels
+    \item[-] classification problem $\underbrace{\text{thresholding is a simple option}}_{\text{local maxima detection}}$
+    \item[] Localization 
+    \item[-] Estimate the position and Orientation of the edge pixel (edge deblurring) 
+\end{enumerate}
+
+\section{Edge operators for Image Enhancement}
+\begin{enumerate}
+    \item Roberts Operator
+    \item Prewitt Operator
+    \item Sobel Operator
+\end{enumerate}
+
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 04 March, 2026, 14:50 PM}  
+
+
+\begin{equation}
+    \begin{aligned}
+    I \circledast S_x &= I_{sx}\\
+    I \circledast S_y &= I_{sy} \\
+    \text{ magnitude image} &= \sqrt{I_{sx}^2 + I_{sy}^2}
+\end{aligned}
+\end{equation}
+
+
+\section{Gradient Operators - 1st derivative operator}
+
+Technique A
+
+
+\begin{itemize}
+  \item Convolve image with the operator
+  \item Computer the gradient magnitude operator
+  \item Threshold the gradient magnitude image gmi
+  \item Output the resulting binary image
+\end{itemize}
+
+Resulting edge would be thicker (multi pixel edge contours)
+
+Thats the issue (simple thresholding)
+
+Ideally want one pixel wide (crisp contour)
+
+Loose localization precision
+
+need to do edge thinning or edge Skeletonization
+
+local maxima based approach
+
+noisy edges 
+
+local maxima
+
+
+For a step edge (for a first derivative)
+
+0 crossing to pixel with smaller abs value 
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 17 March, 2026, 14:50 PM}  
+
+\newpage
+Second order derivatives is more noise sensitive than the laplacian
+
+gradient (first order derivative) $\longleftarrow$ the signal/image needs to be smoothed (Gaussian Smoothing)
+
+Laplacian of Gaussian (LoG) edge operator $\equiv$ Gaussian Smoothing of the image + laplacian computation
+
+Two Techniques for implementing the LoG operator
+Technique 1:\\
+- Smooth the image I(i, j) with the Guassian Operator 
+\[
+    G(i, j, \sigma) = \frac{1}{2\pi\sigma^2} \epsilon^\frac{-(i^2+j^2)}{2\sigma^2} 
+\]
+to generate $I_s(i, j)$
+
+Convolve $I_s(i,j)$ with the laplacian operator 
+
+\[
+\nabla^2(i, j) \text{ or } L(i, j)
+\]
+ 
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 18 March, 2026, 14:50 PM}  
+
+Lower Slope Gentler 0 crossing
+
+
+Range of persistance
+
+Properties of scale space
+\begin{itemize}
+    \item  An edge detected for $\sigma = \sigma_i$ will also be detected for all values of $\sigma\ge\sigma_i$.
+    \item  An edge detected at coarse scale (large sigma value) cannot disappear at a finer scale - principle of causiality in scale space.
+    \item  
+    \item 
+\end{itemize}
+
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 19 March, 2026, 15:02 PM}  
+
+Recap: LoG Edge Vector
+
+Value of simga is critical
+
+Sigma is small (fine scale) implies noisy edges and true edges are accurately localised (no shape distortion)
+
+
+Although an edge may be visible over a range of $\sigma$ values, the edge gets dislocated at higher $\sigma$ values - particularly noticeable at corners.
+
+
+
+Multiscale LoG Detection 
+
+
+
+Let simga = sigma not where simga not is large enough to supress the noisy edge pixels but not eliminate the true edge pixels domain knowledge 
+
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 24 March, 2026, 15:04 PM}  
+
+Edge Detector (become the bechmark)
+
+Canny Edge Detector (Gradient Computation)
+
+Input Image: $I(i, j)$
+\[
+S(i,j) = G(i, j, \sigma) \circleddash I(i, j) \text{Gaussian Smoothing}
+\]
+
+Gradient Computation
+
+\begin{equation}
+    \begin{aligned}
+        P(i, j) &= \nabla_x S(i,j) = \frac{1}{2}\left\{S(i, j+1)- S(i, j) + S(i+1, j+1)- S(i+1, j)\right\} 
+    \end{aligned}
+\end{equation}
+
+
+Gradient Magnitude Image:
+
+Deblurring Direction Sensitive
+
+Maintain the effect of Gaussian Smoothing along the edge contours but \\ $\underbrace{deblur}_{\text{undo the effect of Gaussian Smoothing}}$ the edge across the edge contour.
+
+
+Across the contour $\equiv$ along the Gradient Direction 
+
+
+Deblurring the edges in the gradeint direction (non maxima suppression)
+
+Qunatize the gradient angle $\theta$ into 4 sectors
+
+
+Circle Image goes here 13pm 
+
+The non maxima supression deos deblurring along the gradient direciton ratinas the smoothing along the tangential direction.
+
+Result of NMS is thin edge along the gradent direction.
+
+Dual thresholding to remove noisy edge.
+
+Dual thresholding to remvoe noisy edges
+
+
+NMS -- threhold t1 t1(i,j) noisy edges but cloud
+
+Steps Gaussian Smoothing Noise removal
+Gradient COmpuation  
+Non maximum supression Deblurring along the gradient direciton
+
+edge following with dual thresholdong edge Linking
+
+\newpage
+\pagestyle{fancy} % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 25 March, 2026, 15:00 PM}
+
+\section*{Performance Evaluation}
+
+\subsection*{Performance Criteria}
+\begin{itemize}
+    \item Probability of false edge detection
+    \item Probability of missing true edges
+    \item Localization error (mean squared error)
+    \item Orientation error
+    \item Robustness to noise and other artifacts
+\end{itemize}
+
+\subsection*{Access to Ground Truth Data}
+\begin{itemize}
+    \item Reliability in restricted domains (synthetically or carefully generated datasets)
+    \item In unrestricted or loosely restricted domains:
+    \begin{itemize}
+        \item Crowdsourcing (with compensation)
+        \item Annotation bias
+        \item Demographics of annotators
+        \item Screening for incorrect or malicious annotations
+        \item Consensus-based annotation
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Synthetic Data}
+\begin{itemize}
+    \item Controlled generation environment
+\end{itemize}
+
+\subsection*{Figure of Merit (Pratt Figure of Merit)}
+
+\begin{equation}
+    \text{PFM} = \frac{1}{\max(I_A, I_I)} \sum_{i=1}^{I_A} \frac{1}{\alpha d_i^2 + 1}
+\end{equation}
+
+\noindent
+$ I_A $: Number of detected edge points \\
+$ I_I $: Number of ideal (ground truth) edge points \\
+$ d_i $: Distance between detected edge and corresponding ground truth edge \\
+$ \alpha $: Scaling constant
+
+
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 26 March, 2026, 14:55 PM}  
+
+Contour Analysis
+
+Edge pixels are linked to generate continous contours object boundaries (shape features)
+
+Contour Representation Criteria 
+
+Simplicity 
+
+\begin{definition}
+\textbf{Edge List:} An ordered set of edge pixels or fragments.
+
+\textbf{Boundary:} A closed contour that surrounds a region.
+
+\textbf{Contour:} An edge list representation that can be used for:
+\begin{itemize}
+    \item \textit{Enumerative representation} (rendering)
+    \item \textit{Analytical representation} (analysis, capturing geometry)
+\end{itemize}
+\end{definition}
+
+
+\begin{equation}
+    (x-a)^2 + (y-b)^2 = r^2 \\ \text{draw a doorted circle with centre as a,b and length r}
+\end{equation}
+
+
+\newpage
+
+\section{Curve Geometry}
+
+\newpage
+
+Let $\bar p_1 = (x(u_1) y(u1))$ $\bar p_2 = (x(u_2) y(u_e))$
+
+\begin{equation}
+    \bar n(u) = \frac{\frac{d}{du}t(u)}{\vert \frac{d}{du}t(u)\vert}
+\end{equation}
+
+\subsection{Local Curvature}
+
+\begin{equation}
+    \kappa(u) = \text{local curvature of the curve at p(x)}
+\end{equation}
+
+Consider 3 non colinear points
+
+\begin{equation}
+    \begin{aligned}
+        p(u-\delta u)\\
+        p(u)\\
+        p(u+\delta u)
+    \end{aligned}
+\end{equation}
+
+construct a circle passing through 3 points and curve passing through 3 points
+
+$R(\bar P)$ be the radiuys of the the circle 
+
+
+\begin{equation}
+    \kappa(p(u)) = \lim_{\delta u \rightarrow 0}\frac{1}{R(\bar P)}
+\end{equation}
+
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[scale=1.5, >=stealth]
+        \draw[thick, blue] plot [smooth, tension=1] coordinates {(-1,0) (1,0.5) (3,0)};
+        \node[blue] at (4.2, 0) {Curve};
+
+        \coordinate (P1) at (0.2, 0.28);
+        \coordinate (P2) at (1, 0.5);
+        \coordinate (P3) at (1.8, 0.35);
+
+        \draw[dashed, red] (1, -1.2) circle (1.7);
+        \node[red] at (2.5, -0.5) {Circle $R(\bar{P})$};
+
+        \filldraw (P1) circle (1.5pt) node[above left] {$p(u-\delta u)$};
+        \filldraw (P2) circle (1.5pt) node[above] {$p(u)$};
+        \filldraw (P3) circle (1.5pt) node[above right] {$p(u+\delta u)$};
+
+        \draw[->] (1, -1.2) -- (P2) node[midway, right] {$R$};
+        \filldraw (1, -1.2) circle (1pt) node[below] {Center};
+
+    \end{tikzpicture}
+    \caption{Geometric interpretation of local curvature via the osculating circle.}
+\end{figure}
+
+Discrete Curves 
+Ordered set of edge pixels $(x_1, y_1), (x_2, y_2) \ldots $
+
+Arc Length
+
+\begin{equation}
+    \begin{aligned}
+        \text{Arc Length } \bar S &= \sum_{min}^{max}
+    \end{aligned}
+\end{equation}
+
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 31 March, 2026, 14:55 PM}  
+
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 31 March, 2026, 14:55 PM}
+
+\section{Chain Code}
+
+\begin{equation}
+\{(x_0, y_0), \ldots, (x_n, y_n)\} \quad \text{M-pixel contour}
+\end{equation}
+
+% 3x3 neighborhood example:
+\[
+\begin{bmatrix}
+1 & 2 & 3 \\
+0 & P & 4 \\
+7 & 6 & 5
+\end{bmatrix}
+\]
+
+\[
+(x_0, y_0),\ 4,\ 3,\ 3,\ 5,\ 5,\ 6,\ \ldots
+\]
+
+Set of direction codes linking successive pixels along the contour.
+
+\subsection*{Bit Representation}
+
+For an $N \times N$ image:
+\[
+N = 2^n
+\]
+
+\[
+x, y \in \{0, \ldots, 2^n - 1\} \quad \Rightarrow \quad x, y \text{ require } n \text{ bits each}
+\]
+
+For an $M$-pixel contour:
+\[
+\text{Total bits} = 2n + 3(M - 1)
+\]
+
+\[
+\text{Raw representation} = 2 n M
+\]
+
+\[
+\Rightarrow \quad 2n + 3(M - 1) \ll 2 n M \text{ Also a lossless scheme for compression}
+\]
+
+\subsection*{Example}
+
+If $n = 10$ and $M = 1000$:
+\[
+2nM = 2 \cdot 10 \cdot 1000 = 2 \times 10^4
+\]
+
+\[
+2n + 3(M - 1) = 20 + 3(999) = 3017 \approx 3020 \text{ bits}
+\]
+
+\subsection*{Compression factor}
+
+\[
+\frac{2\cdot n\cdot m}{2n + 3(M-1)}
+\]
+
+As $M \to \infty$:
+\[
+\text{Compression factor} \approx \frac{3}{2n}
+\]
+
+Rotation of a closed contour about the centroid by $45 \cdot n^\circ$ (a multiple of $45^\circ$) is equivalent to:
+\[
+(\text{original chain code label} + n) \bmod 8 = \text{rotated chain code}.
+\]
+
+\subsection{First Difference Chain Code}
+
+The first difference chain code is obtained by computing the difference between successive elements of the chain code modulo 8.
+
+For example, if the chain code is:
+\[
+C_1, C_2, C_3, \ldots
+\]
+
+Then the first difference chain code is:
+\[
+(C_2 - C_1) \bmod 8,\quad (C_3 - C_2) \bmod 8,\ \ldots
+\]
+
+In general, the formula is:
+\[
+(C_i - C_{i-1}) \bmod 8.
+\]
+
+% 
+% Representation of closed contour in rotation invariant manner 
+
+% the first difference chain code would essentialy remain invariant since roation is just adding a constant.
+
+% Essentailly the FD chain rule is roation invariant contour signature.
+
+% Sample Implementation
+% Target Template
+% FD chain codes of model target
+
+% Query target shape - CCL - Boundary - extraction - chain code - fd chain code (fdcc)
+% How does starting point matter?
+
+% FDCC1 and FDCC2 (same shape just rotated and different starting location)
+
+% Cyclic permutation of a sequence
+
+
+% Loop through all the FD chain codes of model targets
+% Loop through all cyclic permutation of the query fd chain code
+
+
+% Compute the difference $Diff(FDCC_m-FDCC_q)$
+% FDCC_m C1m C2m C3m ... Cnm
+% FDCCq C1q C2q ... Cnq
+% | C1m - C1q| + |C2m -C2q| + ...
+% \underbrace above line and type Manhattan distance
+
+String Edit Distance - Insert Delete and Substitution
+%  older
+
+
+\section{Rotation-Invariant Representation of Closed Contours}
+
+A closed contour can be represented in a rotation-invariant manner using the \textbf{first difference chain code (FDCC)}.
+
+The first difference chain code remains invariant under rotation because rotation of the contour corresponds to adding a constant value to all elements of the chain code. When differences are computed modulo 8, this constant cancels out.
+
+Thus, the FDCC serves as a \textbf{rotation-invariant contour signature}.
+
+\subsection{Sample Implementation}
+
+\textbf{Target (Model):}  
+Compute and store the FD chain codes of model targets.
+
+\textbf{Query Shape Processing Pipeline:}
+\begin{itemize}
+    \item Connected Component Labeling (CCL)
+    \item Boundary extraction
+    \item Chain code generation
+    \item First difference chain code (FDCC) computation
+\end{itemize}
+
+\subsection{Effect of Starting Point}
+
+The starting point of the contour traversal affects the chain code representation.
+
+Even for the same shape (possibly rotated), two FDCCs:
+\[
+\text{FDCC}_1 \quad \text{and} \quad \text{FDCC}_2
+\]
+may differ due to different starting points.
+
+This results in a \textbf{cyclic permutation} of the sequence.
+
+\subsection{Matching Strategy}
+
+\begin{itemize}
+    \item Loop through all FD chain codes of model targets.
+    \item For the query FDCC, generate all cyclic permutations.
+    \item Compare each permutation with model FDCCs.
+\end{itemize}
+
+\subsection{Distance Measure}
+
+Let:
+\[
+\text{FDCC}_m = (C_1^m, C_2^m, C_3^m, \ldots, C_n^m)
+\]
+\[
+\text{FDCC}_q = (C_1^q, C_2^q, C_3^q, \ldots, C_n^q)
+\]
+
+The difference is computed using the \textbf{Manhattan distance}:
+
+\[
+\underbrace{
+|C_1^m - C_1^q| + |C_2^m - C_2^q| + \cdots + |C_n^m - C_n^q|
+}_{\text{Manhattan distance}}
+\]
+
+\subsection{Alternative}
+
+Another approach is to use \textbf{String Edit Distance}, which allows:
+\begin{itemize}
+    \item Insertions
+    \item Deletions
+    \item Substitutions
+\end{itemize}
+
+\section{Slope Based Representation for Contours $\psi$--$s$ Plot}
+
+$\psi$ - tangent angle\\
+$s$ - arc length
+
+Straight line segment: $\psi$--$s$ plot is a horizontal line \\
+Circular segment: $\psi$--$s$ plot is an inclined line
+
+\subsection{Slope Density Function}
+
+Histogram/distribution of Slope angles along the contours
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+
+% Circle
+\draw (0,0) circle (2);
+
+% Tangent lines at different points
+\draw (-2,0) -- (-2,1.5);     % left tangent
+\draw (2,0) -- (2,1.5);       % right tangent
+\draw (0,2) -- (1.5,2);       % top tangent
+\draw (0,-2) -- (1.5,-2);     % bottom tangent
+
+% Diagonal tangents
+% \draw (1.414,1.414) -- (2.2,2.2);
+% \draw (-1.414,1.414) -- (-2.2,2.2);
+% \draw (1.414,-1.414) -- (2.2,-2.2);
+% \draw (-1.414,-1.414) -- (-2.2,-2.2);
+
+\end{tikzpicture}
+\end{figure}
+
+Contour roation $\iff$ cyclic shift of the histogram
+
+(Scale Invariance, roational invaraince would be dependent on cyclic shift)
+
+
+\newpage
+\pagestyle{fancy}  % Re-enable fancy headers/footers
+\fancyhead[L]{\textbf{Date:} 1 April, 2026, 14:55 PM}  
+
+\section{Contour Curve Fitting}
+
+Fit an analytical (parameteric) curve to the contour of the list of edge pixels/edge fragment.
+
+Analytical Curves
+
+\begin{itemize}
+    \item Line Segment (Linear Models) - Poly Line Representation
+    \item $2^{nd} order curves (quadratic)$
+    \begin{itemize}
+        \item[-] Circle
+        \item[-] Parabolas 
+        \item[-] Ellipse 
+    \end{itemize}
+    \item Cubic Spline
+\end{itemize}
+
+\section{Curve Fitting}
+
+\begin{itemize}
+    \item Curve Fitting Method
+    \begin{itemize}
+        \item[-] Regression
+        \item[-] Optimization
+    \end{itemize}
+    \item Fitting Metric (goodness of fit)
+    \begin{itemize}
+        \item error-based
+        \item physics-based
+    \end{itemize}
+\end{itemize}
+
+Let $d_i$ be the distance of an edge pixel $i$ from the fitted curve.
+
+Maximum Absolute Error (MAE) = $\max_i|d_i|$
+Mean Squared Error (MSE) = $\frac{1}{n}\sum_{i=1}^{n}d_i^2$
+Normalized MAE = $\frac{\max_i\left|d_i\right|}{S}$ where S is wavelngth
+
+Curve Complex
+
+Error Distribution Biased Fit (Need to check later)
+
+Greed = \# Positive error $\equiv$ \# negative error
+
+Biased Fit $\iff$ One of error signs is extremely dominant
+
+\newpage
+\pagestyle{plain}  % Re-enable plain headers/footers
+\fancyhead[L]{\textbf{Date:} 2 April, 2026, 14:55 PM}  
+
+\section*{Polyline Fitting}
+\begin{itemize}
+    \item Input is essentially an ordered set
+    \item Input: Ordered list of edge pixels/fragments
+    \item Output: Sequence of vertices (end points) of the polyline segments
+\end{itemize}
+
+A, B, C, D --- vertices of the polyline  
+AB, BC, CD --- polyline segments
+
+Line segment joining points $(x_1, y_1)$ and $(x_2, y_2)$:
+
+\[
+\frac{y - y_1}{x - x_1} = \frac{y_2 - y_1}{x_2 - x_1}
+\]
+
+\[
+\underbrace{(y_1 - y_2)x}_{A} + \underbrace{(x_2 - x_1)y}_{B} + \underbrace{(x_1y_2 - x_2y_1)}_{C} = 0
+\]
+
+\[
+Ax + By + C = 0
+\]
+
+Distance from point $(u, v)$ to the line:
+
+\[
+d = \frac{|Au + Bv + C|}{\sqrt{A^2 + B^2}}
+\]
+
+The sign of $\left(Ax + By + C\right)$ indicates the direction of the error or deviation.
+
+
+\subsection{Steps}
+1. Fit a line segement tot endpoints of the contour edge list 
+
+Recursively do the following:
+
+a. Determine a point on the controur edge list that has maximum deviation from the current polyone representation 
+
+b. if the maximum deviation exceeds a threshold T
+
+then add the point to the current polyline 
+
+Halt when no more points can be added to ther current polyline representaiton
+
+\begin{tikzpicture}[scale=1.5, >=stealth, font=\small]
+
+    % --- SECTION 1: LEGEND ---
+    \node[anchor=north west, draw, fill=gray!5, rounded corners] at (0.5,-0.8) {
+        \begin{tabular}{l l}
+            \tikz[baseline=-0.5ex]\draw[dashed, black!50] (0,0) -- (0.5,0); & Contour (Edge List) \\
+            \tikz[baseline=-0.5ex]\draw[black, ultra thick] (0,0) -- (0.5,0); & Final Polyline \\
+            \tikz[baseline=-0.5ex]\draw[red, thin, <->] (0,0) -- (0.5,0); & Max Deviation $d > T$ \\
+        \end{tabular}
+    };
+
+    % --- SECTION 2: COORDINATES ---
+    \coordinate (P1) at (0,1);      % Start (x1, y1)
+    \coordinate (P2) at (6,1);      % End   (x2, y2)
+    
+    % S-shape peaks (calculated as points of max deviation)
+    \coordinate (M1) at (1.5, 2.1); % Peak 1
+    \coordinate (Mid) at (3, 1);    % Inflection point
+    \coordinate (M2) at (4.5, -0.1); % Peak 2
+
+    % --- SECTION 3: DRAW THE SPLINE ---
+    % Drawing the S-curve using the control points logic
+    \draw[dashed, black!40, thick] (P1) .. controls (1, 3) and (2, 3) .. (Mid)
+                                       .. controls (4, -1) and (5, -1) .. (P2);
+    
+    % --- SECTION 4: DYNAMIC DEVIATION VISUALS ---
+
+    % Initial segment P1 to P2
+    \draw[lightgray, dashed] (P1) -- (P2);
+
+    % Deviation d1: M1 relative to segment P1-Mid
+    % Using a perpendicular drop to the y=1 line
+    \draw[red, <->] (M1) -- (1.5, 1) node[midway, left] {$d_1$};
+    \draw (1.5, 1) ++(0, 0.1) -- ++(0.1, 0) -- ++(0, -0.1); % Right angle symbol
+    
+    % Deviation d2: M2 relative to segment Mid-P2
+    \draw[red, <->] (M2) -- (4.5, 1) node[midway, right] {$d_2$};
+    \draw (4.5, 1) ++(0, -0.1) -- ++(-0.1, 0) -- ++(0, 0.1); % Right angle symbol
+
+    % --- SECTION 5: FINAL POLYLINE ---
+    % This is the "Halt" state where the S is represented by 4 segments
+    \draw[ultra thick, black] (P1) -- (M1) -- (Mid) -- (M2) -- (P2);
+    
+    % Vertex Markers
+    \foreach \p in {P1, M1, Mid, M2, P2}
+        \filldraw[black] (\p) circle (1.5pt);
+
+    % Labels
+    \node[left] at (P1) {$(x_1, y_1)$};
+    \node[right] at (P2) {$(x_2, y_2)$};
+    \node[above] at (M1) {$(u, v)_{max1}$};
+    \node[below] at (M2) {$(u, v)_{max2}$};
+
+\end{tikzpicture}
+
+
+\section{Bottom Up Merging}
+
+Start with tthe first point on the edge list and expand the polyline segemnt 
+
+
+\section{Split and Merge Polyline Fitting}
+
+Alternate between split and merge phases
+
+After every split check if two successive polyline segments can be merged
+
+two successive polyline segement can be mergeed if doing so does not increase the maximum deviation by a certain perceantige.
+
+halt when no more splits or merge are possible 
+
+
+Fitting a parametric line to a set of point in a image space $\equiv$ determining the point of intersection of the 
+
+\end{document}
